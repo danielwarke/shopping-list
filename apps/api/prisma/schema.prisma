@@ -1,0 +1,32 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String         @id @default(cuid())
+  name          String?
+  email         String?        @unique
+  emailVerified DateTime?
+  shoppingLists ShoppingList[]
+}
+
+model ShoppingList {
+  id        String     @id @default(cuid())
+  name      String
+  listItems ListItem[]
+  users     User[]
+}
+
+model ListItem {
+  id             String       @id @default(cuid())
+  name           String
+  complete       Boolean      @default(false)
+  sortOrder      Int
+  shoppingList   ShoppingList @relation(fields: [shoppingListId], references: [id])
+  shoppingListId String
+}
