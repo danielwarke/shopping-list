@@ -3,10 +3,10 @@ import { ConfigModule } from "@nestjs/config";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { AuthModule } from "./auth/auth.module";
-import { ShoppingListModule } from "./shopping-list/shopping-list.module";
 import { UsersModule } from "./users/users.module";
 import { APP_GUARD } from "@nestjs/core";
 import { JwtAuthGuard } from "./common/guards";
+import { ShoppingListsModule } from './shopping-lists/shopping-lists.module';
 
 @Module({
   imports: [
@@ -15,8 +15,8 @@ import { JwtAuthGuard } from "./common/guards";
       cache: true,
     }),
     AuthModule,
-    ShoppingListModule,
     UsersModule,
+    ShoppingListsModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_GUARD, useClass: JwtAuthGuard }],
