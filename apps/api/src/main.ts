@@ -22,6 +22,7 @@ async function bootstrap() {
       "A shopping list API which uses websockets to present live updates",
     )
     .setVersion("1.0")
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

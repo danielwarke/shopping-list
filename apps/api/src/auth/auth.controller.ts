@@ -1,8 +1,8 @@
-import { Body, Controller, Post, Req, UseGuards } from "@nestjs/common";
-import { LocalAuthGuard } from "./guards/local-auth.guard";
+import { Body, Controller, Get, Post, Req, UseGuards } from "@nestjs/common";
+import { JwtAuthGuard, LocalAuthGuard } from "../common/guards";
 import { SignUpDto } from "./dto/sign-up.dto";
 import { AuthService } from "./auth.service";
-import { ApiBody, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiBody, ApiTags } from "@nestjs/swagger";
 import { LoginDto } from "./dto/login.dto";
 
 @ApiTags("auth")
@@ -20,5 +20,12 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   login(@Req() req) {
     return this.authService.login(req.user);
+  }
+
+  @Get("profile")
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  getProfile(@Req() req) {
+    return req.user;
   }
 }
