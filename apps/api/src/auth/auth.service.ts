@@ -16,7 +16,7 @@ export class AuthService {
 
   async signup(signUpDto: SignUpDto) {
     const { name, email } = signUpDto;
-    const existingUser = this.usersService.fineOne(email);
+    const existingUser = await this.usersService.fineOne(email);
     if (existingUser) {
       throw new ConflictException(
         `User with email address ${email} already exists`,

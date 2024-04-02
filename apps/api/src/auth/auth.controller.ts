@@ -6,8 +6,8 @@ import { ApiBearerAuth, ApiBody, ApiTags } from "@nestjs/swagger";
 import { LoginDto } from "./dto/login.dto";
 import { Public } from "src/common/decorators";
 
-@ApiTags("auth")
 @Controller()
+@ApiTags("auth")
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
