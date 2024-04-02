@@ -2,12 +2,17 @@ import { ConflictException, Injectable } from "@nestjs/common";
 import { UsersService } from "../users/users.service";
 import * as bcrypt from "bcrypt";
 import { SignUpDto } from "./dto/sign-up.dto";
+import { JwtService } from "@nestjs/jwt";
+import { User } from "@prisma/client";
 
 @Injectable()
 export class AuthService {
   private readonly saltOrRounds = 10;
 
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly jwtService: JwtService,
+  ) {}
 
   async signup(signUpDto: SignUpDto) {
     const { name, email } = signUpDto;
@@ -40,5 +45,12 @@ export class AuthService {
     }
 
     return null;
+  }
+
+  async login(user: User) {
+    const payload = { email: user.email, sub: user.id, name: user.name };
+    return {
+      access_token: this.jwtService.sign(payload),
+    };
   }
 }
