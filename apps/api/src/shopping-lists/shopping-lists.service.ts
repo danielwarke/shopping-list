@@ -3,6 +3,8 @@ import { CreateShoppingListDto } from "./dto/create-shopping-list.dto";
 import { UpdateShoppingListDto } from "./dto/update-shopping-list.dto";
 import { PrismaService } from "../database/prisma.service";
 import { ShoppingList } from "../_gen/prisma-class/shopping_list";
+import { ReorderShoppingListDto } from "./dto/reorder-shopping-list.dto";
+import { ListItem } from "src/_gen/prisma-class/list_item";
 
 @Injectable()
 export class ShoppingListsService {
@@ -55,7 +57,7 @@ export class ShoppingListsService {
     return shoppingList;
   }
 
-  update(
+  rename(
     email: string,
     id: string,
     updateShoppingListDto: UpdateShoppingListDto,
@@ -73,6 +75,33 @@ export class ShoppingListsService {
         },
       },
     });
+  }
+
+  reorder(
+    email: string,
+    id: string,
+    reorderListItemsDto: ReorderShoppingListDto,
+  ): Promise<ListItem[]> {
+    return this.prisma.$transaction(
+      reorderListItemsDto.order
+        .sort((a, b) => a.sortOrder - b.sortOrder)
+        .map((reorderItem) => {
+          return this.prisma.listItem.update({
+            data: {
+              sortOrder: reorderItem.sortOrder,
+            },
+            where: {
+              id: reorderItem.listItemId,
+              shoppingList: {
+                id: id,
+                users: {
+                  some: { email },
+                },
+              },
+            },
+          });
+        }),
+    );
   }
 
   remove(email: string, id: string): Promise<ShoppingList> {

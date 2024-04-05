@@ -12,8 +12,9 @@ import { ShoppingListsService } from "./shopping-lists.service";
 import { CreateShoppingListDto } from "./dto/create-shopping-list.dto";
 import { UpdateShoppingListDto } from "./dto/update-shopping-list.dto";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
+import { ReorderShoppingListDto } from "./dto/reorder-shopping-list.dto";
 
-@Controller("shopping-lists")
+@Controller()
 @ApiTags("shopping-lists")
 @ApiBearerAuth()
 export class ShoppingListsController {
@@ -37,16 +38,29 @@ export class ShoppingListsController {
     return this.shoppingListsService.findOne(req.user.email, id);
   }
 
-  @Patch(":id")
-  update(
+  @Patch(":id/rename")
+  rename(
     @Req() req,
     @Param("id") id: string,
     @Body() updateShoppingListDto: UpdateShoppingListDto,
   ) {
-    return this.shoppingListsService.update(
+    return this.shoppingListsService.rename(
       req.user.email,
       id,
       updateShoppingListDto,
+    );
+  }
+
+  @Patch(":id/reorder")
+  reorder(
+    @Req() req,
+    @Param("id") id: string,
+    @Body() reorderShoppingListDto: ReorderShoppingListDto,
+  ) {
+    return this.shoppingListsService.reorder(
+      req.user.email,
+      id,
+      reorderShoppingListDto,
     );
   }
 
