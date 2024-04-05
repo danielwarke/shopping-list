@@ -11,7 +11,7 @@ export class ShoppingListsService {
   constructor(private readonly prisma: PrismaService) {}
 
   create(
-    email: string,
+    userId: string,
     createShoppingListDto: CreateShoppingListDto,
   ): Promise<ShoppingList> {
     return this.prisma.shoppingList.create({
@@ -19,32 +19,33 @@ export class ShoppingListsService {
         name: createShoppingListDto.name,
         users: {
           connect: {
-            email,
+            id: userId,
           },
         },
+        createdByUserId: userId,
       },
     });
   }
 
-  async findAll(email: string): Promise<ShoppingList[]> {
+  async findAll(userId: string): Promise<ShoppingList[]> {
     return this.prisma.shoppingList.findMany({
       where: {
         users: {
           some: {
-            email,
+            id: userId,
           },
         },
       },
     });
   }
 
-  async findOne(email: string, id: string): Promise<ShoppingList> {
+  async findOne(userId: string, id: string): Promise<ShoppingList> {
     const shoppingList = await this.prisma.shoppingList.findUnique({
       where: {
         id,
         users: {
           some: {
-            email,
+            id: userId,
           },
         },
       },
@@ -58,7 +59,7 @@ export class ShoppingListsService {
   }
 
   rename(
-    email: string,
+    userId: string,
     id: string,
     updateShoppingListDto: UpdateShoppingListDto,
   ): Promise<ShoppingList> {
@@ -70,7 +71,7 @@ export class ShoppingListsService {
         id,
         users: {
           some: {
-            email,
+            id: userId,
           },
         },
       },
@@ -78,7 +79,7 @@ export class ShoppingListsService {
   }
 
   reorder(
-    email: string,
+    userId: string,
     id: string,
     reorderListItemsDto: ReorderShoppingListDto,
   ): Promise<ListItem[]> {
@@ -95,7 +96,7 @@ export class ShoppingListsService {
               shoppingList: {
                 id: id,
                 users: {
-                  some: { email },
+                  some: { id: userId },
                 },
               },
             },
@@ -104,13 +105,13 @@ export class ShoppingListsService {
     );
   }
 
-  remove(email: string, id: string): Promise<ShoppingList> {
+  remove(userId: string, id: string): Promise<ShoppingList> {
     return this.prisma.shoppingList.delete({
       where: {
         id,
         users: {
           some: {
-            email,
+            id: userId,
           },
         },
       },

@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger'
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 
 export class ListItem {
 	@ApiProperty({ type: String })
@@ -15,4 +15,10 @@ export class ListItem {
 
 	@ApiProperty({ type: String })
 	shoppingListId: string
+
+	@ApiProperty({ type: Date })
+	createdAt: Date
+
+	@ApiPropertyOptional({ type: Date })
+	updatedAt?: Date
 }

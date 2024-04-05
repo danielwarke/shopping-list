@@ -8,13 +8,13 @@ import { CreateShoppingListDto } from "../shopping-lists/dto/create-shopping-lis
 export class ListItemsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  findAll(email: string, shoppingListId: string): Promise<ListItem[]> {
+  findAll(userId: string, shoppingListId: string): Promise<ListItem[]> {
     return this.prisma.listItem.findMany({
       where: {
         shoppingList: {
           id: shoppingListId,
           users: {
-            some: { email },
+            some: { id: userId },
           },
         },
       },
@@ -25,7 +25,7 @@ export class ListItemsService {
   }
 
   async create(
-    email: string,
+    userId: string,
     shoppingListId: string,
     createShoppingListDto: CreateShoppingListDto,
   ): Promise<ListItem> {
@@ -44,7 +44,7 @@ export class ListItemsService {
       where: {
         id: shoppingListId,
         users: {
-          some: { email },
+          some: { id: userId },
         },
       },
     });
@@ -64,7 +64,7 @@ export class ListItemsService {
   }
 
   rename(
-    email: string,
+    userId: string,
     shoppingListId: string,
     id: string,
     renameListItemDto: RenameListItemDto,
@@ -79,7 +79,7 @@ export class ListItemsService {
           id: shoppingListId,
           users: {
             some: {
-              email,
+              id: userId,
             },
           },
         },
@@ -88,7 +88,7 @@ export class ListItemsService {
   }
 
   async toggleComplete(
-    email: string,
+    userId: string,
     shoppingListId: string,
     id: string,
   ): Promise<ListItem> {
@@ -101,7 +101,7 @@ export class ListItemsService {
         shoppingList: {
           id: shoppingListId,
           users: {
-            some: { email },
+            some: { id: userId },
           },
         },
       },
@@ -121,14 +121,18 @@ export class ListItemsService {
     });
   }
 
-  remove(email: string, shoppingListId: string, id: string): Promise<ListItem> {
+  remove(
+    userId: string,
+    shoppingListId: string,
+    id: string,
+  ): Promise<ListItem> {
     return this.prisma.listItem.delete({
       where: {
         id: id,
         shoppingList: {
           id: shoppingListId,
           users: {
-            some: { email },
+            some: { id: userId },
           },
         },
       },

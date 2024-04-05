@@ -23,19 +23,19 @@ export class ShoppingListsController {
   @Post()
   create(@Req() req, @Body() createShoppingListDto: CreateShoppingListDto) {
     return this.shoppingListsService.create(
-      req.user.email,
+      req.user.userId,
       createShoppingListDto,
     );
   }
 
   @Get()
   findAll(@Req() req) {
-    return this.shoppingListsService.findAll(req.user.email);
+    return this.shoppingListsService.findAll(req.user.userId);
   }
 
   @Get(":id")
   findOne(@Req() req, @Param("id") id: string) {
-    return this.shoppingListsService.findOne(req.user.email, id);
+    return this.shoppingListsService.findOne(req.user.userId, id);
   }
 
   @Patch(":id/rename")
@@ -45,7 +45,7 @@ export class ShoppingListsController {
     @Body() updateShoppingListDto: UpdateShoppingListDto,
   ) {
     return this.shoppingListsService.rename(
-      req.user.email,
+      req.user.userId,
       id,
       updateShoppingListDto,
     );
@@ -58,7 +58,7 @@ export class ShoppingListsController {
     @Body() reorderShoppingListDto: ReorderShoppingListDto,
   ) {
     return this.shoppingListsService.reorder(
-      req.user.email,
+      req.user.userId,
       id,
       reorderShoppingListDto,
     );
@@ -66,6 +66,6 @@ export class ShoppingListsController {
 
   @Delete(":id")
   remove(@Req() req, @Param("id") id: string) {
-    return this.shoppingListsService.remove(req.user.email, id);
+    return this.shoppingListsService.remove(req.user.userId, id);
   }
 }

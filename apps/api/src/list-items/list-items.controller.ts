@@ -21,7 +21,7 @@ export class ListItemsController {
 
   @Get()
   findAll(@Req() req, @Param("shoppingListId") shoppingListId: string) {
-    return this.listItemsService.findAll(req.user.email, shoppingListId);
+    return this.listItemsService.findAll(req.user.userId, shoppingListId);
   }
 
   @Post()
@@ -31,7 +31,7 @@ export class ListItemsController {
     @Body() createShoppingListDto: CreateShoppingListDto,
   ) {
     return this.listItemsService.create(
-      req.user.email,
+      req.user.userId,
       shoppingListId,
       createShoppingListDto,
     );
@@ -45,7 +45,7 @@ export class ListItemsController {
     @Body() renameListItemDto: RenameListItemDto,
   ) {
     return this.listItemsService.rename(
-      req.user.email,
+      req.user.userId,
       shoppingListId,
       id,
       renameListItemDto,
@@ -59,7 +59,7 @@ export class ListItemsController {
     @Param("id") id: string,
   ) {
     return this.listItemsService.toggleComplete(
-      req.user.email,
+      req.user.userId,
       shoppingListId,
       id,
     );
@@ -71,6 +71,6 @@ export class ListItemsController {
     @Param("shoppingListId") shoppingListId: string,
     @Param("id") id: string,
   ) {
-    return this.listItemsService.remove(req.user.email, shoppingListId, id);
+    return this.listItemsService.remove(req.user.userId, shoppingListId, id);
   }
 }

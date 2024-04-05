@@ -14,19 +14,25 @@ datasource db {
 }
 
 model User {
-  id            String         @id @default(cuid())
-  name          String
-  email         String         @unique
-  emailVerified DateTime?
-  shoppingLists ShoppingList[]
-  password      String
+  id                   String         @id @default(cuid())
+  name                 String
+  email                String         @unique
+  emailVerified        DateTime?
+  shoppingLists        ShoppingList[] @relation("UsersWithShoppingListAccess")
+  password             String
+  createdShoppingLists ShoppingList[] @relation("CreatedByUser")
+  createdAt            DateTime       @default(now())
 }
 
 model ShoppingList {
-  id        String     @id @default(cuid())
-  name      String     @default("")
-  listItems ListItem[]
-  users     User[]
+  id              String     @id @default(cuid())
+  name            String     @default("")
+  listItems       ListItem[]
+  users           User[]     @relation("UsersWithShoppingListAccess")
+  createdByUserId String
+  createdByUser   User       @relation("CreatedByUser", fields: [createdByUserId], references: [id])
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime?  @updatedAt
 }
 
 model ListItem {
@@ -36,4 +42,6 @@ model ListItem {
   sortOrder      Int
   shoppingList   ShoppingList @relation(fields: [shoppingListId], references: [id], onDelete: Cascade)
   shoppingListId String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime?    @updatedAt
 }

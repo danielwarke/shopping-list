@@ -15,4 +15,7 @@ export class User {
 
 	@ApiProperty({ type: String })
 	password: string
+
+	@ApiProperty({ type: Date })
+	createdAt: Date
 }
