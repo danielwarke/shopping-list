@@ -105,8 +105,8 @@ export class ShoppingListsService {
     );
   }
 
-  remove(userId: string, id: string): Promise<ShoppingList> {
-    return this.prisma.shoppingList.delete({
+  async remove(userId: string, id: string): Promise<ShoppingList> {
+    const shoppingList = await this.prisma.shoppingList.findUniqueOrThrow({
       where: {
         id,
         users: {
@@ -114,6 +114,29 @@ export class ShoppingListsService {
             id: userId,
           },
         },
+      },
+    });
+
+    // if the current user created the shopping list, delete is for all users
+    if (shoppingList.createdByUserId === userId) {
+      return this.prisma.shoppingList.delete({
+        where: {
+          id,
+        },
+      });
+    }
+
+    // if current user did not delete shopping list, just remove their access
+    return this.prisma.shoppingList.update({
+      data: {
+        users: {
+          disconnect: {
+            id: userId,
+          },
+        },
+      },
+      where: {
+        id,
       },
     });
   }
