@@ -19,8 +19,8 @@ export const LoginForm: FC = () => {
   const loginMutation = useMutation({
     mutationFn: apiClient.auth.authControllerLogin,
     onSuccess: (data) => {
-      const token = (data.data as any).access_token;
-      apiClient.setSecurityData({ token });
+      const token = (data as any).access_token;
+      localStorage.setItem("auth_token", token);
       router.push("/shopping-lists");
     },
   });
