@@ -3,7 +3,7 @@ import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
-import { SignUpForm } from "@/components/SignUpForm";
+import { LoginForm } from "@/components/LoginForm";
 
 export default function Home() {
   return (
@@ -15,7 +15,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <SignUpForm />
+        <LoginForm />
       </main>
     </>
   );
