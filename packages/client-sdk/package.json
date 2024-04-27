@@ -1,0 +1,13 @@
+{
+  "name": "@app/client-sdk",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.ts",
+  "types": "index.ts",
+  "scripts": {
+    "lint": "tsc"
+  },
+  "dependencies": {
+    "axios": "^1.6.8"
+  }
+}
