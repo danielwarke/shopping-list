@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "api-client:generate": "npx swagger-typescript-api -p http://localhost:8000/api-json --axios --unwrap-response-data -o src/api/client-sdk"
   },
   "dependencies": {
     "@emotion/react": "^11.11.4",
