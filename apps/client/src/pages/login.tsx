@@ -3,7 +3,7 @@ import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
 import TextField from "@mui/material/TextField";
 import { useMutation } from "@tanstack/react-query";
-import { FC, useState } from "react";
+import { useState } from "react";
 import Alert from "@mui/material/Alert";
 import { getErrorMessages } from "@/api/utils";
 import { apiClient } from "@/api/api-client";
@@ -81,7 +81,7 @@ export default function Login() {
           Login
         </LoadingButton>
         <Button onClick={() => router.push("/sign-up")}>
-          Don't have an account yet?
+          Don&apos;t have an account yet?
         </Button>
       </Box>
     </Container>
