@@ -10,35 +10,36 @@ import { apiClient } from "@/api/api-client";
 import { useRouter } from "next/router";
 import LoadingButton from "@mui/lab/LoadingButton";
 
-export const SignUpForm: FC = () => {
+export default function Login() {
   const router = useRouter();
 
-  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [success, setSuccess] = useState(false);
 
-  const signUpMutation = useMutation({
-    mutationFn: apiClient.auth.authControllerSignUp,
-    onSuccess: () => setSuccess(true),
+  const loginMutation = useMutation({
+    mutationFn: apiClient.auth.authControllerLogin,
+    onSuccess: (data) => {
+      const token = (data as any).access_token;
+      localStorage.setItem("auth_token", token);
+      router.push("/shopping-lists");
+    },
   });
 
   function handleSubmit() {
-    signUpMutation.mutate({
-      name,
+    loginMutation.mutate({
       email,
       password,
     });
   }
 
-  const errorMessages = getErrorMessages(signUpMutation.error);
+  const errorMessages = getErrorMessages(loginMutation.error);
 
   return (
     <Container maxWidth="sm">
       <Box marginTop="3vh" marginBottom="1em" sx={{ typography: "h5" }}>
-        Sign up to start creating your own shopping list
+        Login to view your shopping lists
       </Box>
-      {signUpMutation.isError && (
+      {loginMutation.isError && (
         <>
           {errorMessages.map((message) => (
             <Alert key={message} severity="error">
@@ -46,13 +47,6 @@ export const SignUpForm: FC = () => {
             </Alert>
           ))}
         </>
-      )}
-      {success && (
-        <Alert severity="success">
-          You have signed up successfully! <br />
-          Please check your email for a link to verify your account. You can
-          safely close this tab.
-        </Alert>
       )}
       <Box
         display="flex"
@@ -63,48 +57,33 @@ export const SignUpForm: FC = () => {
         marginTop="3vh"
       >
         <TextField
-          label="Name"
-          fullWidth
-          placeholder="John Doe"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          disabled={success}
-        />
-        <TextField
           label="Email"
           fullWidth
           placeholder="jdoe@email.com"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          disabled={success}
         />
         <TextField
           label="Password"
           fullWidth
-          placeholder="Make it a good one"
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          disabled={success}
         />
-        {!success && (
-          <>
-            <LoadingButton
-              variant="contained"
-              size="large"
-              onClick={handleSubmit}
-              loading={signUpMutation.isPending}
-              disabled={!name || !email || !password}
-            >
-              Sign Up
-            </LoadingButton>
-            <Button onClick={() => router.push("/")}>
-              Already have an account?
-            </Button>
-          </>
-        )}
+        <LoadingButton
+          variant="contained"
+          size="large"
+          onClick={handleSubmit}
+          loading={loginMutation.isPending}
+          disabled={!email || !password}
+        >
+          Login
+        </LoadingButton>
+        <Button onClick={() => router.push("/sign-up")}>
+          Don't have an account yet?
+        </Button>
       </Box>
     </Container>
   );
-};
+}
