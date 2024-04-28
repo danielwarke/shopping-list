@@ -5,6 +5,7 @@ import { PrismaService } from "../database/prisma.service";
 import { ShoppingList } from "../_gen/prisma-class/shopping_list";
 import { ReorderShoppingListDto } from "./dto/reorder-shopping-list.dto";
 import { ListItem } from "src/_gen/prisma-class/list_item";
+import { ShoppingListWithPreview } from "./dto/shopping-list-with-preview.dto";
 
 @Injectable()
 export class ShoppingListsService {
@@ -27,8 +28,21 @@ export class ShoppingListsService {
     });
   }
 
-  async findAll(userId: string): Promise<ShoppingList[]> {
-    return this.prisma.shoppingList.findMany({
+  async findAll(userId: string): Promise<ShoppingListWithPreview[]> {
+    const shoppingLists = await this.prisma.shoppingList.findMany({
+      include: {
+        listItems: {
+          take: 3,
+          orderBy: {
+            sortOrder: "asc",
+          },
+        },
+        _count: {
+          select: {
+            listItems: true,
+          },
+        },
+      },
       where: {
         users: {
           some: {
@@ -36,6 +50,23 @@ export class ShoppingListsService {
           },
         },
       },
+      orderBy: {
+        updatedAt: "desc",
+      },
+    });
+
+    return shoppingLists.map((shoppingList) => {
+      const {
+        listItems: listItemsPreview,
+        _count: { listItems: itemCount },
+        ...rest
+      } = shoppingList;
+
+      return {
+        ...rest,
+        listItemsPreview,
+        itemCount,
+      };
     });
   }
 
