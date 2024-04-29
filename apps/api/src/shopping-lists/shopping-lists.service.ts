@@ -39,7 +39,11 @@ export class ShoppingListsService {
         },
         _count: {
           select: {
-            listItems: true,
+            listItems: {
+              where: {
+                complete: false,
+              },
+            },
           },
         },
       },
@@ -58,14 +62,14 @@ export class ShoppingListsService {
     return shoppingLists.map((shoppingList) => {
       const {
         listItems: listItemsPreview,
-        _count: { listItems: itemCount },
+        _count: { listItems: incompleteItemCount },
         ...rest
       } = shoppingList;
 
       return {
         ...rest,
         listItemsPreview,
-        itemCount,
+        incompleteItemCount,
       };
     });
   }

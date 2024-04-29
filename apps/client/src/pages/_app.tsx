@@ -18,6 +18,11 @@ export default function App({ Component, pageProps }: AppProps) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
+        <style jsx global>{`
+          body {
+            margin: 0;
+          }
+        `}</style>
         <QueryClientProvider client={queryClient}>
           <Component {...pageProps} />
         </QueryClientProvider>

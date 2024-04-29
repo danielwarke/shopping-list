@@ -34,6 +34,30 @@ export interface ShoppingList {
   updatedAt?: string;
 }
 
+export interface ListItem {
+  id: string;
+  name: string;
+  complete: boolean;
+  sortOrder: number;
+  shoppingListId: string;
+  /** @format date-time */
+  createdAt: string;
+  /** @format date-time */
+  updatedAt?: string;
+}
+
+export interface ShoppingListWithPreview {
+  id: string;
+  name: string;
+  createdByUserId: string;
+  /** @format date-time */
+  createdAt: string;
+  /** @format date-time */
+  updatedAt?: string;
+  listItemsPreview: ListItem[];
+  incompleteItemCount: number;
+}
+
 export interface UpdateShoppingListDto {
   name?: string;
 }
@@ -45,18 +69,6 @@ export interface ReorderItem {
 
 export interface ReorderShoppingListDto {
   order: ReorderItem[];
-}
-
-export interface ListItem {
-  id: string;
-  name: string;
-  complete: boolean;
-  sortOrder: number;
-  shoppingListId: string;
-  /** @format date-time */
-  createdAt: string;
-  /** @format date-time */
-  updatedAt?: string;
 }
 
 export interface RenameListItemDto {
@@ -297,7 +309,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @secure
      */
     shoppingListsControllerFindAll: (params: RequestParams = {}) =>
-      this.request<ShoppingList[], any>({
+      this.request<ShoppingListWithPreview[], any>({
         path: `/shopping-lists`,
         method: "GET",
         secure: true,
