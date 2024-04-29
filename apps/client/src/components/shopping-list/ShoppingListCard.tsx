@@ -18,7 +18,7 @@ export const ShoppingListCard: FC<ShoppingListCardProps> = ({
   shoppingList,
 }) => {
   return (
-    <Card variant="outlined">
+    <Card variant="outlined" sx={{ marginBottom: "1em" }}>
       <CardHeader
         title={shoppingList.name}
         action={<ShoppingListActionsMenu shoppingListId={shoppingList.id} />}
