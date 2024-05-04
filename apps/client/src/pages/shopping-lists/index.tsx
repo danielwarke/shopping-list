@@ -25,7 +25,7 @@ export default function ShoppingLists() {
 
   function handleCreateButtonClicked() {
     createShoppingListMutation.mutate({
-      name: `List #${shoppingLists.length + 1}`,
+      name: "New Shopping List",
     });
   }
 

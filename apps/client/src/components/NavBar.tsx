@@ -4,9 +4,10 @@ import { useRouter } from "next/router";
 
 interface NavBarProps {
   title: string;
+  startComponent?: React.ReactNode;
 }
 
-export const NavBar: FC<NavBarProps> = ({ title }) => {
+export const NavBar: FC<NavBarProps> = ({ title, startComponent }) => {
   const router = useRouter();
 
   function handleLogout() {
@@ -18,6 +19,7 @@ export const NavBar: FC<NavBarProps> = ({ title }) => {
     <Box sx={{ flexGrow: 1 }} marginBottom="2em">
       <AppBar position="static">
         <Toolbar>
+          {startComponent}
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             {title}
           </Typography>
