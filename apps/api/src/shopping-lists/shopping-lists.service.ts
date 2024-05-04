@@ -33,9 +33,18 @@ export class ShoppingListsService {
       include: {
         listItems: {
           take: 3,
-          orderBy: {
-            sortOrder: "asc",
+          where: {
+            complete: false,
+            name: {
+              not: "",
+            },
           },
+          orderBy: [
+            {
+              sortOrder: "asc",
+            },
+            { createdAt: "asc" },
+          ],
         },
         _count: {
           select: {

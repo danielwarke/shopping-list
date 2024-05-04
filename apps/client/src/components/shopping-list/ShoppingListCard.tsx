@@ -1,5 +1,6 @@
 import { FC } from "react";
 import {
+  Box,
   Button,
   Card,
   CardActions,
@@ -31,8 +32,20 @@ export const ShoppingListCard: FC<ShoppingListCardProps> = ({
         action={<ShoppingListActionsMenu shoppingListId={shoppingList.id} />}
       ></CardHeader>
       <CardContent>
-        <Typography variant="subtitle1" color="text.secondary">
-          {`Items remaining: ${shoppingList.incompleteItemCount}`}
+        {shoppingList.listItemsPreview.length > 0 && (
+          <Box marginBottom="1em">
+            {shoppingList.listItemsPreview.map((listItem) => (
+              <Typography key={listItem.id} variant="subtitle1">
+                {listItem.name}
+              </Typography>
+            ))}
+            ...
+          </Box>
+        )}
+        <Typography variant="subtitle2" color="text.secondary">
+          {shoppingList.incompleteItemCount === 0
+            ? "All items completed"
+            : `${shoppingList.incompleteItemCount} incomplete item${shoppingList.incompleteItemCount !== 1 ? "s" : ""}`}
         </Typography>
       </CardContent>
       <CardActions>
