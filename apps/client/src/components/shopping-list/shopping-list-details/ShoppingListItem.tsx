@@ -1,9 +1,9 @@
-import { ChangeEvent, FC, KeyboardEvent } from "react";
+import { ChangeEvent, FC, KeyboardEvent, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ListItem, RenameListItemDto } from "@/api/client-sdk/Api";
 import { apiClient } from "@/api/api-client";
 import { useDebounceState } from "@/hooks/use-debounce-state";
-import { IconButton, Input, TextField } from "@mui/material";
+import { Checkbox, IconButton, Input } from "@mui/material";
 import { Clear } from "@mui/icons-material";
 
 interface ShoppingListItemProps {
@@ -18,13 +18,22 @@ export const ShoppingListItem: FC<ShoppingListItemProps> = ({
   onEnterKey,
 }) => {
   const queryClient = useQueryClient();
+  const listItemId = listItem.id;
 
   const renameListItemMutation = useMutation({
     mutationFn: (data: RenameListItemDto) =>
       apiClient.shoppingLists.listItemsControllerRename(
         shoppingListId,
-        listItem.id,
+        listItemId,
         data,
+      ),
+  });
+
+  const toggleCompleteMutation = useMutation({
+    mutationFn: () =>
+      apiClient.shoppingLists.listItemsControllerToggleComplete(
+        shoppingListId,
+        listItemId,
       ),
   });
 
@@ -32,7 +41,7 @@ export const ShoppingListItem: FC<ShoppingListItemProps> = ({
     mutationFn: () =>
       apiClient.shoppingLists.listItemsControllerRemove(
         shoppingListId,
-        listItem.id,
+        listItemId,
       ),
     onSuccess: () =>
       queryClient.invalidateQueries({
@@ -43,9 +52,15 @@ export const ShoppingListItem: FC<ShoppingListItemProps> = ({
   const [name, setName] = useDebounceState(listItem.name, (newName) => {
     renameListItemMutation.mutate({ name: newName });
   });
+  const [complete, setComplete] = useState(listItem.complete);
 
   function handleNameChange(e: ChangeEvent<HTMLInputElement>) {
     setName(e.target.value);
+  }
+
+  function handleCompleteChange(e: ChangeEvent<HTMLInputElement>) {
+    setComplete(e.target.checked);
+    toggleCompleteMutation.mutate();
   }
 
   function handleKeyDown(e: KeyboardEvent) {
@@ -63,9 +78,16 @@ export const ShoppingListItem: FC<ShoppingListItemProps> = ({
       value={name}
       onChange={handleNameChange}
       onKeyDown={handleKeyDown}
+      disabled={complete}
       placeholder="List item"
       fullWidth
-      sx={{ marginTop: "1em" }}
+      sx={{
+        marginTop: "1em",
+        ...(complete && { textDecoration: "line-through" }),
+      }}
+      startAdornment={
+        <Checkbox checked={complete} onChange={handleCompleteChange} />
+      }
       endAdornment={
         <IconButton onClick={() => deleteListItemMutation.mutate()}>
           <Clear />
