@@ -24,8 +24,20 @@ export default function ShoppingLists() {
   });
 
   function handleCreateButtonClicked() {
+    let newName = "New Shopping List";
+    const newShoppingLists = shoppingLists.filter(
+      (shoppingList) =>
+        shoppingList.name === newName ||
+        (shoppingList.name.startsWith(newName) &&
+          shoppingList.name.endsWith(")")),
+    );
+
+    if (newShoppingLists.length > 0) {
+      newName += ` (${newShoppingLists.length + 1})`;
+    }
+
     createShoppingListMutation.mutate({
-      name: "New Shopping List",
+      name: newName,
     });
   }
 
