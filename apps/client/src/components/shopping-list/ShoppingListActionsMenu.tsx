@@ -1,7 +1,5 @@
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import IconButton from "@mui/material/IconButton";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
+import { MoreVert } from "@mui/icons-material";
+import { IconButton, Menu, MenuItem } from "@mui/material";
 import { FC, useState } from "react";
 import { DeleteShoppingListDialog } from "@/components/shopping-list/DeleteShoppingListDialog";
 
@@ -31,7 +29,7 @@ export const ShoppingListActionsMenu: FC<ShoppingListActionMenuProps> = ({
   return (
     <div>
       <IconButton aria-label="settings" onClick={handleMenuClick}>
-        <MoreVertIcon />
+        <MoreVert />
       </IconButton>
       <Menu
         id="shopping-list-actions-menu"

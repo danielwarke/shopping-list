@@ -1,8 +1,7 @@
 import { FC } from "react";
 import {
-  Button,
   Card,
-  CardActions,
+  CardActionArea,
   CardContent,
   CardHeader,
   Typography,
@@ -19,18 +18,17 @@ export const ShoppingListCard: FC<ShoppingListCardProps> = ({
 }) => {
   return (
     <Card variant="outlined" sx={{ marginBottom: "1em" }}>
-      <CardHeader
-        title={shoppingList.name}
-        action={<ShoppingListActionsMenu shoppingListId={shoppingList.id} />}
-      ></CardHeader>
-      <CardContent>
-        <Typography variant="subtitle1" color="text.secondary">
-          {`Items remaining: ${shoppingList.incompleteItemCount}`}
-        </Typography>
-      </CardContent>
-      <CardActions>
-        <Button size="small">View Shopping List</Button>
-      </CardActions>
+      <CardActionArea>
+        <CardHeader
+          title={shoppingList.name}
+          action={<ShoppingListActionsMenu shoppingListId={shoppingList.id} />}
+        ></CardHeader>
+        <CardContent>
+          <Typography variant="subtitle1" color="text.secondary">
+            {`Items remaining: ${shoppingList.incompleteItemCount}`}
+          </Typography>
+        </CardContent>
+      </CardActionArea>
     </Card>
   );
 };

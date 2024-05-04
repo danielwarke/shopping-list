@@ -1,9 +1,5 @@
 import { FC } from "react";
-import Box from "@mui/material/Box";
-import AppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
+import { AppBar, Box, Button, Toolbar, Typography } from "@mui/material";
 import { useRouter } from "next/router";
 
 interface NavBarProps {

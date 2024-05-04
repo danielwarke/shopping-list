@@ -1,13 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/api/api-client";
-import Container from "@mui/material/Container";
-import Fab from "@mui/material/Fab";
-import AddIcon from "@mui/icons-material/Add";
+import { Box, Container, Fab, Tooltip } from "@mui/material";
+import { Add } from "@mui/icons-material";
 import { ShoppingListCard } from "@/components/shopping-list/ShoppingListCard";
 import { useAuth } from "@/hooks/use-auth";
 import { NavBar } from "@/components/NavBar";
-import Box from "@mui/material/Box";
-import Tooltip from "@mui/material/Tooltip";
 
 export default function ShoppingLists() {
   const queryClient = useQueryClient();
@@ -50,7 +47,7 @@ export default function ShoppingLists() {
             sx={{ position: "fixed", bottom: "2em", right: "2em" }}
             onClick={handleCreateButtonClicked}
           >
-            <AddIcon />
+            <Add />
           </Fab>
         </Tooltip>
       </Container>

@@ -3,12 +3,8 @@ import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { apiClient } from "@/api/api-client";
 import { getErrorMessages } from "@/api/utils";
-import Container from "@mui/material/Container";
-import Box from "@mui/material/Box";
-import Alert from "@mui/material/Alert";
-import TextField from "@mui/material/TextField";
-import LoadingButton from "@mui/lab/LoadingButton";
-import Button from "@mui/material/Button";
+import { Alert, Box, Button, Container, TextField } from "@mui/material";
+import { LoadingButton } from "@mui/lab";
 
 export default function SignUp() {
   const router = useRouter();
