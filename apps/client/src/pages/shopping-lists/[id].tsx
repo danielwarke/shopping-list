@@ -15,11 +15,13 @@ import { ShoppingListName } from "@/components/shopping-list/shopping-list-detai
 import { NavBar } from "@/components/NavBar";
 import { CreateListItemDto } from "@/api/client-sdk/Api";
 import { ShoppingListItem } from "@/components/shopping-list/shopping-list-details/ShoppingListItem";
+import { useState } from "react";
 
 export default function ShoppingListDetails() {
   const router = useRouter();
   const shoppingListId = router.query.id as string;
   const queryClient = useQueryClient();
+  const [autoFocusListItemId, setAutoFocusListItemId] = useState("");
 
   const {
     data: shoppingList,
@@ -40,15 +42,18 @@ export default function ShoppingListDetails() {
   const createListItemMutation = useMutation({
     mutationFn: (data: CreateListItemDto) =>
       apiClient.shoppingLists.listItemsControllerCreate(shoppingListId, data),
-    onSuccess: () => {
+    onSuccess: (createdListItem) => {
       queryClient.invalidateQueries({
         queryKey: ["shopping-lists", shoppingListId, "items"],
       });
+      setAutoFocusListItemId(createdListItem.id);
     },
   });
 
-  function handleCreateListItem() {
-    createListItemMutation.mutate({});
+  function handleCreateListItem(sortOrder?: number) {
+    createListItemMutation.mutate({
+      sortOrder,
+    });
   }
 
   return (
@@ -92,6 +97,7 @@ export default function ShoppingListDetails() {
                 shoppingListId={shoppingListId}
                 listItem={listItem}
                 onEnterKey={handleCreateListItem}
+                autoFocus={listItem.id === autoFocusListItemId}
               />
             ))}
           </Box>
@@ -100,7 +106,7 @@ export default function ShoppingListDetails() {
           <Fab
             color="primary"
             sx={{ position: "fixed", bottom: "2em", right: "2em" }}
-            onClick={handleCreateListItem}
+            onClick={() => handleCreateListItem()}
           >
             <Add />
           </Fab>

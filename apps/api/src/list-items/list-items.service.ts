@@ -18,9 +18,12 @@ export class ListItemsService {
           },
         },
       },
-      orderBy: {
-        sortOrder: "asc",
-      },
+      orderBy: [
+        {
+          sortOrder: "asc",
+        },
+        { createdAt: "asc" },
+      ],
     });
   }
 
@@ -49,10 +52,13 @@ export class ListItemsService {
       },
     });
 
-    const sortOrder =
-      shoppingList.listItems.length > 0
-        ? shoppingList.listItems[0].sortOrder + 1
-        : 1;
+    let sortOrder = createListItemDto.sortOrder;
+    if (!sortOrder) {
+      sortOrder =
+        shoppingList.listItems.length > 0
+          ? shoppingList.listItems[0].sortOrder + 1
+          : 1;
+    }
 
     return this.prisma.listItem.create({
       data: {

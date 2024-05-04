@@ -73,6 +73,7 @@ export interface ReorderShoppingListDto {
 
 export interface CreateListItemDto {
   name?: string;
+  sortOrder?: number;
 }
 
 export interface RenameListItemDto {

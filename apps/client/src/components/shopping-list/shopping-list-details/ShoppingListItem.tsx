@@ -9,13 +9,15 @@ import { Clear } from "@mui/icons-material";
 interface ShoppingListItemProps {
   shoppingListId: string;
   listItem: ListItem;
-  onEnterKey: () => void;
+  onEnterKey: (sortOrder: number) => void;
+  autoFocus: boolean;
 }
 
 export const ShoppingListItem: FC<ShoppingListItemProps> = ({
   shoppingListId,
   listItem,
   onEnterKey,
+  autoFocus,
 }) => {
   const queryClient = useQueryClient();
   const listItemId = listItem.id;
@@ -65,7 +67,7 @@ export const ShoppingListItem: FC<ShoppingListItemProps> = ({
 
   function handleKeyDown(e: KeyboardEvent) {
     if (e.code === "Enter") {
-      onEnterKey();
+      onEnterKey(listItem.sortOrder);
     }
 
     if (e.code === "Backspace" && name === "") {
@@ -79,6 +81,7 @@ export const ShoppingListItem: FC<ShoppingListItemProps> = ({
       onChange={handleNameChange}
       onKeyDown={handleKeyDown}
       disabled={complete}
+      autoFocus={autoFocus}
       placeholder="List item"
       fullWidth
       sx={{
