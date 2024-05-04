@@ -16,8 +16,8 @@ export const NavBar: FC<NavBarProps> = ({ title, startComponent }) => {
   }
 
   return (
-    <Box sx={{ flexGrow: 1 }} marginBottom="2em">
-      <AppBar position="static">
+    <>
+      <AppBar position="static" sx={{ position: "fixed", top: 0 }}>
         <Toolbar>
           {startComponent}
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
@@ -28,6 +28,7 @@ export const NavBar: FC<NavBarProps> = ({ title, startComponent }) => {
           </Button>
         </Toolbar>
       </AppBar>
-    </Box>
+      <Box marginBottom="4em">&nbsp;</Box>
+    </>
   );
 };
