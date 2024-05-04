@@ -71,6 +71,10 @@ export interface ReorderShoppingListDto {
   order: ReorderItem[];
 }
 
+export interface CreateListItemDto {
+  name?: string;
+}
+
 export interface RenameListItemDto {
   name: string;
 }
@@ -414,7 +418,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request POST:/shopping-lists/{shoppingListId}/items
      * @secure
      */
-    listItemsControllerCreate: (shoppingListId: string, data: CreateShoppingListDto, params: RequestParams = {}) =>
+    listItemsControllerCreate: (shoppingListId: string, data: CreateListItemDto, params: RequestParams = {}) =>
       this.request<ListItem, any>({
         path: `/shopping-lists/${shoppingListId}/items`,
         method: "POST",

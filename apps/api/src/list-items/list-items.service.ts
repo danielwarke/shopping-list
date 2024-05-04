@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "../database/prisma.service";
 import { ListItem } from "../_gen/prisma-class/list_item";
 import { RenameListItemDto } from "./dto/rename-list-item.dto";
-import { CreateShoppingListDto } from "../shopping-lists/dto/create-shopping-list.dto";
+import { CreateListItemDto } from "./dto/create-list-item.dto";
 
 @Injectable()
 export class ListItemsService {
@@ -27,7 +27,7 @@ export class ListItemsService {
   async create(
     userId: string,
     shoppingListId: string,
-    createShoppingListDto: CreateShoppingListDto,
+    createListItemDto: CreateListItemDto,
   ): Promise<ListItem> {
     const shoppingList = await this.prisma.shoppingList.findUniqueOrThrow({
       select: {
@@ -57,7 +57,7 @@ export class ListItemsService {
     return this.prisma.listItem.create({
       data: {
         shoppingListId,
-        name: createShoppingListDto.name,
+        name: createListItemDto.name,
         sortOrder,
       },
     });

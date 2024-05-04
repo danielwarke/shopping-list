@@ -11,7 +11,7 @@ import {
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { ListItemsService } from "./list-items.service";
 import { RenameListItemDto } from "./dto/rename-list-item.dto";
-import { CreateShoppingListDto } from "../shopping-lists/dto/create-shopping-list.dto";
+import { CreateListItemDto } from "./dto/create-list-item.dto";
 
 @Controller()
 @ApiTags("items")
@@ -28,12 +28,12 @@ export class ListItemsController {
   create(
     @Req() req,
     @Param("shoppingListId") shoppingListId: string,
-    @Body() createShoppingListDto: CreateShoppingListDto,
+    @Body() createListItemDto: CreateListItemDto,
   ) {
     return this.listItemsService.create(
       req.user.userId,
       shoppingListId,
-      createShoppingListDto,
+      createListItemDto,
     );
   }
 

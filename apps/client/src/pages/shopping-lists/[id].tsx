@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/router";
 import { apiClient } from "@/api/api-client";
 import {
@@ -6,25 +6,50 @@ import {
   Box,
   CircularProgress,
   Container,
+  Fab,
   IconButton,
+  Tooltip,
 } from "@mui/material";
-import { ArrowBack } from "@mui/icons-material";
+import { Add, ArrowBack } from "@mui/icons-material";
 import { ShoppingListName } from "@/components/shopping-list/shopping-list-details/ShoppingListName";
 import { NavBar } from "@/components/NavBar";
+import { CreateListItemDto } from "@/api/client-sdk/Api";
+import { ShoppingListItem } from "@/components/shopping-list/shopping-list-details/ShoppingListItem";
 
 export default function ShoppingListDetails() {
   const router = useRouter();
   const shoppingListId = router.query.id as string;
+  const queryClient = useQueryClient();
 
   const {
     data: shoppingList,
-    isError,
-    isLoading,
+    isError: shoppingListIsError,
+    isLoading: shoppingListIsLoading,
   } = useQuery({
     queryKey: ["shopping-lists", shoppingListId],
     queryFn: () =>
       apiClient.shoppingLists.shoppingListsControllerFindOne(shoppingListId),
   });
+
+  const { data: listItems = [], isLoading: listItemsIsLoading } = useQuery({
+    queryKey: ["shopping-lists", shoppingListId, "items"],
+    queryFn: () =>
+      apiClient.shoppingLists.listItemsControllerFindAll(shoppingListId),
+  });
+
+  const createListItemMutation = useMutation({
+    mutationFn: (data: CreateListItemDto) =>
+      apiClient.shoppingLists.listItemsControllerCreate(shoppingListId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["shopping-lists", shoppingListId, "items"],
+      });
+    },
+  });
+
+  function handleCreateListItem() {
+    createListItemMutation.mutate({});
+  }
 
   return (
     <>
@@ -42,24 +67,44 @@ export default function ShoppingListDetails() {
         }
       />
       <Container maxWidth="sm">
-        {isError && (
+        {shoppingListIsError && (
           <Alert severity="error">Unable to load shopping list.</Alert>
         )}
         <Box
           display="flex"
-          alignItems="center"
           justifyContent="center"
           flexDirection="column"
           marginTop="4vh"
         >
-          {isLoading && <CircularProgress />}
+          {(shoppingListIsLoading || listItemsIsLoading) && (
+            <CircularProgress />
+          )}
           {shoppingList && (
             <ShoppingListName
               id={shoppingListId}
               currentName={shoppingList.name}
             />
           )}
+          <Box marginTop="2vh">
+            {listItems.map((listItem) => (
+              <ShoppingListItem
+                key={listItem.id}
+                shoppingListId={shoppingListId}
+                listItem={listItem}
+                onEnterKey={handleCreateListItem}
+              />
+            ))}
+          </Box>
         </Box>
+        <Tooltip title="New List Item">
+          <Fab
+            color="primary"
+            sx={{ position: "fixed", bottom: "2em", right: "2em" }}
+            onClick={handleCreateListItem}
+          >
+            <Add />
+          </Fab>
+        </Tooltip>
       </Container>
     </>
   );
