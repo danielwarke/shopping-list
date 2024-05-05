@@ -20,6 +20,10 @@ export interface LoginDto {
   password: string;
 }
 
+export interface VerifyEmailDto {
+  token: string;
+}
+
 export interface ForgotPasswordDto {
   email: string;
 }
@@ -271,6 +275,22 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     authControllerLogin: (data: LoginDto, params: RequestParams = {}) =>
       this.request<void, any>({
         path: `/auth/login`,
+        method: "POST",
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags auth
+     * @name AuthControllerVerifyEmail
+     * @request POST:/auth/verify-email
+     */
+    authControllerVerifyEmail: (data: VerifyEmailDto, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/auth/verify-email`,
         method: "POST",
         body: data,
         type: ContentType.Json,

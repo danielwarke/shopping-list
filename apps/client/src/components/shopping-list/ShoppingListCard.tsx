@@ -34,12 +34,14 @@ export const ShoppingListCard: FC<ShoppingListCardProps> = ({
       <CardContent>
         {shoppingList.listItemsPreview.length > 0 && (
           <Box marginBottom="1em">
-            {shoppingList.listItemsPreview.map((listItem) => (
+            {shoppingList.listItemsPreview.map((listItem, index) => (
               <Typography key={listItem.id} variant="subtitle1">
                 {listItem.name}
+                {index === shoppingList.listItemsPreview.length - 1
+                  ? "..."
+                  : ""}
               </Typography>
             ))}
-            ...
           </Box>
         )}
         <Typography variant="subtitle2" color="text.secondary">

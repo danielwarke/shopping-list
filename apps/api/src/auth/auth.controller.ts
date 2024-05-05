@@ -1,12 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Post,
-  Req,
-  UseGuards,
-} from "@nestjs/common";
+import { Body, Controller, Get, Post, Req, UseGuards } from "@nestjs/common";
 import { LocalAuthGuard } from "../common/guards";
 import { SignUpDto } from "./dto/sign-up.dto";
 import { AuthService } from "./auth.service";
@@ -15,6 +7,7 @@ import { LoginDto } from "./dto/login.dto";
 import { Public } from "src/common/decorators";
 import { ForgotPasswordDto } from "./dto/forgot-password.dto";
 import { ResetPasswordDto } from "./dto/reset-password.dto";
+import { VerifyEmailDto } from "./dto/verify-email.dto";
 
 @Controller()
 @ApiTags("auth")
@@ -33,6 +26,12 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   login(@Req() req) {
     return this.authService.login(req.user);
+  }
+
+  @Post("verify-email")
+  @Public()
+  verifyEmail(@Body() verifyEmailDto: VerifyEmailDto) {
+    return this.authService.verifyEmail(verifyEmailDto);
   }
 
   @Get("profile")

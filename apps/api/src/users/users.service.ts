@@ -39,6 +39,16 @@ export class UsersService {
     });
   }
 
+  async verifyEmail(email: string) {
+    return this.prisma.user.update({
+      data: {
+        emailVerified: new Date(),
+        token: null,
+      },
+      where: { email },
+    });
+  }
+
   async resetPassword(email: string, password: string) {
     return this.prisma.user.update({
       data: {
