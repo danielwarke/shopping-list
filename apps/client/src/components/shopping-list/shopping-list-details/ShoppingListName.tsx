@@ -19,7 +19,7 @@ export const ShoppingListName: FC<ShoppingListNameProps> = ({
   const renameShoppingListMutation = useMutation({
     mutationFn: (data: UpdateShoppingListDto) =>
       apiClient.shoppingLists.shoppingListsControllerRename(id, data),
-    onSuccess: () => {
+    onError: () => {
       queryClient.invalidateQueries({ queryKey: ["shopping-lists", id] });
     },
   });

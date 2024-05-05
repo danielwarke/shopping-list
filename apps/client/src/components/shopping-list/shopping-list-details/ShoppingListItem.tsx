@@ -22,6 +22,10 @@ export const ShoppingListItem: FC<ShoppingListItemProps> = ({
 }) => {
   const queryClient = useQueryClient();
   const listItemId = listItem.id;
+  const invalidateCache = () =>
+    queryClient.invalidateQueries({
+      queryKey: ["shopping-lists", shoppingListId, "items"],
+    });
 
   const renameListItemMutation = useMutation({
     mutationFn: (data: RenameListItemDto) =>
@@ -30,6 +34,7 @@ export const ShoppingListItem: FC<ShoppingListItemProps> = ({
         listItemId,
         data,
       ),
+    onError: invalidateCache,
   });
 
   const toggleCompleteMutation = useMutation({
@@ -38,6 +43,7 @@ export const ShoppingListItem: FC<ShoppingListItemProps> = ({
         shoppingListId,
         listItemId,
       ),
+    onError: invalidateCache,
   });
 
   const deleteListItemMutation = useMutation({
@@ -46,10 +52,8 @@ export const ShoppingListItem: FC<ShoppingListItemProps> = ({
         shoppingListId,
         listItemId,
       ),
-    onSuccess: () =>
-      queryClient.invalidateQueries({
-        queryKey: ["shopping-lists", shoppingListId, "items"],
-      }),
+    onSuccess: invalidateCache,
+    onError: invalidateCache,
   });
 
   const [name, setName] = useDebounceState(listItem.name, (newName) => {

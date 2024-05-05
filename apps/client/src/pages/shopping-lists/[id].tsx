@@ -53,6 +53,13 @@ export default function ShoppingListDetails() {
     });
   }
 
+  function handleBackButtonClick() {
+    queryClient.invalidateQueries({
+      queryKey: ["shopping-lists", shoppingListId],
+    });
+    router.push("/shopping-lists");
+  }
+
   return (
     <>
       <NavBar
@@ -62,7 +69,7 @@ export default function ShoppingListDetails() {
             size="large"
             edge="start"
             color="inherit"
-            onClick={() => router.push("/shopping-lists")}
+            onClick={handleBackButtonClick}
           >
             <ArrowBack />
           </IconButton>
