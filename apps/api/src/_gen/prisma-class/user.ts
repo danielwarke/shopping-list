@@ -16,6 +16,9 @@ export class User {
 	@ApiProperty({ type: String })
 	password: string
 
+	@ApiPropertyOptional({ type: String })
+	token?: string
+
 	@ApiProperty({ type: Date })
 	createdAt: Date
 }

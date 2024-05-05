@@ -20,6 +20,7 @@ model User {
   emailVerified        DateTime?
   shoppingLists        ShoppingList[] @relation("UsersWithShoppingListAccess")
   password             String
+  token                String?
   createdShoppingLists ShoppingList[] @relation("CreatedByUser")
   createdAt            DateTime       @default(now())
 }
