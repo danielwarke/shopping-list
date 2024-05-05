@@ -99,7 +99,7 @@ export class AuthService {
       );
       userId = sub;
     } catch (e) {
-      throw new InternalServerErrorException(e.message);
+      throw new InternalServerErrorException(e.message.replace("jwt", "token"));
     }
 
     const user = await this.usersService.findOne(userId);
@@ -108,7 +108,7 @@ export class AuthService {
     }
 
     if (user.token !== resetPasswordDto.token) {
-      throw new UnprocessableEntityException("User token is invalid");
+      throw new UnprocessableEntityException("Token is invalid");
     }
 
     const hashedPass = await bcrypt.hash(
