@@ -1,44 +1,46 @@
 import { Alert, Box, Button, Container, TextField } from "@mui/material";
+import { LoadingButton } from "@mui/lab";
 import { useMutation } from "@tanstack/react-query";
+import { apiClient } from "@/api/api-client";
 import { FormEvent, useState } from "react";
 import { getErrorMessages } from "@/api/utils";
-import { apiClient } from "@/api/api-client";
 import { useRouter } from "next/router";
-import { LoadingButton } from "@mui/lab";
 
-export default function Login() {
+export default function ForgotPassword() {
   const router = useRouter();
 
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [success, setSuccess] = useState(false);
 
-  const loginMutation = useMutation({
-    mutationFn: apiClient.auth.authControllerLogin,
-    onSuccess: (data) => {
-      const token = (data as any).access_token;
-      localStorage.setItem("auth_token", token);
-      router.push("/shopping-lists");
-    },
+  const forgotPasswordMutation = useMutation({
+    mutationFn: apiClient.auth.authControllerForgotPassword,
+    onSuccess: () => setSuccess(true),
   });
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
 
-    loginMutation.mutate({
+    forgotPasswordMutation.mutate({
       email,
-      password,
     });
   }
 
-  const errorMessages = getErrorMessages(loginMutation.error);
+  const errorMessages = getErrorMessages(forgotPasswordMutation.error);
 
   return (
     <Container maxWidth="sm">
       <form onSubmit={handleSubmit}>
+        {success && (
+          <Alert severity="success" sx={{ marginTop: "2vh" }}>
+            If you have an account with us you will receive an email with a link
+            to reset your password. You can safely close this tab or return to
+            login.
+          </Alert>
+        )}
         <Box marginTop="3vh" marginBottom="1em" sx={{ typography: "h5" }}>
-          Login to view your shopping lists
+          Enter your email address to reset your password
         </Box>
-        {loginMutation.isError && (
+        {forgotPasswordMutation.isError && (
           <>
             {errorMessages.map((message) => (
               <Alert key={message} severity="error">
@@ -61,36 +63,20 @@ export default function Login() {
             placeholder="jdoe@email.com"
             type="email"
             value={email}
+            disabled={success}
             onChange={(e) => setEmail(e.target.value)}
-          />
-          <TextField
-            label="Password"
-            fullWidth
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
           />
           <LoadingButton
             variant="contained"
             size="large"
-            loading={loginMutation.isPending}
-            disabled={!email || !password}
+            loading={forgotPasswordMutation.isPending}
+            disabled={!email || success}
             type="submit"
           >
-            Login
+            Submit
           </LoadingButton>
-          {loginMutation.isError && (
-            <Button
-              onClick={() => router.push("/forgot-password")}
-              type="button"
-              color="error"
-              sx={{ marginTop: "2vh" }}
-            >
-              Forgot password?
-            </Button>
-          )}
-          <Button onClick={() => router.push("/sign-up")} type="button">
-            Don&apos;t have an account yet?
+          <Button onClick={() => router.push("/login")} type="button">
+            Return to login
           </Button>
         </Box>
       </form>

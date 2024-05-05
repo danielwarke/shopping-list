@@ -20,6 +20,15 @@ export interface LoginDto {
   password: string;
 }
 
+export interface ForgotPasswordDto {
+  email: string;
+}
+
+export interface ResetPasswordDto {
+  token: string;
+  password: string;
+}
+
 export interface CreateShoppingListDto {
   name?: string;
 }
@@ -282,6 +291,38 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         method: "GET",
         secure: true,
         format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags auth
+     * @name AuthControllerForgotPassword
+     * @request POST:/auth/forgot-password
+     */
+    authControllerForgotPassword: (data: ForgotPasswordDto, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/auth/forgot-password`,
+        method: "POST",
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags auth
+     * @name AuthControllerResetPassword
+     * @request POST:/auth/reset-password
+     */
+    authControllerResetPassword: (data: ResetPasswordDto, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/auth/reset-password`,
+        method: "POST",
+        body: data,
+        type: ContentType.Json,
         ...params,
       }),
   };
