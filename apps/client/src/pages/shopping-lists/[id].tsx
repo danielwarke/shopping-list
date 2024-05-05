@@ -14,11 +14,13 @@ import { Add, ArrowBack } from "@mui/icons-material";
 import { ShoppingListName } from "@/components/shopping-list/shopping-list-details/ShoppingListName";
 import { NavBar } from "@/components/NavBar";
 import { CreateListItemDto } from "@/api/client-sdk/Api";
-import { ShoppingListItem } from "@/components/shopping-list/shopping-list-details/ShoppingListItem";
 import { useState } from "react";
+import { useAuth } from "@/hooks/use-auth";
+import { ShoppingListDraggableItems } from "@/components/shopping-list/shopping-list-details/ShoppingListDraggableItems";
 
 export default function ShoppingListDetails() {
   const router = useRouter();
+  const isAuthenticated = useAuth();
   const shoppingListId = router.query.id as string;
   const queryClient = useQueryClient();
   const [autoFocusListItemId, setAutoFocusListItemId] = useState("");
@@ -31,12 +33,7 @@ export default function ShoppingListDetails() {
     queryKey: ["shopping-lists", shoppingListId],
     queryFn: () =>
       apiClient.shoppingLists.shoppingListsControllerFindOne(shoppingListId),
-  });
-
-  const { data: listItems = [], isLoading: listItemsIsLoading } = useQuery({
-    queryKey: ["shopping-lists", shoppingListId, "items"],
-    queryFn: () =>
-      apiClient.shoppingLists.listItemsControllerFindAll(shoppingListId),
+    enabled: isAuthenticated,
   });
 
   const createListItemMutation = useMutation({
@@ -81,9 +78,7 @@ export default function ShoppingListDetails() {
           flexDirection="column"
           marginTop="4vh"
         >
-          {(shoppingListIsLoading || listItemsIsLoading) && (
-            <CircularProgress />
-          )}
+          {shoppingListIsLoading && <CircularProgress />}
           {shoppingList && (
             <ShoppingListName
               id={shoppingListId}
@@ -91,15 +86,11 @@ export default function ShoppingListDetails() {
             />
           )}
           <Box marginTop="2vh">
-            {listItems.map((listItem) => (
-              <ShoppingListItem
-                key={listItem.id}
-                shoppingListId={shoppingListId}
-                listItem={listItem}
-                onEnterKey={handleCreateListItem}
-                autoFocus={listItem.id === autoFocusListItemId}
-              />
-            ))}
+            <ShoppingListDraggableItems
+              shoppingListId={shoppingListId}
+              autoFocusListItemId={autoFocusListItemId}
+              handleCreateListItem={handleCreateListItem}
+            />
           </Box>
         </Box>
         <Tooltip title="New List Item">

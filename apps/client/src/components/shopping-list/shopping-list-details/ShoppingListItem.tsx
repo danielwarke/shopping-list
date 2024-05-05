@@ -4,7 +4,8 @@ import { ListItem, RenameListItemDto } from "@/api/client-sdk/Api";
 import { apiClient } from "@/api/api-client";
 import { useDebounceState } from "@/hooks/use-debounce-state";
 import { Checkbox, IconButton, Input } from "@mui/material";
-import { Clear } from "@mui/icons-material";
+import { Clear, DragHandle } from "@mui/icons-material";
+import { Draggable } from "react-smooth-dnd";
 
 interface ShoppingListItemProps {
   shoppingListId: string;
@@ -76,26 +77,31 @@ export const ShoppingListItem: FC<ShoppingListItemProps> = ({
   }
 
   return (
-    <Input
-      value={name}
-      onChange={handleNameChange}
-      onKeyDown={handleKeyDown}
-      disabled={complete}
-      autoFocus={autoFocus}
-      placeholder="List item"
-      fullWidth
-      sx={{
-        marginTop: "1em",
-        ...(complete && { textDecoration: "line-through" }),
-      }}
-      startAdornment={
-        <Checkbox checked={complete} onChange={handleCompleteChange} />
-      }
-      endAdornment={
-        <IconButton onClick={() => deleteListItemMutation.mutate()}>
-          <Clear />
-        </IconButton>
-      }
-    />
+    <Draggable key={listItemId}>
+      <Input
+        value={name}
+        onChange={handleNameChange}
+        onKeyDown={handleKeyDown}
+        disabled={complete}
+        autoFocus={autoFocus}
+        placeholder="List item"
+        fullWidth
+        sx={{
+          marginTop: "1em",
+          ...(complete && { textDecoration: "line-through" }),
+        }}
+        startAdornment={
+          <>
+            <DragHandle className="drag-handle" sx={{ cursor: "grab" }} />
+            <Checkbox checked={complete} onChange={handleCompleteChange} />
+          </>
+        }
+        endAdornment={
+          <IconButton onClick={() => deleteListItemMutation.mutate()}>
+            <Clear />
+          </IconButton>
+        }
+      />
+    </Draggable>
   );
 };
