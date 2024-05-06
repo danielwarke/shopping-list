@@ -2,9 +2,9 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { apiClient } from "@/api/api-client";
-import { getErrorMessages } from "@/api/utils";
 import { Alert, Box, Button, Container, TextField } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
+import { ErrorRenderer } from "@/components/ErrorRenderer";
 
 export default function SignUp() {
   const router = useRouter();
@@ -27,22 +27,15 @@ export default function SignUp() {
     });
   }
 
-  const errorMessages = getErrorMessages(signUpMutation.error);
-
   return (
     <Container maxWidth="sm">
       <Box marginTop="3vh" marginBottom="1em" sx={{ typography: "h5" }}>
         Sign up to start creating your own shopping list
       </Box>
-      {signUpMutation.isError && (
-        <>
-          {errorMessages.map((message) => (
-            <Alert key={message} severity="error">
-              Error: {message}
-            </Alert>
-          ))}
-        </>
-      )}
+      <ErrorRenderer
+        isError={signUpMutation.isError}
+        error={signUpMutation.error}
+      />
       {success && (
         <Alert severity="success">
           You have signed up successfully! <br />

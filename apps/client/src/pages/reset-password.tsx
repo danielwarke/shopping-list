@@ -3,8 +3,8 @@ import { LoadingButton } from "@mui/lab";
 import { useMutation } from "@tanstack/react-query";
 import { apiClient } from "@/api/api-client";
 import { FormEvent, useState } from "react";
-import { getErrorMessages } from "@/api/utils";
 import { useRouter } from "next/router";
+import { ErrorRenderer } from "@/components/ErrorRenderer";
 
 export default function ResetPassword() {
   const router = useRouter();
@@ -27,8 +27,6 @@ export default function ResetPassword() {
     });
   }
 
-  const errorMessages = getErrorMessages(resetPasswordMutation.error);
-
   return (
     <Container maxWidth="sm">
       <form onSubmit={handleSubmit}>
@@ -40,15 +38,10 @@ export default function ResetPassword() {
         <Box marginTop="3vh" marginBottom="1em" sx={{ typography: "h5" }}>
           Please enter a new password
         </Box>
-        {resetPasswordMutation.isError && (
-          <>
-            {errorMessages.map((message) => (
-              <Alert key={message} severity="error">
-                Error: {message}
-              </Alert>
-            ))}
-          </>
-        )}
+        <ErrorRenderer
+          isError={resetPasswordMutation.isError}
+          error={resetPasswordMutation.error}
+        />
         <Box
           display="flex"
           alignItems="center"

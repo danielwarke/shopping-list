@@ -1,10 +1,10 @@
-import { Alert, Box, Button, Container, TextField } from "@mui/material";
+import { Box, Button, Container, TextField } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import { FormEvent, useState } from "react";
-import { getErrorMessages } from "@/api/utils";
 import { apiClient } from "@/api/api-client";
 import { useRouter } from "next/router";
 import { LoadingButton } from "@mui/lab";
+import { ErrorRenderer } from "@/components/ErrorRenderer";
 
 export default function Login() {
   const router = useRouter();
@@ -30,23 +30,16 @@ export default function Login() {
     });
   }
 
-  const errorMessages = getErrorMessages(loginMutation.error);
-
   return (
     <Container maxWidth="sm">
       <form onSubmit={handleSubmit}>
         <Box marginTop="3vh" marginBottom="1em" sx={{ typography: "h5" }}>
           Login to view your shopping lists
         </Box>
-        {loginMutation.isError && (
-          <>
-            {errorMessages.map((message) => (
-              <Alert key={message} severity="error">
-                Error: {message}
-              </Alert>
-            ))}
-          </>
-        )}
+        <ErrorRenderer
+          isError={loginMutation.isError}
+          error={loginMutation.error}
+        />
         <Box
           display="flex"
           alignItems="center"

@@ -2,8 +2,8 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { apiClient } from "@/api/api-client";
-import { getErrorMessages } from "@/api/utils";
 import { Alert, Box, Button, Container } from "@mui/material";
+import { ErrorRenderer } from "@/components/ErrorRenderer";
 
 export default function VerifyEmail() {
   const router = useRouter();
@@ -15,8 +15,6 @@ export default function VerifyEmail() {
     mutationFn: apiClient.auth.authControllerVerifyEmail,
     onSuccess: () => setSuccess(true),
   });
-
-  let errorMessages = getErrorMessages(verifyEmailMutation.error);
 
   useEffect(() => {
     if (
@@ -42,15 +40,10 @@ export default function VerifyEmail() {
           Unable to verify email address: token must be provided
         </Alert>
       )}
-      {verifyEmailMutation.isError && (
-        <>
-          {errorMessages.map((message) => (
-            <Alert key={message} severity="error">
-              Unable to verify email address: {message}
-            </Alert>
-          ))}
-        </>
-      )}
+      <ErrorRenderer
+        isError={verifyEmailMutation.isError}
+        error={verifyEmailMutation.error}
+      />
       <Box
         display="flex"
         alignItems="center"

@@ -1,6 +1,5 @@
 import { FC } from "react";
 import {
-  Alert,
   Button,
   Dialog,
   DialogActions,
@@ -11,7 +10,7 @@ import {
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/api/api-client";
 import { LoadingButton } from "@mui/lab";
-import { getErrorMessages } from "@/api/utils";
+import { ErrorRenderer } from "@/components/ErrorRenderer";
 
 interface DeleteShoppingListDialogProps {
   open: boolean;
@@ -33,21 +32,14 @@ export const DeleteShoppingListDialog: FC<DeleteShoppingListDialogProps> = ({
     },
   });
 
-  const errorMessages = getErrorMessages(deleteShoppingListMutation.error);
-
   return (
     <Dialog onClose={handleClose} open={open}>
       <DialogTitle>Please Confirm</DialogTitle>
       <DialogContent>
-        {deleteShoppingListMutation.isError && (
-          <>
-            {errorMessages.map((message) => (
-              <Alert key={message} severity="error">
-                Error: {message}
-              </Alert>
-            ))}
-          </>
-        )}
+        <ErrorRenderer
+          isError={deleteShoppingListMutation.isError}
+          error={deleteShoppingListMutation.error}
+        />
         <DialogContentText>
           Are you sure you want to delete the selected shopping list?
         </DialogContentText>
