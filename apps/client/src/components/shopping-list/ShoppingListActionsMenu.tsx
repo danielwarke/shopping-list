@@ -1,7 +1,9 @@
 import { MoreVert } from "@mui/icons-material";
 import { IconButton, Menu, MenuItem } from "@mui/material";
 import { FC, useState } from "react";
-import { DeleteShoppingListDialog } from "@/components/shopping-list/DeleteShoppingListDialog";
+import { DeleteShoppingListDialog } from "@/components/shopping-list/dialogs/DeleteShoppingListDialog";
+import { ShareShoppingListDialog } from "@/components/shopping-list/dialogs/ShareShoppingListDialog";
+import { useSnackbarContext } from "@/contexts/SnackbarContext";
 
 interface ShoppingListActionMenuProps {
   shoppingListId: string;
@@ -10,8 +12,10 @@ interface ShoppingListActionMenuProps {
 export const ShoppingListActionsMenu: FC<ShoppingListActionMenuProps> = ({
   shoppingListId,
 }) => {
+  const { showMessage } = useSnackbarContext();
+
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [openDialog, setOpenDialog] = useState<"share" | "delete" | null>(null);
 
   const handleMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -19,11 +23,25 @@ export const ShoppingListActionsMenu: FC<ShoppingListActionMenuProps> = ({
 
   function handleClose() {
     setAnchorEl(null);
-    setDeleteDialogOpen(false);
+    setOpenDialog(null);
+  }
+
+  function handleOpenShareDialog() {
+    setOpenDialog("share");
+  }
+
+  function handleShareClose(email?: string) {
+    handleClose();
+
+    if (email) {
+      showMessage(
+        `If the user exists in our system, they will receive an invitation email at ${email} to start sharing this shopping list.`,
+      );
+    }
   }
 
   function handleOpenDeleteDialog() {
-    setDeleteDialogOpen(true);
+    setOpenDialog("delete");
   }
 
   return (
@@ -37,10 +55,16 @@ export const ShoppingListActionsMenu: FC<ShoppingListActionMenuProps> = ({
         open={!!anchorEl}
         onClose={handleClose}
       >
-        <MenuItem onClick={handleOpenDeleteDialog}>Delete List</MenuItem>
+        <MenuItem onClick={handleOpenShareDialog}>Share</MenuItem>
+        <MenuItem onClick={handleOpenDeleteDialog}>Delete</MenuItem>
       </Menu>
+      <ShareShoppingListDialog
+        open={openDialog === "share"}
+        handleClose={handleShareClose}
+        shoppingListId={shoppingListId}
+      />
       <DeleteShoppingListDialog
-        open={deleteDialogOpen}
+        open={openDialog === "delete"}
         handleClose={handleClose}
         shoppingListId={shoppingListId}
       />

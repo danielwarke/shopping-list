@@ -84,6 +84,10 @@ export interface ReorderShoppingListDto {
   order: ReorderItem[];
 }
 
+export interface ShareShoppingListDto {
+  otherUserEmail: string;
+}
+
 export interface CreateListItemDto {
   name?: string;
   sortOrder?: number;
@@ -301,23 +305,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * No description
      *
      * @tags auth
-     * @name AuthControllerGetProfile
-     * @request GET:/auth/profile
-     * @secure
-     */
-    authControllerGetProfile: (params: RequestParams = {}) =>
-      this.request<object, any>({
-        path: `/auth/profile`,
-        method: "GET",
-        secure: true,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags auth
      * @name AuthControllerForgotPassword
      * @request POST:/auth/forgot-password
      */
@@ -343,6 +330,22 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         method: "POST",
         body: data,
         type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags auth
+     * @name AuthControllerGetProfile
+     * @request GET:/auth/profile
+     * @secure
+     */
+    authControllerGetProfile: (params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/auth/profile`,
+        method: "GET",
+        secure: true,
         ...params,
       }),
   };
@@ -452,6 +455,24 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         secure: true,
         type: ContentType.Json,
         format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags shopping-lists
+     * @name ShoppingListsControllerShare
+     * @request POST:/shopping-lists/{id}/share
+     * @secure
+     */
+    shoppingListsControllerShare: (id: string, data: ShareShoppingListDto, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/shopping-lists/${id}/share`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
         ...params,
       }),
 
