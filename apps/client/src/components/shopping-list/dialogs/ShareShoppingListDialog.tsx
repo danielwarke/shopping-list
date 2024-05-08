@@ -44,7 +44,7 @@ export const ShareShoppingListDialog: FC<ShareShoppingListDialogProps> = ({
           isError={shareShoppingListMutation.isError}
           error={shareShoppingListMutation.error}
         />
-        <DialogContentText sx={{ margin: "2vh" }}>
+        <DialogContentText sx={{ marginY: "2vh" }}>
           By sharing a shopping list with another user, you can collaborate
           together in real time!
         </DialogContentText>
