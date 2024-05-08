@@ -8,6 +8,7 @@ import { PassportModule } from "@nestjs/passport";
 import { JwtModule } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
 import { JwtStrategy } from "./strategies/jwt.strategy";
+import { EmailsModule } from "../emails/emails.module";
 
 @Module({
   imports: [
@@ -20,7 +21,9 @@ import { JwtStrategy } from "./strategies/jwt.strategy";
         },
       }),
       inject: [ConfigService],
+      global: true,
     }),
+    EmailsModule,
     DatabaseModule,
     UsersModule,
   ],

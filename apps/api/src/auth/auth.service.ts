@@ -11,10 +11,9 @@ import * as bcrypt from "bcrypt";
 import { SignUpDto } from "./dto/sign-up.dto";
 import { JwtService } from "@nestjs/jwt";
 import { User } from "@prisma/client";
-import { MailerService } from "@nestjs-modules/mailer";
-import { ConfigService } from "@nestjs/config";
 import { ResetPasswordDto } from "./dto/reset-password.dto";
 import { VerifyEmailDto } from "./dto/verify-email.dto";
+import { EmailsService } from "../emails/emails.service";
 
 @Injectable()
 export class AuthService {
@@ -23,24 +22,8 @@ export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
-    private readonly mailerService: MailerService,
-    private readonly configService: ConfigService,
+    private readonly emailsService: EmailsService,
   ) {}
-
-  private sendVerifyEmail(email: string, name: string, token: string) {
-    const clientDomain = this.configService.get<string>("CLIENT_DOMAIN");
-    const url = `${clientDomain}/verify-email?token=${token}`;
-
-    return this.mailerService.sendMail({
-      to: email,
-      subject: "Shopping List - Verify Email Address",
-      template: "../templates/verify-email",
-      context: {
-        url,
-        name,
-      },
-    });
-  }
 
   private async validateUserToken(
     token: string,
@@ -97,7 +80,7 @@ export class AuthService {
       expiresIn: "1 year",
     });
     await this.usersService.setToken(email, verifyEmailToken);
-    this.sendVerifyEmail(email, name, verifyEmailToken);
+    this.emailsService.verifyEmail(email, name, verifyEmailToken);
 
     const { password, ...rest } = user;
     return rest;
@@ -118,7 +101,7 @@ export class AuthService {
 
   async login(user: User) {
     if (!user.emailVerified) {
-      this.sendVerifyEmail(user.email, user.name, user.token);
+      this.emailsService.verifyEmail(user.email, user.name, user.token);
       throw new UnauthorizedException(
         "Please verify your email address before logging in. A new verification email has been sent.",
       );
@@ -146,18 +129,7 @@ export class AuthService {
       const payload = { sub: user.id, type: "password" };
       const resetToken = this.jwtService.sign(payload, { expiresIn: "10m" });
       await this.usersService.setToken(email, resetToken);
-      const clientDomain = this.configService.get<string>("CLIENT_DOMAIN");
-      const url = `${clientDomain}/reset-password?token=${resetToken}`;
-
-      this.mailerService.sendMail({
-        to: email,
-        subject: "Shopping List - Forgot Password",
-        template: "../templates/forgot-password",
-        context: {
-          url,
-          name: user.name,
-        },
-      });
+      this.emailsService.forgotPassword(email, user.name, resetToken);
     } catch (e) {
       // we don't want the user to know if this was successful or not to avoid leaking data
       console.error(e);
