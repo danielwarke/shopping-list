@@ -1,9 +1,11 @@
-import { Module } from '@nestjs/common';
-import { ShoppingListsService } from './shopping-lists.service';
-import { ShoppingListsController } from './shopping-lists.controller';
+import { Module } from "@nestjs/common";
+import { ShoppingListsService } from "./shopping-lists.service";
+import { ShoppingListsController } from "./shopping-lists.controller";
+import { EmailsModule } from "../emails/emails.module";
 
 @Module({
+  imports: [EmailsModule],
   controllers: [ShoppingListsController],
-  providers: [ShoppingListsService]
+  providers: [ShoppingListsService],
 })
 export class ShoppingListsModule {}

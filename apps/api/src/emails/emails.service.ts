@@ -41,4 +41,26 @@ export class EmailsService {
       },
     });
   }
+
+  shareShoppingList(
+    toEmail: string,
+    inviter: string,
+    invitee: string,
+    shoppingList: string,
+    token: string,
+  ) {
+    const url = this.buildUrl("accept-list-invite", token);
+
+    return this.mailerService.sendMail({
+      to: toEmail,
+      subject: "Shopping List - Invite to Share Shopping List",
+      template: "./invite-user",
+      context: {
+        inviter,
+        invitee,
+        shoppingList,
+        url,
+      },
+    });
+  }
 }
