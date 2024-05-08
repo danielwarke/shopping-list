@@ -12,6 +12,7 @@ import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { ListItemsService } from "./list-items.service";
 import { RenameListItemDto } from "./dto/rename-list-item.dto";
 import { CreateListItemDto } from "./dto/create-list-item.dto";
+import { JwtRequest } from "../types";
 
 @Controller()
 @ApiTags("items")
@@ -20,13 +21,16 @@ export class ListItemsController {
   constructor(private readonly listItemsService: ListItemsService) {}
 
   @Get()
-  findAll(@Req() req, @Param("shoppingListId") shoppingListId: string) {
+  findAll(
+    @Req() req: JwtRequest,
+    @Param("shoppingListId") shoppingListId: string,
+  ) {
     return this.listItemsService.findAll(req.user.userId, shoppingListId);
   }
 
   @Post()
   create(
-    @Req() req,
+    @Req() req: JwtRequest,
     @Param("shoppingListId") shoppingListId: string,
     @Body() createListItemDto: CreateListItemDto,
   ) {
@@ -39,7 +43,7 @@ export class ListItemsController {
 
   @Patch(":id/rename")
   rename(
-    @Req() req,
+    @Req() req: JwtRequest,
     @Param("shoppingListId") shoppingListId: string,
     @Param("id") id: string,
     @Body() renameListItemDto: RenameListItemDto,
@@ -54,7 +58,7 @@ export class ListItemsController {
 
   @Patch(":id/toggle-complete")
   toggleComplete(
-    @Req() req,
+    @Req() req: JwtRequest,
     @Param("shoppingListId") shoppingListId: string,
     @Param("id") id: string,
   ) {
@@ -67,7 +71,7 @@ export class ListItemsController {
 
   @Delete(":id")
   remove(
-    @Req() req,
+    @Req() req: JwtRequest,
     @Param("shoppingListId") shoppingListId: string,
     @Param("id") id: string,
   ) {

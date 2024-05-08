@@ -13,6 +13,7 @@ import { CreateShoppingListDto } from "./dto/create-shopping-list.dto";
 import { UpdateShoppingListDto } from "./dto/update-shopping-list.dto";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { ReorderShoppingListDto } from "./dto/reorder-shopping-list.dto";
+import { JwtRequest } from "../types";
 
 @Controller()
 @ApiTags("shopping-lists")
@@ -21,7 +22,10 @@ export class ShoppingListsController {
   constructor(private readonly shoppingListsService: ShoppingListsService) {}
 
   @Post()
-  create(@Req() req, @Body() createShoppingListDto: CreateShoppingListDto) {
+  create(
+    @Req() req: JwtRequest,
+    @Body() createShoppingListDto: CreateShoppingListDto,
+  ) {
     return this.shoppingListsService.create(
       req.user.userId,
       createShoppingListDto,
@@ -29,18 +33,18 @@ export class ShoppingListsController {
   }
 
   @Get()
-  findAll(@Req() req) {
+  findAll(@Req() req: JwtRequest) {
     return this.shoppingListsService.findAll(req.user.userId);
   }
 
   @Get(":id")
-  findOne(@Req() req, @Param("id") id: string) {
+  findOne(@Req() req: JwtRequest, @Param("id") id: string) {
     return this.shoppingListsService.findOne(req.user.userId, id);
   }
 
   @Patch(":id/rename")
   rename(
-    @Req() req,
+    @Req() req: JwtRequest,
     @Param("id") id: string,
     @Body() updateShoppingListDto: UpdateShoppingListDto,
   ) {
@@ -53,7 +57,7 @@ export class ShoppingListsController {
 
   @Patch(":id/reorder")
   reorder(
-    @Req() req,
+    @Req() req: JwtRequest,
     @Param("id") id: string,
     @Body() reorderShoppingListDto: ReorderShoppingListDto,
   ) {
@@ -65,7 +69,7 @@ export class ShoppingListsController {
   }
 
   @Delete(":id")
-  remove(@Req() req, @Param("id") id: string) {
+  remove(@Req() req: JwtRequest, @Param("id") id: string) {
     return this.shoppingListsService.remove(req.user.userId, id);
   }
 }

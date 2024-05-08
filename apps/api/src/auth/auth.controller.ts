@@ -8,6 +8,7 @@ import { Public } from "src/common/decorators";
 import { ForgotPasswordDto } from "./dto/forgot-password.dto";
 import { ResetPasswordDto } from "./dto/reset-password.dto";
 import { VerifyEmailDto } from "./dto/verify-email.dto";
+import { JwtRequest } from "../types";
 
 @Controller()
 @ApiTags("auth")
@@ -34,12 +35,6 @@ export class AuthController {
     return this.authService.verifyEmail(verifyEmailDto);
   }
 
-  @Get("profile")
-  @ApiBearerAuth()
-  getProfile(@Req() req) {
-    return req.user;
-  }
-
   @Post("forgot-password")
   @Public()
   forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
@@ -50,5 +45,11 @@ export class AuthController {
   @Public()
   resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
     return this.authService.resetPassword(resetPasswordDto);
+  }
+
+  @Get("profile")
+  @ApiBearerAuth()
+  getProfile(@Req() req: JwtRequest) {
+    return req.user;
   }
 }
