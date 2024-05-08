@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/api/api-client";
-import { Box, Container, Fab, Tooltip } from "@mui/material";
+import { Box, Container, Fab, Tooltip, Typography } from "@mui/material";
 import { Add } from "@mui/icons-material";
 import { ShoppingListCard } from "@/components/shopping-list/ShoppingListCard";
 import { useAuth } from "@/hooks/use-auth";
@@ -10,7 +10,7 @@ export default function ShoppingLists() {
   const queryClient = useQueryClient();
   const isAuthenticated = useAuth();
 
-  const { data: shoppingLists = [] } = useQuery({
+  const { data: shoppingLists = [], isLoading } = useQuery({
     queryKey: ["shopping-lists"],
     queryFn: apiClient.shoppingLists.shoppingListsControllerFindAll,
     enabled: isAuthenticated,
@@ -52,6 +52,12 @@ export default function ShoppingLists() {
               shoppingList={shoppingList}
             />
           ))}
+          {!shoppingLists.length && !isLoading && (
+            <Typography variant="h5">
+              Press the button in the bottom right corner to create a new
+              shopping list 🛒
+            </Typography>
+          )}
         </Box>
         <Tooltip title="New Shopping List">
           <Fab

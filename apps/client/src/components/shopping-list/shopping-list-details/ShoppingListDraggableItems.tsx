@@ -4,6 +4,7 @@ import { apiClient } from "@/api/api-client";
 import { ShoppingListItem } from "@/components/shopping-list/shopping-list-details/ShoppingListItem";
 import { Container as DraggableContainer } from "react-smooth-dnd";
 import { ReorderShoppingListDto } from "@/api/client-sdk/Api";
+import { Typography } from "@mui/material";
 
 interface ShoppingListDraggableItemsProps {
   shoppingListId: string;
@@ -16,7 +17,7 @@ export const ShoppingListDraggableItems: FC<
 > = ({ shoppingListId, autoFocusListItemId, handleCreateListItem }) => {
   const queryClient = useQueryClient();
 
-  const { data: listItems = [] } = useQuery({
+  const { data: listItems = [], isLoading } = useQuery({
     queryKey: ["shopping-lists", shoppingListId, "items"],
     queryFn: () =>
       apiClient.shoppingLists.listItemsControllerFindAll(shoppingListId),
@@ -34,6 +35,15 @@ export const ShoppingListDraggableItems: FC<
       });
     },
   });
+
+  if (listItems.length === 0 && !isLoading) {
+    return (
+      <Typography variant="h5" sx={{ marginTop: "2vh" }}>
+        Press the button in the bottom right corner to add a new item to the
+        list 🧀
+      </Typography>
+    );
+  }
 
   return (
     <DraggableContainer
