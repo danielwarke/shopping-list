@@ -8,7 +8,7 @@ import { NavBar } from "@/components/NavBar";
 
 export default function ShoppingLists() {
   const queryClient = useQueryClient();
-  const isAuthenticated = useAuth();
+  const { isAuthenticated } = useAuth(true);
 
   const { data: shoppingLists = [], isLoading } = useQuery({
     queryKey: ["shopping-lists"],

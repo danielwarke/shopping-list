@@ -13,6 +13,7 @@ import { ShoppingListWithPreview } from "./dto/shopping-list-with-preview.dto";
 import { JwtService } from "@nestjs/jwt";
 import { ShareShoppingListDto } from "./dto/share-shopping-list.dto";
 import { EmailsService } from "../emails/emails.service";
+import { AcceptListInviteDto } from "./dto/accept-list-invite.dto";
 
 @Injectable()
 export class ShoppingListsService {
@@ -42,6 +43,12 @@ export class ShoppingListsService {
   async findAll(userId: string): Promise<ShoppingListWithPreview[]> {
     const shoppingLists = await this.prisma.shoppingList.findMany({
       include: {
+        createdByUser: {
+          select: {
+            email: true,
+            name: true,
+          },
+        },
         listItems: {
           take: 3,
           where: {
@@ -238,5 +245,33 @@ export class ShoppingListsService {
         console.error(e);
       }
     }
+  }
+
+  async acceptInvite(
+    userId: string,
+    acceptListInviteDto: AcceptListInviteDto,
+  ): Promise<ShoppingList> {
+    const { token } = acceptListInviteDto;
+    const { sub, shoppingListId } = await this.jwtService.verifyAsync<{
+      sub: string;
+      shoppingListId: string;
+    }>(token);
+
+    if (userId !== sub) {
+      throw new ConflictException("Invalid token");
+    }
+
+    return this.prisma.shoppingList.update({
+      data: {
+        users: {
+          connect: {
+            id: userId,
+          },
+        },
+      },
+      where: {
+        id: shoppingListId,
+      },
+    });
   }
 }

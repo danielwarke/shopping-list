@@ -20,7 +20,7 @@ import { ShoppingListDraggableItems } from "@/components/shopping-list/shopping-
 
 export default function ShoppingListDetails() {
   const router = useRouter();
-  const isAuthenticated = useAuth();
+  const { isAuthenticated } = useAuth(true);
   const shoppingListId = router.query.id as string;
   const queryClient = useQueryClient();
   const [autoFocusListItemId, setAutoFocusListItemId] = useState("");

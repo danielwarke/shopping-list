@@ -1,27 +1,38 @@
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { apiClient } from "@/api/api-client";
 
-export function useAuth() {
+export function useAuth(shouldRedirect?: boolean) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [email, setEmail] = useState("");
+  const [userId, setUserId] = useState("");
+
   const router = useRouter();
+
+  const redirectToLogin = useCallback(() => {
+    if (shouldRedirect) {
+      router.push("/login");
+    }
+  }, [router, shouldRedirect]);
 
   useEffect(() => {
     const token = localStorage.getItem("auth_token");
     if (!token) {
-      router.push("/login");
+      redirectToLogin();
       return;
     }
 
     apiClient.auth
       .authControllerGetProfile()
-      .then(() => {
+      .then((data: any) => {
         setIsAuthenticated(true);
+        setEmail(data.email);
+        setUserId(data.userId);
       })
       .catch(() => {
-        router.push("/login");
+        redirectToLogin();
       });
-  }, [router]);
+  }, [redirectToLogin, router, shouldRedirect]);
 
-  return isAuthenticated;
+  return { isAuthenticated, email, userId };
 }

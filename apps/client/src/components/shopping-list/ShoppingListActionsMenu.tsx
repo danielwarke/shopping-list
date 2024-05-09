@@ -7,10 +7,12 @@ import { useSnackbarContext } from "@/contexts/SnackbarContext";
 
 interface ShoppingListActionMenuProps {
   shoppingListId: string;
+  shared?: boolean;
 }
 
 export const ShoppingListActionsMenu: FC<ShoppingListActionMenuProps> = ({
   shoppingListId,
+  shared,
 }) => {
   const { showMessage } = useSnackbarContext();
 
@@ -55,8 +57,10 @@ export const ShoppingListActionsMenu: FC<ShoppingListActionMenuProps> = ({
         open={!!anchorEl}
         onClose={handleClose}
       >
-        <MenuItem onClick={handleOpenShareDialog}>Share</MenuItem>
-        <MenuItem onClick={handleOpenDeleteDialog}>Delete</MenuItem>
+        {!shared && <MenuItem onClick={handleOpenShareDialog}>Share</MenuItem>}
+        <MenuItem onClick={handleOpenDeleteDialog}>
+          {shared ? "Remove Access" : "Delete"}
+        </MenuItem>
       </Menu>
       <ShareShoppingListDialog
         open={openDialog === "share"}
@@ -67,6 +71,7 @@ export const ShoppingListActionsMenu: FC<ShoppingListActionMenuProps> = ({
         open={openDialog === "delete"}
         handleClose={handleClose}
         shoppingListId={shoppingListId}
+        shared={shared}
       />
     </div>
   );

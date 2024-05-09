@@ -6,11 +6,14 @@ import {
   CardActions,
   CardContent,
   CardHeader,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import { ShoppingListWithPreview } from "@/api/client-sdk/Api";
 import { ShoppingListActionsMenu } from "@/components/shopping-list/ShoppingListActionsMenu";
 import { useRouter } from "next/router";
+import { useAuth } from "@/hooks/use-auth";
+import { AccountCircle } from "@mui/icons-material";
 
 interface ShoppingListCardProps {
   shoppingList: ShoppingListWithPreview;
@@ -20,6 +23,8 @@ export const ShoppingListCard: FC<ShoppingListCardProps> = ({
   shoppingList,
 }) => {
   const router = useRouter();
+  const { userId } = useAuth(false);
+  const isShared = shoppingList.createdByUserId !== userId;
 
   function handleViewShoppingListClick() {
     router.push(`/shopping-lists/${shoppingList.id}`);
@@ -28,8 +33,22 @@ export const ShoppingListCard: FC<ShoppingListCardProps> = ({
   return (
     <Card variant="outlined" sx={{ marginBottom: "1em" }}>
       <CardHeader
-        title={shoppingList.name}
-        action={<ShoppingListActionsMenu shoppingListId={shoppingList.id} />}
+        title={
+          <Box display="flex" alignItems="center" gap={1}>
+            {shoppingList.name}
+            {isShared && (
+              <Tooltip title={`Shared by ${shoppingList.createdByUser.name}`}>
+                <AccountCircle color="action" />
+              </Tooltip>
+            )}
+          </Box>
+        }
+        action={
+          <ShoppingListActionsMenu
+            shoppingListId={shoppingList.id}
+            shared={isShared}
+          />
+        }
       ></CardHeader>
       <CardContent>
         {shoppingList.listItemsPreview.length > 0 && (

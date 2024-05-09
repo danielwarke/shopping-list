@@ -15,6 +15,7 @@ import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { ReorderShoppingListDto } from "./dto/reorder-shopping-list.dto";
 import { JwtRequest } from "../types";
 import { ShareShoppingListDto } from "./dto/share-shopping-list.dto";
+import { AcceptListInviteDto } from "./dto/accept-list-invite.dto";
 
 @Controller()
 @ApiTags("shopping-lists")
@@ -87,6 +88,17 @@ export class ShoppingListsController {
       name,
       id,
       shareShoppingListDto,
+    );
+  }
+
+  @Post("accept-invite")
+  acceptInvite(
+    @Req() req: JwtRequest,
+    @Body() acceptListInviteDto: AcceptListInviteDto,
+  ) {
+    return this.shoppingListsService.acceptInvite(
+      req.user.userId,
+      acceptListInviteDto,
     );
   }
 }

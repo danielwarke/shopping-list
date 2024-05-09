@@ -1,49 +1,49 @@
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { apiClient } from "@/api/api-client";
 import { Alert, Box, Button, CircularProgress, Container } from "@mui/material";
 import { ErrorRenderer } from "@/components/ErrorRenderer";
+import { useAuth } from "@/hooks/use-auth";
 
-export default function VerifyEmail() {
+export default function AcceptListInvite() {
+  const { isAuthenticated } = useAuth();
   const router = useRouter();
   const token = router.query.token as string;
 
-  const [success, setSuccess] = useState(false);
-
-  const verifyEmailMutation = useMutation({
-    mutationFn: apiClient.auth.authControllerVerifyEmail,
-    onSuccess: () => setSuccess(true),
+  const acceptInviteMutation = useMutation({
+    mutationFn: apiClient.shoppingLists.shoppingListsControllerAcceptInvite,
+    onSuccess: () => router.push("/"),
   });
 
   useEffect(() => {
     if (
-      !success &&
       token &&
-      !verifyEmailMutation.isError &&
-      !verifyEmailMutation.isPending
+      isAuthenticated &&
+      !acceptInviteMutation.isError &&
+      !acceptInviteMutation.isPending
     ) {
-      verifyEmailMutation.mutate({ token });
+      acceptInviteMutation.mutate({ token });
     }
-  }, [success, token, verifyEmailMutation]);
+  }, [token, acceptInviteMutation, isAuthenticated]);
 
   return (
     <Container maxWidth="sm">
       <Box sx={{ marginBottom: "2vh" }}></Box>
-      {verifyEmailMutation.isPending && <CircularProgress />}
-      {success && (
-        <Alert severity="success">
-          Email address verified successfully, please return to the login page.
-        </Alert>
-      )}
+      {acceptInviteMutation.isPending && <CircularProgress />}
       {!token && (
         <Alert severity="error">
-          Unable to verify email address: token must be provided
+          Unable to accept shopping list invite: token must be provided
+        </Alert>
+      )}
+      {!isAuthenticated && !!token && (
+        <Alert severity="error">
+          Please login before accepting shopping list invite
         </Alert>
       )}
       <ErrorRenderer
-        isError={verifyEmailMutation.isError}
-        error={verifyEmailMutation.error}
+        isError={acceptInviteMutation.isError}
+        error={acceptInviteMutation.error}
       />
       <Box
         display="flex"

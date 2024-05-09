@@ -47,6 +47,11 @@ export interface ShoppingList {
   updatedAt?: string;
 }
 
+export interface CreatedByUser {
+  name: string;
+  email: string;
+}
+
 export interface ListItem {
   id: string;
   name: string;
@@ -67,6 +72,7 @@ export interface ShoppingListWithPreview {
   createdAt: string;
   /** @format date-time */
   updatedAt?: string;
+  createdByUser: CreatedByUser;
   listItemsPreview: ListItem[];
   incompleteItemCount: number;
 }
@@ -86,6 +92,10 @@ export interface ReorderShoppingListDto {
 
 export interface ShareShoppingListDto {
   otherUserEmail: string;
+}
+
+export interface AcceptListInviteDto {
+  token: string;
 }
 
 export interface CreateListItemDto {
@@ -473,6 +483,25 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         body: data,
         secure: true,
         type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags shopping-lists
+     * @name ShoppingListsControllerAcceptInvite
+     * @request POST:/shopping-lists/accept-invite
+     * @secure
+     */
+    shoppingListsControllerAcceptInvite: (data: AcceptListInviteDto, params: RequestParams = {}) =>
+      this.request<ShoppingList, any>({
+        path: `/shopping-lists/accept-invite`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
         ...params,
       }),
 

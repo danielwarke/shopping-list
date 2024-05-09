@@ -40,7 +40,7 @@ const SnackbarContextProvider: FC<PropsWithChildren> = ({ children }) => {
       <Snackbar
         open={open}
         message={message}
-        autoHideDuration={4000}
+        autoHideDuration={6000}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
         onClose={handleClose}
       />

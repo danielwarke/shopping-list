@@ -16,12 +16,14 @@ interface DeleteShoppingListDialogProps {
   open: boolean;
   handleClose: () => void;
   shoppingListId: string;
+  shared?: boolean;
 }
 
 export const DeleteShoppingListDialog: FC<DeleteShoppingListDialogProps> = ({
   open,
   handleClose,
   shoppingListId,
+  shared,
 }) => {
   const queryClient = useQueryClient();
 
@@ -41,7 +43,7 @@ export const DeleteShoppingListDialog: FC<DeleteShoppingListDialogProps> = ({
           error={deleteShoppingListMutation.error}
         />
         <DialogContentText>
-          Are you sure you want to delete the selected shopping list?
+          {`Are you sure you want to ${shared ? "remove your access from" : "delete"} the selected shopping list?`}
         </DialogContentText>
       </DialogContent>
       <DialogActions>
@@ -51,7 +53,7 @@ export const DeleteShoppingListDialog: FC<DeleteShoppingListDialogProps> = ({
           loading={deleteShoppingListMutation.isPending}
           color="error"
         >
-          Yes, delete it
+          Yes
         </LoadingButton>
       </DialogActions>
     </Dialog>
