@@ -17,7 +17,7 @@ export const NavBar: FC<NavBarProps> = ({ title, startComponent }) => {
 
   return (
     <>
-      <AppBar position="static" sx={{ position: "fixed", top: 0 }}>
+      <AppBar position="static" sx={{ position: "fixed", top: 0, zIndex: 99 }}>
         <Toolbar>
           {startComponent}
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>

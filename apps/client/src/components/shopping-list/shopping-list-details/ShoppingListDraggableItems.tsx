@@ -1,10 +1,16 @@
-import { FC } from "react";
+import { FC, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/api/api-client";
 import { ShoppingListItem } from "@/components/shopping-list/shopping-list-details/ShoppingListItem";
 import { Container as DraggableContainer } from "react-smooth-dnd";
 import { ReorderShoppingListDto } from "@/api/client-sdk/Api";
-import { Typography } from "@mui/material";
+import {
+  IconButton,
+  InputAdornment,
+  TextField,
+  Typography,
+} from "@mui/material";
+import { Backspace, Search } from "@mui/icons-material";
 
 interface ShoppingListDraggableItemsProps {
   shoppingListId: string;
@@ -36,6 +42,13 @@ export const ShoppingListDraggableItems: FC<
     },
   });
 
+  const [search, setSearch] = useState("");
+  const filteredListItems = useMemo(() => {
+    return listItems.filter((listItem) => {
+      return listItem.name.toLowerCase().includes(search.toLowerCase());
+    });
+  }, [listItems, search]);
+
   if (listItems.length === 0 && !isLoading) {
     return (
       <Typography variant="h5" sx={{ marginTop: "2vh" }}>
@@ -46,41 +59,75 @@ export const ShoppingListDraggableItems: FC<
   }
 
   return (
-    <DraggableContainer
-      dragHandleSelector=".drag-handle"
-      lockAxis="y"
-      onDrop={({ removedIndex, addedIndex }) => {
-        if (removedIndex === null || addedIndex === null) {
-          return;
+    <>
+      <TextField
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        onFocus={() =>
+          queryClient.invalidateQueries({
+            queryKey: ["shopping-lists", shoppingListId, "items"],
+          })
         }
+        fullWidth
+        size="small"
+        placeholder="Search your shopping list"
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <Search />
+            </InputAdornment>
+          ),
+          endAdornment: (
+            <InputAdornment position="end">
+              <IconButton onClick={() => setSearch("")} size="small">
+                <Backspace />
+              </IconButton>
+            </InputAdornment>
+          ),
+        }}
+        sx={{ marginY: "1vh" }}
+      />
+      <DraggableContainer
+        dragHandleSelector=".drag-handle"
+        lockAxis="y"
+        onDrop={({ removedIndex, addedIndex }) => {
+          if (
+            removedIndex === null ||
+            addedIndex === null ||
+            search.length > 0
+          ) {
+            return;
+          }
 
-        const reorderedListItems = [...listItems];
-        const itemToMove = reorderedListItems[removedIndex];
-        reorderedListItems.splice(removedIndex, 1);
-        reorderedListItems.splice(addedIndex, 0, itemToMove);
+          const reorderedListItems = [...listItems];
+          const itemToMove = reorderedListItems[removedIndex];
+          reorderedListItems.splice(removedIndex, 1);
+          reorderedListItems.splice(addedIndex, 0, itemToMove);
 
-        queryClient.setQueryData(
-          ["shopping-lists", shoppingListId, "items"],
-          reorderedListItems,
-        );
+          queryClient.setQueryData(
+            ["shopping-lists", shoppingListId, "items"],
+            reorderedListItems,
+          );
 
-        const updatedOrder = reorderedListItems.map(({ id }, index) => ({
-          listItemId: id,
-          sortOrder: index + 1,
-        }));
+          const updatedOrder = reorderedListItems.map(({ id }, index) => ({
+            listItemId: id,
+            sortOrder: index + 1,
+          }));
 
-        reorderListItemsMutation.mutate({ order: updatedOrder });
-      }}
-    >
-      {listItems.map((listItem) => (
-        <ShoppingListItem
-          key={listItem.id}
-          shoppingListId={shoppingListId}
-          listItem={listItem}
-          onEnterKey={handleCreateListItem}
-          autoFocus={listItem.id === autoFocusListItemId}
-        />
-      ))}
-    </DraggableContainer>
+          reorderListItemsMutation.mutate({ order: updatedOrder });
+        }}
+      >
+        {filteredListItems.map((listItem) => (
+          <ShoppingListItem
+            key={listItem.id}
+            shoppingListId={shoppingListId}
+            listItem={listItem}
+            onEnterKey={handleCreateListItem}
+            autoFocus={listItem.id === autoFocusListItemId}
+            disableDrag={search.length > 0}
+          />
+        ))}
+      </DraggableContainer>
+    </>
   );
 };

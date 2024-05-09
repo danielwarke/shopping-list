@@ -52,7 +52,7 @@ export const ShoppingListCard: FC<ShoppingListCardProps> = ({
       </CardContent>
       <CardActions>
         <Button onClick={handleViewShoppingListClick} size="small">
-          View Shopping List
+          View
         </Button>
       </CardActions>
     </Card>

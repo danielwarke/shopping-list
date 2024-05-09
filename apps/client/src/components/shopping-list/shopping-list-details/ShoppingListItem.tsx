@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ListItem, RenameListItemDto } from "@/api/client-sdk/Api";
 import { apiClient } from "@/api/api-client";
 import { useDebounceState } from "@/hooks/use-debounce-state";
-import { Checkbox, IconButton, Input } from "@mui/material";
+import { Checkbox, IconButton, InputAdornment, TextField } from "@mui/material";
 import { Clear, DragHandle } from "@mui/icons-material";
 import { Draggable } from "react-smooth-dnd";
 
@@ -12,6 +12,7 @@ interface ShoppingListItemProps {
   listItem: ListItem;
   onEnterKey: (sortOrder: number) => void;
   autoFocus: boolean;
+  disableDrag?: boolean;
 }
 
 export const ShoppingListItem: FC<ShoppingListItemProps> = ({
@@ -19,6 +20,7 @@ export const ShoppingListItem: FC<ShoppingListItemProps> = ({
   listItem,
   onEnterKey,
   autoFocus,
+  disableDrag,
 }) => {
   const queryClient = useQueryClient();
   const listItemId = listItem.id;
@@ -82,7 +84,7 @@ export const ShoppingListItem: FC<ShoppingListItemProps> = ({
 
   return (
     <Draggable key={listItemId}>
-      <Input
+      <TextField
         value={name}
         onChange={handleNameChange}
         onKeyDown={handleKeyDown}
@@ -94,17 +96,28 @@ export const ShoppingListItem: FC<ShoppingListItemProps> = ({
           marginTop: "1em",
           ...(complete && { textDecoration: "line-through" }),
         }}
-        startAdornment={
-          <>
-            <DragHandle className="drag-handle" sx={{ cursor: "grab" }} />
-            <Checkbox checked={complete} onChange={handleCompleteChange} />
-          </>
-        }
-        endAdornment={
-          <IconButton onClick={() => deleteListItemMutation.mutate()}>
-            <Clear />
-          </IconButton>
-        }
+        variant="standard"
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              {!disableDrag && (
+                <DragHandle
+                  className="drag-handle"
+                  sx={{ cursor: "grab" }}
+                  onClick={(e) => e.preventDefault()}
+                />
+              )}
+              <Checkbox checked={complete} onChange={handleCompleteChange} />
+            </InputAdornment>
+          ),
+          endAdornment: (
+            <InputAdornment position="end">
+              <IconButton onClick={() => deleteListItemMutation.mutate()}>
+                <Clear />
+              </IconButton>
+            </InputAdornment>
+          ),
+        }}
       />
     </Draggable>
   );

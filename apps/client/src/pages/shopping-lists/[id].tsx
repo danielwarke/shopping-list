@@ -33,7 +33,7 @@ export default function ShoppingListDetails() {
     queryKey: ["shopping-lists", shoppingListId],
     queryFn: () =>
       apiClient.shoppingLists.shoppingListsControllerFindOne(shoppingListId),
-    enabled: isAuthenticated,
+    enabled: isAuthenticated && !!shoppingListId,
   });
 
   const createListItemMutation = useMutation({
@@ -92,7 +92,7 @@ export default function ShoppingListDetails() {
               currentName={shoppingList.name}
             />
           )}
-          <Box marginTop="2vh">
+          <Box marginTop="2vh" paddingBottom="16vh">
             <ShoppingListDraggableItems
               shoppingListId={shoppingListId}
               autoFocusListItemId={autoFocusListItemId}
