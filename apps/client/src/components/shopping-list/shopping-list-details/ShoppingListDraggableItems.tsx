@@ -44,6 +44,10 @@ export const ShoppingListDraggableItems: FC<
 
   const [search, setSearch] = useState("");
   const filteredListItems = useMemo(() => {
+    if (search.length === 0) {
+      return listItems;
+    }
+
     return listItems.filter((listItem) => {
       return listItem.name.toLowerCase().includes(search.toLowerCase());
     });
