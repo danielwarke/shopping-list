@@ -14,6 +14,7 @@ import { JwtService } from "@nestjs/jwt";
 import { ShareShoppingListDto } from "./dto/share-shopping-list.dto";
 import { EmailsService } from "../emails/emails.service";
 import { AcceptListInviteDto } from "./dto/accept-list-invite.dto";
+import { ShoppingListWithMetadata } from "./dto/shopping-list-with-metadata.dto";
 
 @Injectable()
 export class ShoppingListsService {
@@ -101,8 +102,15 @@ export class ShoppingListsService {
     });
   }
 
-  async findOne(userId: string, id: string): Promise<ShoppingList> {
+  async findOne(userId: string, id: string): Promise<ShoppingListWithMetadata> {
     const shoppingList = await this.prisma.shoppingList.findUnique({
+      include: {
+        _count: {
+          select: {
+            users: true,
+          },
+        },
+      },
       where: {
         id,
         users: {
@@ -117,7 +125,15 @@ export class ShoppingListsService {
       throw new NotFoundException("Shopping list does not exist");
     }
 
-    return shoppingList;
+    const {
+      _count: { users },
+      ...rest
+    } = shoppingList;
+
+    return {
+      isShared: users > 1,
+      ...rest,
+    };
   }
 
   rename(
