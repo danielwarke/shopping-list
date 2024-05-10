@@ -77,6 +77,17 @@ export interface ShoppingListWithPreview {
   incompleteItemCount: number;
 }
 
+export interface ShoppingListWithMetadata {
+  id: string;
+  name: string;
+  createdByUserId: string;
+  /** @format date-time */
+  createdAt: string;
+  /** @format date-time */
+  updatedAt?: string;
+  isShared: boolean;
+}
+
 export interface UpdateShoppingListDto {
   name?: string;
 }
@@ -405,7 +416,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @secure
      */
     shoppingListsControllerFindOne: (id: string, params: RequestParams = {}) =>
-      this.request<ShoppingList, any>({
+      this.request<ShoppingListWithMetadata, any>({
         path: `/shopping-lists/${id}`,
         method: "GET",
         secure: true,

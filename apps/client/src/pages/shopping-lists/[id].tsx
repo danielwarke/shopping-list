@@ -14,13 +14,14 @@ import { Add, ArrowBack } from "@mui/icons-material";
 import { ShoppingListName } from "@/components/shopping-list/shopping-list-details/ShoppingListName";
 import { NavBar } from "@/components/NavBar";
 import { CreateListItemDto } from "@/api/client-sdk/Api";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { ShoppingListDraggableItems } from "@/components/shopping-list/shopping-list-details/ShoppingListDraggableItems";
+import { io } from "socket.io-client";
 
 export default function ShoppingListDetails() {
   const router = useRouter();
-  const { isAuthenticated } = useAuth(true);
+  const { isAuthenticated, userId } = useAuth(true);
   const shoppingListId = router.query.id as string;
   const queryClient = useQueryClient();
   const [autoFocusListItemId, setAutoFocusListItemId] = useState("");
@@ -36,13 +37,41 @@ export default function ShoppingListDetails() {
     enabled: isAuthenticated && !!shoppingListId,
   });
 
+  const refreshListItems = useCallback(() => {
+    queryClient.invalidateQueries({
+      queryKey: ["shopping-lists", shoppingListId, "items"],
+    });
+  }, [queryClient, shoppingListId]);
+
+  const isShared = !!shoppingList?.isShared;
+
+  useEffect(() => {
+    const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+    if (!apiUrl || !shoppingListId || !isAuthenticated || !isShared) {
+      return;
+    }
+
+    const socket = io(apiUrl);
+    socket.on("connect", () => {
+      socket.emit("join_room", shoppingListId);
+    });
+
+    socket.on("list_updated", ({ userId: eventUserId }: { userId: string }) => {
+      if (eventUserId !== userId) {
+        refreshListItems();
+      }
+    });
+
+    return () => {
+      socket.emit("leave_room", shoppingListId);
+    };
+  }, [isAuthenticated, isShared, refreshListItems, shoppingListId, userId]);
+
   const createListItemMutation = useMutation({
     mutationFn: (data: CreateListItemDto) =>
       apiClient.shoppingLists.listItemsControllerCreate(shoppingListId, data),
     onSuccess: (createdListItem) => {
-      queryClient.invalidateQueries({
-        queryKey: ["shopping-lists", shoppingListId, "items"],
-      });
+      refreshListItems();
       setAutoFocusListItemId(createdListItem.id);
     },
   });

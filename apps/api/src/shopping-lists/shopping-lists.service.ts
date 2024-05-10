@@ -15,6 +15,7 @@ import { ShareShoppingListDto } from "./dto/share-shopping-list.dto";
 import { EmailsService } from "../emails/emails.service";
 import { AcceptListInviteDto } from "./dto/accept-list-invite.dto";
 import { ShoppingListWithMetadata } from "./dto/shopping-list-with-metadata.dto";
+import { GatewayService } from "../gateway/gateway.service";
 
 @Injectable()
 export class ShoppingListsService {
@@ -22,6 +23,7 @@ export class ShoppingListsService {
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
     private readonly emailsService: EmailsService,
+    private readonly gatewayService: GatewayService,
   ) {}
 
   create(
@@ -156,12 +158,12 @@ export class ShoppingListsService {
     });
   }
 
-  reorder(
+  async reorder(
     userId: string,
     id: string,
     reorderListItemsDto: ReorderShoppingListDto,
   ): Promise<ListItem[]> {
-    return this.prisma.$transaction(
+    const updatedListItems = await this.prisma.$transaction(
       reorderListItemsDto.order
         .sort((a, b) => a.sortOrder - b.sortOrder)
         .map((reorderItem) => {
@@ -181,6 +183,10 @@ export class ShoppingListsService {
           });
         }),
     );
+
+    this.gatewayService.onListUpdated(id, userId);
+
+    return updatedListItems;
   }
 
   async remove(userId: string, id: string): Promise<ShoppingList> {

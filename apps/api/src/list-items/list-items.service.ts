@@ -3,10 +3,14 @@ import { PrismaService } from "../database/prisma.service";
 import { ListItem } from "../_gen/prisma-class/list_item";
 import { RenameListItemDto } from "./dto/rename-list-item.dto";
 import { CreateListItemDto } from "./dto/create-list-item.dto";
+import { GatewayService } from "../gateway/gateway.service";
 
 @Injectable()
 export class ListItemsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly gatewayService: GatewayService,
+  ) {}
 
   findAll(userId: string, shoppingListId: string): Promise<ListItem[]> {
     return this.prisma.listItem.findMany({
@@ -60,22 +64,26 @@ export class ListItemsService {
           : 1;
     }
 
-    return this.prisma.listItem.create({
+    const createdListItem = await this.prisma.listItem.create({
       data: {
         shoppingListId,
         name: createListItemDto.name,
         sortOrder,
       },
     });
+
+    this.gatewayService.onListUpdated(shoppingListId, userId);
+
+    return createdListItem;
   }
 
-  rename(
+  async rename(
     userId: string,
     shoppingListId: string,
     id: string,
     renameListItemDto: RenameListItemDto,
   ): Promise<ListItem> {
-    return this.prisma.listItem.update({
+    const updatedListItem = await this.prisma.listItem.update({
       data: {
         name: renameListItemDto.name,
       },
@@ -91,6 +99,10 @@ export class ListItemsService {
         },
       },
     });
+
+    this.gatewayService.onListUpdated(shoppingListId, userId);
+
+    return updatedListItem;
   }
 
   async toggleComplete(
@@ -117,7 +129,7 @@ export class ListItemsService {
       throw new NotFoundException("List item does not exist");
     }
 
-    return this.prisma.listItem.update({
+    const updatedList = await this.prisma.listItem.update({
       data: {
         complete: !listItem.complete,
       },
@@ -125,14 +137,18 @@ export class ListItemsService {
         id: id,
       },
     });
+
+    this.gatewayService.onListUpdated(shoppingListId, userId);
+
+    return updatedList;
   }
 
-  remove(
+  async remove(
     userId: string,
     shoppingListId: string,
     id: string,
   ): Promise<ListItem> {
-    return this.prisma.listItem.delete({
+    const deletedListItem = await this.prisma.listItem.delete({
       where: {
         id: id,
         shoppingList: {
@@ -143,5 +159,9 @@ export class ListItemsService {
         },
       },
     });
+
+    this.gatewayService.onListUpdated(shoppingListId, userId);
+
+    return deletedListItem;
   }
 }

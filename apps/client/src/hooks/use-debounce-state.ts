@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { debounce } from "@/utils/debounce";
 
 export function useDebounceState<T>(
@@ -20,6 +20,11 @@ export function useDebounceState<T>(
     },
     [withDebounce],
   );
+
+  // this is necessary so that it re-renders when another user makes a change
+  useEffect(() => {
+    setState(initialState);
+  }, [initialState]);
 
   return [state, setStateWithDebounce];
 }
