@@ -61,16 +61,10 @@ export const ShoppingListItem: FC<ShoppingListItemProps> = ({
   const [name, setName] = useDebounceState(listItem.name, (newName) => {
     renameListItemMutation.mutate({ name: newName });
   });
-  const [complete, setComplete] = useState(listItem.complete);
 
-  function handleNameChange(e: ChangeEvent<HTMLInputElement>) {
-    setName(e.target.value);
-  }
-
-  function handleCompleteChange(e: ChangeEvent<HTMLInputElement>) {
-    setComplete(e.target.checked);
-    toggleCompleteMutation.mutate();
-  }
+  const [complete, setComplete] = useDebounceState(listItem.complete, () =>
+    toggleCompleteMutation.mutate(),
+  );
 
   function handleKeyDown(e: KeyboardEvent) {
     if (e.code === "Enter") {
@@ -86,7 +80,7 @@ export const ShoppingListItem: FC<ShoppingListItemProps> = ({
     <Draggable key={listItemId}>
       <TextField
         value={name}
-        onChange={handleNameChange}
+        onChange={(e) => setName(e.target.value)}
         onKeyDown={handleKeyDown}
         disabled={complete}
         autoFocus={autoFocus}
@@ -107,7 +101,10 @@ export const ShoppingListItem: FC<ShoppingListItemProps> = ({
                   onClick={(e) => e.preventDefault()}
                 />
               )}
-              <Checkbox checked={complete} onChange={handleCompleteChange} />
+              <Checkbox
+                checked={complete}
+                onChange={(e) => setComplete(e.target.checked)}
+              />
             </InputAdornment>
           ),
           endAdornment: (
