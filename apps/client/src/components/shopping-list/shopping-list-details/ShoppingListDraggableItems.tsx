@@ -62,6 +62,35 @@ export const ShoppingListDraggableItems: FC<
     );
   }
 
+  function onDropHandler({
+    removedIndex,
+    addedIndex,
+  }: {
+    removedIndex: number | null;
+    addedIndex: number | null;
+  }) {
+    if (removedIndex === null || addedIndex === null || search.length > 0) {
+      return;
+    }
+
+    const reorderedListItems = [...listItems];
+    const itemToMove = reorderedListItems[removedIndex];
+    reorderedListItems.splice(removedIndex, 1);
+    reorderedListItems.splice(addedIndex, 0, itemToMove);
+
+    queryClient.setQueryData(
+      ["shopping-lists", shoppingListId, "items"],
+      reorderedListItems,
+    );
+
+    const updatedOrder = reorderedListItems.map(({ id }, index) => ({
+      listItemId: id,
+      sortOrder: index + 1,
+    }));
+
+    reorderListItemsMutation.mutate({ order: updatedOrder });
+  }
+
   return (
     <>
       <TextField
@@ -94,32 +123,7 @@ export const ShoppingListDraggableItems: FC<
       <DraggableContainer
         dragHandleSelector=".drag-handle"
         lockAxis="y"
-        onDrop={({ removedIndex, addedIndex }) => {
-          if (
-            removedIndex === null ||
-            addedIndex === null ||
-            search.length > 0
-          ) {
-            return;
-          }
-
-          const reorderedListItems = [...listItems];
-          const itemToMove = reorderedListItems[removedIndex];
-          reorderedListItems.splice(removedIndex, 1);
-          reorderedListItems.splice(addedIndex, 0, itemToMove);
-
-          queryClient.setQueryData(
-            ["shopping-lists", shoppingListId, "items"],
-            reorderedListItems,
-          );
-
-          const updatedOrder = reorderedListItems.map(({ id }, index) => ({
-            listItemId: id,
-            sortOrder: index + 1,
-          }));
-
-          reorderListItemsMutation.mutate({ order: updatedOrder });
-        }}
+        onDrop={onDropHandler}
       >
         {filteredListItems.map((listItem) => (
           <ShoppingListItem
