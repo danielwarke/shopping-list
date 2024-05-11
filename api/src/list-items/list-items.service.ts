@@ -1,9 +1,10 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../database/prisma.service";
 import { ListItem } from "../_gen/prisma-class/list_item";
 import { RenameListItemDto } from "./dto/rename-list-item.dto";
 import { CreateListItemDto } from "./dto/create-list-item.dto";
 import { GatewayService } from "../gateway/gateway.service";
+import { SetListItemCompleteDto } from "./dto/set-list-item-complete.dto";
 
 @Injectable()
 export class ListItemsService {
@@ -105,14 +106,15 @@ export class ListItemsService {
     return updatedListItem;
   }
 
-  async toggleComplete(
+  async setComplete(
     userId: string,
     shoppingListId: string,
     id: string,
+    setListItemCompleteDto: SetListItemCompleteDto,
   ): Promise<ListItem> {
-    const listItem = await this.prisma.listItem.findUnique({
-      select: {
-        complete: true,
+    const updatedList = await this.prisma.listItem.update({
+      data: {
+        complete: setListItemCompleteDto.complete,
       },
       where: {
         id: id,
@@ -122,19 +124,6 @@ export class ListItemsService {
             some: { id: userId },
           },
         },
-      },
-    });
-
-    if (!listItem) {
-      throw new NotFoundException("List item does not exist");
-    }
-
-    const updatedList = await this.prisma.listItem.update({
-      data: {
-        complete: !listItem.complete,
-      },
-      where: {
-        id: id,
       },
     });
 

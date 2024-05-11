@@ -13,6 +13,7 @@ import { ListItemsService } from "./list-items.service";
 import { RenameListItemDto } from "./dto/rename-list-item.dto";
 import { CreateListItemDto } from "./dto/create-list-item.dto";
 import { JwtRequest } from "../types";
+import { SetListItemCompleteDto } from "./dto/set-list-item-complete.dto";
 
 @Controller()
 @ApiTags("items")
@@ -56,16 +57,18 @@ export class ListItemsController {
     );
   }
 
-  @Patch(":id/toggle-complete")
-  toggleComplete(
+  @Patch(":id/set-complete")
+  setComplete(
     @Req() req: JwtRequest,
     @Param("shoppingListId") shoppingListId: string,
     @Param("id") id: string,
+    @Body() setListItemCompleteDto: SetListItemCompleteDto,
   ) {
-    return this.listItemsService.toggleComplete(
+    return this.listItemsService.setComplete(
       req.user.userId,
       shoppingListId,
       id,
+      setListItemCompleteDto,
     );
   }
 

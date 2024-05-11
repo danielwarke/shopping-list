@@ -1,6 +1,10 @@
-import { ChangeEvent, FC, KeyboardEvent, useState } from "react";
+import { FC, KeyboardEvent } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ListItem, RenameListItemDto } from "@/api/client-sdk/Api";
+import {
+  ListItem,
+  RenameListItemDto,
+  SetListItemCompleteDto,
+} from "@/api/client-sdk/Api";
 import { apiClient } from "@/api/api-client";
 import { useDebounceState } from "@/hooks/use-debounce-state";
 import { Checkbox, IconButton, InputAdornment, TextField } from "@mui/material";
@@ -39,11 +43,12 @@ export const ShoppingListItem: FC<ShoppingListItemProps> = ({
     onError: invalidateCache,
   });
 
-  const toggleCompleteMutation = useMutation({
-    mutationFn: () =>
-      apiClient.shoppingLists.listItemsControllerToggleComplete(
+  const setCompleteMutation = useMutation({
+    mutationFn: (data: SetListItemCompleteDto) =>
+      apiClient.shoppingLists.listItemsControllerSetComplete(
         shoppingListId,
         listItemId,
+        data,
       ),
     onError: invalidateCache,
   });
@@ -62,8 +67,9 @@ export const ShoppingListItem: FC<ShoppingListItemProps> = ({
     renameListItemMutation.mutate({ name: newName });
   });
 
-  const [complete, setComplete] = useDebounceState(listItem.complete, () =>
-    toggleCompleteMutation.mutate(),
+  const [complete, setComplete] = useDebounceState(
+    listItem.complete,
+    (newComplete) => setCompleteMutation.mutate({ complete: newComplete }),
   );
 
   function handleKeyDown(e: KeyboardEvent) {

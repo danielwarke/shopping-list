@@ -118,6 +118,10 @@ export interface RenameListItemDto {
   name: string;
 }
 
+export interface SetListItemCompleteDto {
+  complete: boolean;
+}
+
 import type { AxiosInstance, AxiosRequestConfig, HeadersDefaults, ResponseType } from "axios";
 import axios from "axios";
 
@@ -580,15 +584,22 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * No description
      *
      * @tags items
-     * @name ListItemsControllerToggleComplete
-     * @request PATCH:/shopping-lists/{shoppingListId}/items/{id}/toggle-complete
+     * @name ListItemsControllerSetComplete
+     * @request PATCH:/shopping-lists/{shoppingListId}/items/{id}/set-complete
      * @secure
      */
-    listItemsControllerToggleComplete: (shoppingListId: string, id: string, params: RequestParams = {}) =>
+    listItemsControllerSetComplete: (
+      shoppingListId: string,
+      id: string,
+      data: SetListItemCompleteDto,
+      params: RequestParams = {},
+    ) =>
       this.request<ListItem, any>({
-        path: `/shopping-lists/${shoppingListId}/items/${id}/toggle-complete`,
+        path: `/shopping-lists/${shoppingListId}/items/${id}/set-complete`,
         method: "PATCH",
+        body: data,
         secure: true,
+        type: ContentType.Json,
         format: "json",
         ...params,
       }),
