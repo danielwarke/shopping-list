@@ -12,7 +12,7 @@ export default function AcceptListInvite() {
   const token = router.query.token as string;
 
   const acceptInviteMutation = useMutation({
-    mutationFn: apiClient.shoppingLists.shoppingListsControllerAcceptInvite,
+    mutationFn: apiClient.listSharing.listSharingControllerAcceptInvite,
     onSuccess: () => router.push("/"),
   });
 

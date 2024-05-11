@@ -102,14 +102,6 @@ export interface ReorderShoppingListDto {
   order: ReorderItem[];
 }
 
-export interface ShareShoppingListDto {
-  otherUserEmail: string;
-}
-
-export interface AcceptListInviteDto {
-  token: string;
-}
-
 export interface CreateListItemDto {
   name?: string;
   sortOrder?: number;
@@ -121,6 +113,14 @@ export interface RenameListItemDto {
 
 export interface SetListItemCompleteDto {
   complete: boolean;
+}
+
+export interface ShareShoppingListDto {
+  otherUserEmail: string;
+}
+
+export interface AcceptListInviteDto {
+  token: string;
 }
 
 import type { AxiosInstance, AxiosRequestConfig, HeadersDefaults, ResponseType } from "axios";
@@ -487,43 +487,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     /**
      * No description
      *
-     * @tags shopping-lists
-     * @name ShoppingListsControllerShare
-     * @request POST:/shopping-lists/{id}/share
-     * @secure
-     */
-    shoppingListsControllerShare: (id: string, data: ShareShoppingListDto, params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/shopping-lists/${id}/share`,
-        method: "POST",
-        body: data,
-        secure: true,
-        type: ContentType.Json,
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags shopping-lists
-     * @name ShoppingListsControllerAcceptInvite
-     * @request POST:/shopping-lists/accept-invite
-     * @secure
-     */
-    shoppingListsControllerAcceptInvite: (data: AcceptListInviteDto, params: RequestParams = {}) =>
-      this.request<ShoppingList, any>({
-        path: `/shopping-lists/accept-invite`,
-        method: "POST",
-        body: data,
-        secure: true,
-        type: ContentType.Json,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
      * @tags items
      * @name ListItemsControllerFindAll
      * @request GET:/shopping-lists/{shoppingListId}/items
@@ -618,6 +581,44 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         path: `/shopping-lists/${shoppingListId}/items/${id}`,
         method: "DELETE",
         secure: true,
+        format: "json",
+        ...params,
+      }),
+  };
+  listSharing = {
+    /**
+     * No description
+     *
+     * @tags list-sharing
+     * @name ListSharingControllerShare
+     * @request POST:/list-sharing/{id}/share
+     * @secure
+     */
+    listSharingControllerShare: (id: string, data: ShareShoppingListDto, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/list-sharing/${id}/share`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags list-sharing
+     * @name ListSharingControllerAcceptInvite
+     * @request POST:/list-sharing/accept-invite
+     * @secure
+     */
+    listSharingControllerAcceptInvite: (data: AcceptListInviteDto, params: RequestParams = {}) =>
+      this.request<ShoppingList, any>({
+        path: `/list-sharing/accept-invite`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
         format: "json",
         ...params,
       }),

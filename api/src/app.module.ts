@@ -8,6 +8,7 @@ import { APP_GUARD, RouterModule } from "@nestjs/core";
 import { JwtAuthGuard } from "./common/guards";
 import { ShoppingListsModule } from "./shopping-lists/shopping-lists.module";
 import { ListItemsModule } from "./list-items/list-items.module";
+import { ListSharingModule } from "./list-sharing/list-sharing.module";
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { ListItemsModule } from "./list-items/list-items.module";
     UsersModule,
     ShoppingListsModule,
     ListItemsModule,
+    ListSharingModule,
     RouterModule.register([
       {
         path: "auth",
@@ -33,6 +35,10 @@ import { ListItemsModule } from "./list-items/list-items.module";
             module: ListItemsModule,
           },
         ],
+      },
+      {
+        path: "list-sharing",
+        module: ListSharingModule,
       },
     ]),
   ],

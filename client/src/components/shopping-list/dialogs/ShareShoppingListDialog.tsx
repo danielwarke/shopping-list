@@ -29,10 +29,7 @@ export const ShareShoppingListDialog: FC<ShareShoppingListDialogProps> = ({
 
   const shareShoppingListMutation = useMutation({
     mutationFn: (data: ShareShoppingListDto) =>
-      apiClient.shoppingLists.shoppingListsControllerShare(
-        shoppingListId,
-        data,
-      ),
+      apiClient.listSharing.listSharingControllerShare(shoppingListId, data),
     onSuccess: () => handleClose(email),
   });
 

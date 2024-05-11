@@ -14,8 +14,6 @@ import { UpdateShoppingListDto } from "./dto/update-shopping-list.dto";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { ReorderShoppingListDto } from "./dto/reorder-shopping-list.dto";
 import { JwtRequest } from "../types";
-import { ShareShoppingListDto } from "./dto/share-shopping-list.dto";
-import { AcceptListInviteDto } from "./dto/accept-list-invite.dto";
 
 @Controller()
 @ApiTags("shopping-lists")
@@ -73,32 +71,5 @@ export class ShoppingListsController {
   @Delete(":id")
   remove(@Req() req: JwtRequest, @Param("id") id: string) {
     return this.shoppingListsService.remove(req.user.userId, id);
-  }
-
-  @Post(":id/share")
-  share(
-    @Req() req: JwtRequest,
-    @Param("id") id: string,
-    @Body() shareShoppingListDto: ShareShoppingListDto,
-  ) {
-    const { userId, name } = req.user;
-
-    return this.shoppingListsService.share(
-      userId,
-      name,
-      id,
-      shareShoppingListDto,
-    );
-  }
-
-  @Post("accept-invite")
-  acceptInvite(
-    @Req() req: JwtRequest,
-    @Body() acceptListInviteDto: AcceptListInviteDto,
-  ) {
-    return this.shoppingListsService.acceptInvite(
-      req.user.userId,
-      acceptListInviteDto,
-    );
   }
 }
