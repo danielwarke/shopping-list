@@ -8,3 +8,11 @@ services:
       - "6543:5432"
     env_file:
       - .env
+  api:
+    build:
+      context: ./api
+    env_file:
+      - ./api/.env
+    restart: always
+    ports:
+      - 8000:8000
