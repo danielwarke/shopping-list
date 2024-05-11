@@ -3,7 +3,6 @@ import { IconButton, Menu, MenuItem } from "@mui/material";
 import { FC, useState } from "react";
 import { DeleteShoppingListDialog } from "@/components/shopping-list/dialogs/DeleteShoppingListDialog";
 import { ShareShoppingListDialog } from "@/components/shopping-list/dialogs/ShareShoppingListDialog";
-import { useSnackbarContext } from "@/contexts/SnackbarContext";
 
 interface ShoppingListActionMenuProps {
   shoppingListId: string;
@@ -14,8 +13,6 @@ export const ShoppingListActionsMenu: FC<ShoppingListActionMenuProps> = ({
   shoppingListId,
   shared,
 }) => {
-  const { showMessage } = useSnackbarContext();
-
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [openDialog, setOpenDialog] = useState<"share" | "delete" | null>(null);
 
@@ -30,16 +27,6 @@ export const ShoppingListActionsMenu: FC<ShoppingListActionMenuProps> = ({
 
   function handleOpenShareDialog() {
     setOpenDialog("share");
-  }
-
-  function handleShareClose(email?: string) {
-    handleClose();
-
-    if (email) {
-      showMessage(
-        "If a user account exists, they will receive an email invite to start sharing this shopping list.",
-      );
-    }
   }
 
   function handleOpenDeleteDialog() {
@@ -64,7 +51,7 @@ export const ShoppingListActionsMenu: FC<ShoppingListActionMenuProps> = ({
       </Menu>
       <ShareShoppingListDialog
         open={openDialog === "share"}
-        handleClose={handleShareClose}
+        handleClose={handleClose}
         shoppingListId={shoppingListId}
       />
       <DeleteShoppingListDialog

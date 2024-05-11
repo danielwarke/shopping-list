@@ -14,6 +14,7 @@ import { ShoppingListActionsMenu } from "@/components/shopping-list/ShoppingList
 import { useRouter } from "next/router";
 import { useAuth } from "@/hooks/use-auth";
 import { AccountCircle } from "@mui/icons-material";
+import { ShoppingListSharedUser } from "@/components/shopping-list/ShoppingListSharedUser";
 
 interface ShoppingListCardProps {
   shoppingList: ShoppingListWithPreview;
@@ -23,8 +24,8 @@ export const ShoppingListCard: FC<ShoppingListCardProps> = ({
   shoppingList,
 }) => {
   const router = useRouter();
-  const { userId } = useAuth(false);
-  const isShared = !!userId && shoppingList.createdByUserId !== userId;
+  const { userId, email } = useAuth(false);
+  const isShared = !!userId && shoppingList.createdByUser.email !== email;
 
   function handleViewShoppingListClick() {
     router.push(`/shopping-lists/${shoppingList.id}`);
@@ -78,9 +79,12 @@ export const ShoppingListCard: FC<ShoppingListCardProps> = ({
           {shoppingList.sharedWithUsers.length > 0 && (
             <Box>
               {shoppingList.sharedWithUsers.map((user) => (
-                <Tooltip key={user.email} title={`Shared with ${user.name}`}>
-                  <AccountCircle color="action" sx={{ margin: "1vh" }} />
-                </Tooltip>
+                <ShoppingListSharedUser
+                  key={user.email}
+                  shoppingListId={shoppingList.id}
+                  email={user.email}
+                  userName={user.name}
+                />
               ))}
             </Box>
           )}

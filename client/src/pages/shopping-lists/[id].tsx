@@ -108,9 +108,6 @@ export default function ShoppingListDetails() {
         }
       />
       <Container maxWidth="sm">
-        {shoppingListIsError && (
-          <Alert severity="error">Unable to load shopping list.</Alert>
-        )}
         <Box
           display="flex"
           justifyContent="center"
@@ -118,38 +115,43 @@ export default function ShoppingListDetails() {
           marginTop="4vh"
         >
           {shoppingListIsLoading && <CircularProgress />}
-          {shoppingList && (
-            <ShoppingListName
-              id={shoppingListId}
-              currentName={shoppingList.name}
-            />
+          {shoppingListIsError && (
+            <Alert severity="error">Unable to load shopping list.</Alert>
           )}
-          <Box marginTop="2vh" paddingBottom="16vh">
-            <ShoppingListSearchBar
-              shoppingListId={shoppingListId}
-              search={search}
-              setSearch={(value) => {
-                setSearch(value);
-                setAutoFocusListItemId("");
-              }}
-            />
-            <ShoppingListDraggableItems
-              shoppingListId={shoppingListId}
-              autoFocusListItemId={autoFocusListItemId}
-              handleCreateListItem={handleCreateListItem}
-              search={search}
-            />
-          </Box>
+          {shoppingList && (
+            <>
+              <ShoppingListName
+                id={shoppingListId}
+                currentName={shoppingList.name}
+              />
+              <Box marginTop="2vh" paddingBottom="16vh">
+                <ShoppingListSearchBar
+                  shoppingListId={shoppingListId}
+                  search={search}
+                  setSearch={(value) => {
+                    setSearch(value);
+                    setAutoFocusListItemId("");
+                  }}
+                />
+                <ShoppingListDraggableItems
+                  shoppingListId={shoppingListId}
+                  autoFocusListItemId={autoFocusListItemId}
+                  handleCreateListItem={handleCreateListItem}
+                  search={search}
+                />
+              </Box>
+              <Tooltip title="New List Item">
+                <Fab
+                  color="primary"
+                  sx={{ position: "fixed", bottom: "2em", right: "2em" }}
+                  onClick={() => handleCreateListItem()}
+                >
+                  <Add />
+                </Fab>
+              </Tooltip>
+            </>
+          )}
         </Box>
-        <Tooltip title="New List Item">
-          <Fab
-            color="primary"
-            sx={{ position: "fixed", bottom: "2em", right: "2em" }}
-            onClick={() => handleCreateListItem()}
-          >
-            <Add />
-          </Fab>
-        </Tooltip>
       </Container>
     </>
   );

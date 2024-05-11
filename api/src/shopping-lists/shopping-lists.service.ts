@@ -104,7 +104,6 @@ export class ShoppingListsService {
 
       return {
         ...rest,
-        createdByUserId,
         sharedWithUsers,
         listItemsPreview,
         incompleteItemCount,

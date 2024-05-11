@@ -116,7 +116,11 @@ export interface SetListItemCompleteDto {
 }
 
 export interface ShareShoppingListDto {
-  otherUserEmail: string;
+  email: string;
+}
+
+export interface RevokeAccessDto {
+  email: string;
 }
 
 export interface AcceptListInviteDto {
@@ -601,6 +605,25 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         body: data,
         secure: true,
         type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags list-sharing
+     * @name ListSharingControllerRevokeAccess
+     * @request POST:/list-sharing/{id}/revoke-access
+     * @secure
+     */
+    listSharingControllerRevokeAccess: (id: string, data: RevokeAccessDto, params: RequestParams = {}) =>
+      this.request<ShoppingList, any>({
+        path: `/list-sharing/${id}/revoke-access`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
         ...params,
       }),
 

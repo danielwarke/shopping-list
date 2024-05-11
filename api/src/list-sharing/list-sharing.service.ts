@@ -5,6 +5,7 @@ import { JwtService } from "@nestjs/jwt";
 import { EmailsService } from "../emails/emails.service";
 import { ShareShoppingListDto } from "./dto/share-shopping-list.dto";
 import { AcceptListInviteDto } from "./dto/accept-list-invite.dto";
+import { RevokeAccessDto } from "./dto/revoke-access.dto";
 
 @Injectable()
 export class ListSharingService {
@@ -30,7 +31,7 @@ export class ListSharingService {
 
     const invitee = await this.prisma.user.findUnique({
       where: {
-        email: shareShoppingListDto.otherUserEmail,
+        email: shareShoppingListDto.email,
       },
     });
 
@@ -56,6 +57,26 @@ export class ListSharingService {
         console.error(e);
       }
     }
+  }
+
+  async revokeAccess(
+    userId: string,
+    id: string,
+    revokeAccessDto: RevokeAccessDto,
+  ): Promise<ShoppingList> {
+    return this.prisma.shoppingList.update({
+      data: {
+        users: {
+          disconnect: {
+            email: revokeAccessDto.email,
+          },
+        },
+      },
+      where: {
+        createdByUserId: userId,
+        id,
+      },
+    });
   }
 
   async acceptInvite(
