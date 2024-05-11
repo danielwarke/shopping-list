@@ -3,6 +3,8 @@ version: "3"
 services:
   db:
     image: postgres
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
     restart: always
     ports:
       - "6543:5432"

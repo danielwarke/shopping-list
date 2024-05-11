@@ -12,3 +12,6 @@
 # Misc
 .DS_Store
 *.pem
+
+# database volume
+postgres
