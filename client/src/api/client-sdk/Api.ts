@@ -47,7 +47,7 @@ export interface ShoppingList {
   updatedAt?: string;
 }
 
-export interface CreatedByUser {
+export interface SharedUser {
   name: string;
   email: string;
 }
@@ -72,7 +72,8 @@ export interface ShoppingListWithPreview {
   createdAt: string;
   /** @format date-time */
   updatedAt?: string;
-  createdByUser: CreatedByUser;
+  createdByUser: SharedUser;
+  sharedWithUsers: SharedUser[];
   listItemsPreview: ListItem[];
   incompleteItemCount: number;
 }

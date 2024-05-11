@@ -43,7 +43,7 @@ export const DeleteShoppingListDialog: FC<DeleteShoppingListDialogProps> = ({
           error={deleteShoppingListMutation.error}
         />
         <DialogContentText>
-          {`Are you sure you want to ${shared ? "remove your access from" : "delete"} the selected shopping list?`}
+          {`Are you sure you want to ${shared ? "remove yourself from" : "delete"} the selected shopping list?`}
         </DialogContentText>
       </DialogContent>
       <DialogActions>

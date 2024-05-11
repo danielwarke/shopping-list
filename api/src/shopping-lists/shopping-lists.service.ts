@@ -52,6 +52,17 @@ export class ShoppingListsService {
             name: true,
           },
         },
+        users: {
+          select: {
+            email: true,
+            name: true,
+          },
+          where: {
+            id: {
+              not: userId,
+            },
+          },
+        },
         listItems: {
           take: 3,
           where: {
@@ -92,12 +103,19 @@ export class ShoppingListsService {
     return shoppingLists.map((shoppingList) => {
       const {
         listItems: listItemsPreview,
+        users,
+        createdByUserId,
         _count: { listItems: incompleteItemCount },
         ...rest
       } = shoppingList;
 
+      const createdByCurrentUser = createdByUserId === userId;
+      const sharedWithUsers = createdByCurrentUser ? users : [];
+
       return {
         ...rest,
+        createdByUserId,
+        sharedWithUsers,
         listItemsPreview,
         incompleteItemCount,
       };

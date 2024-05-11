@@ -3,10 +3,11 @@ import { ListItem } from "../../_gen/prisma-class/list_item";
 import { PickType } from "@nestjs/swagger";
 import { User } from "../../_gen/prisma-class/user";
 
-class CreatedByUser extends PickType(User, ["name", "email"]) {}
+class SharedUser extends PickType(User, ["name", "email"]) {}
 
 export class ShoppingListWithPreview extends ShoppingList {
-  createdByUser: CreatedByUser;
+  createdByUser: SharedUser;
+  sharedWithUsers: SharedUser[];
   listItemsPreview: ListItem[];
   incompleteItemCount: number;
 }

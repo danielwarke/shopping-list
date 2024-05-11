@@ -37,7 +37,7 @@ export const ShoppingListActionsMenu: FC<ShoppingListActionMenuProps> = ({
 
     if (email) {
       showMessage(
-        `If the user exists in our system, they will receive an invitation email at ${email} to start sharing this shopping list.`,
+        "If a user account exists, they will receive an email invite to start sharing this shopping list.",
       );
     }
   }
@@ -59,7 +59,7 @@ export const ShoppingListActionsMenu: FC<ShoppingListActionMenuProps> = ({
       >
         {!shared && <MenuItem onClick={handleOpenShareDialog}>Share</MenuItem>}
         <MenuItem onClick={handleOpenDeleteDialog}>
-          {shared ? "Remove Access" : "Delete"}
+          {shared ? "Remove" : "Delete"}
         </MenuItem>
       </Menu>
       <ShareShoppingListDialog

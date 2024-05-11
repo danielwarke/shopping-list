@@ -33,16 +33,7 @@ export const ShoppingListCard: FC<ShoppingListCardProps> = ({
   return (
     <Card variant="outlined" sx={{ marginBottom: "1em" }}>
       <CardHeader
-        title={
-          <Box display="flex" alignItems="center" gap={1}>
-            {shoppingList.name}
-            {isShared && (
-              <Tooltip title={`Shared by ${shoppingList.createdByUser.name}`}>
-                <AccountCircle color="action" />
-              </Tooltip>
-            )}
-          </Box>
-        }
+        title={shoppingList.name}
         action={
           <ShoppingListActionsMenu
             shoppingListId={shoppingList.id}
@@ -70,9 +61,30 @@ export const ShoppingListCard: FC<ShoppingListCardProps> = ({
         </Typography>
       </CardContent>
       <CardActions>
-        <Button onClick={handleViewShoppingListClick} size="small">
-          View
-        </Button>
+        <Box
+          display="flex"
+          alignItems="center"
+          justifyContent="space-between"
+          width="100%"
+        >
+          <Button onClick={handleViewShoppingListClick} size="small">
+            View
+          </Button>
+          {isShared && (
+            <Tooltip title={`Shared by ${shoppingList.createdByUser.name}`}>
+              <AccountCircle color="action" sx={{ margin: "1vh" }} />
+            </Tooltip>
+          )}
+          {shoppingList.sharedWithUsers.length > 0 && (
+            <Box>
+              {shoppingList.sharedWithUsers.map((user) => (
+                <Tooltip key={user.email} title={`Shared with ${user.name}`}>
+                  <AccountCircle color="action" sx={{ margin: "1vh" }} />
+                </Tooltip>
+              ))}
+            </Box>
+          )}
+        </Box>
       </CardActions>
     </Card>
   );
