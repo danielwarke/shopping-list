@@ -4,8 +4,7 @@ WORKDIR /usr/src/app
 
 COPY --chown=node:node package.json pnpm-lock.yaml ./
 
-RUN yarn global add pnpm
-RUN pnpm install --frozen-lockfile
+RUN corepack enable pnpm && pnpm install --frozen-lockfile
 
 COPY --chown=node:node . .
 

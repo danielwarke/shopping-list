@@ -120,6 +120,7 @@ export const ShoppingListDraggableItems: FC<
         }}
         sx={{ marginY: "1vh" }}
       />
+      {/* @ts-ignore */}
       <DraggableContainer
         dragHandleSelector=".drag-handle"
         lockAxis="y"

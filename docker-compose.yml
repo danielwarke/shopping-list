@@ -16,3 +16,11 @@ services:
     restart: always
     ports:
       - 8000:8000
+  client:
+    build:
+      context: ./client
+    env_file:
+      - ./client/.env
+    restart: always
+    ports:
+      - 3000:3000

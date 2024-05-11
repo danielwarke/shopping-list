@@ -83,6 +83,7 @@ export const ShoppingListItem: FC<ShoppingListItemProps> = ({
   }
 
   return (
+    // @ts-ignore
     <Draggable key={listItemId}>
       <TextField
         value={name}
