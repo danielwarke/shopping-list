@@ -128,7 +128,10 @@ export default function ShoppingListDetails() {
             <ShoppingListSearchBar
               shoppingListId={shoppingListId}
               search={search}
-              setSearch={setSearch}
+              setSearch={(value) => {
+                setSearch(value);
+                setAutoFocusListItemId("");
+              }}
             />
             <ShoppingListDraggableItems
               shoppingListId={shoppingListId}

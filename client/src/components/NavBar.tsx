@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { AppBar, Box, Button, Toolbar, Typography } from "@mui/material";
+import { AppBar, Button, Toolbar, Typography } from "@mui/material";
 import { useRouter } from "next/router";
 
 interface NavBarProps {
@@ -16,7 +16,7 @@ export const NavBar: FC<NavBarProps> = ({ title, startComponent }) => {
   }
 
   return (
-    <AppBar position="static" sx={{ position: "sticky", top: 0, zIndex: 99 }}>
+    <AppBar position="sticky" sx={{ top: 0, zIndex: 99 }}>
       <Toolbar>
         {startComponent}
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
