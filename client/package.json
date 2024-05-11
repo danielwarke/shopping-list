@@ -1,0 +1,36 @@
+{
+  "name": "shopping-list-client",
+  "version": "1.0.0",
+  "author": "Daniel Warke",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "api-client:generate": "npx swagger-typescript-api -p http://localhost:8000/api-json --axios --unwrap-response-data -o src/api/client-sdk"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
+    "@fontsource/roboto": "^5.0.13",
+    "@mui/icons-material": "^5.15.15",
+    "@mui/lab": "5.0.0-alpha.170",
+    "@mui/material": "^5.15.15",
+    "@tanstack/react-query": "^5.32.0",
+    "axios": "^1.6.8",
+    "next": "14.2.3",
+    "react": "^18",
+    "react-dom": "^18",
+    "react-smooth-dnd": "^0.11.1",
+    "socket.io-client": "^4.7.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.3",
+    "typescript": "^5"
+  }
+}
