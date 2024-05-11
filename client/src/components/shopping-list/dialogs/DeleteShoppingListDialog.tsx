@@ -11,6 +11,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/api/api-client";
 import { LoadingButton } from "@mui/lab";
 import { ErrorRenderer } from "@/components/ErrorRenderer";
+import { useSnackbarContext } from "@/contexts/SnackbarContext";
 
 interface DeleteShoppingListDialogProps {
   open: boolean;
@@ -25,11 +26,18 @@ export const DeleteShoppingListDialog: FC<DeleteShoppingListDialogProps> = ({
   shoppingListId,
   shared,
 }) => {
+  const { showMessage } = useSnackbarContext();
   const queryClient = useQueryClient();
 
   const deleteShoppingListMutation = useMutation({
     mutationFn: apiClient.shoppingLists.shoppingListsControllerRemove,
     onSuccess: () => {
+      showMessage(
+        shared
+          ? "You have been successfully removed from the shopping list"
+          : "Successfully deleted shopping list",
+      );
+
       queryClient.invalidateQueries({ queryKey: ["shopping-lists"] });
     },
   });
