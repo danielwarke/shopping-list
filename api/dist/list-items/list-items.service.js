@@ -93,10 +93,10 @@ let ListItemsService = class ListItemsService {
         this.gatewayService.onListUpdated(shoppingListId, userId);
         return updatedListItem;
     }
-    async toggleComplete(userId, shoppingListId, id) {
-        const listItem = await this.prisma.listItem.findUnique({
-            select: {
-                complete: true,
+    async setComplete(userId, shoppingListId, id, setListItemCompleteDto) {
+        const updatedList = await this.prisma.listItem.update({
+            data: {
+                complete: setListItemCompleteDto.complete,
             },
             where: {
                 id: id,
@@ -106,17 +106,6 @@ let ListItemsService = class ListItemsService {
                         some: { id: userId },
                     },
                 },
-            },
-        });
-        if (!listItem) {
-            throw new common_1.NotFoundException("List item does not exist");
-        }
-        const updatedList = await this.prisma.listItem.update({
-            data: {
-                complete: !listItem.complete,
-            },
-            where: {
-                id: id,
             },
         });
         this.gatewayService.onListUpdated(shoppingListId, userId);

@@ -20,6 +20,7 @@ const list_items_service_1 = require("./list-items.service");
 const rename_list_item_dto_1 = require("./dto/rename-list-item.dto");
 const create_list_item_dto_1 = require("./dto/create-list-item.dto");
 const types_1 = require("../types");
+const set_list_item_complete_dto_1 = require("./dto/set-list-item-complete.dto");
 let ListItemsController = class ListItemsController {
     constructor(listItemsService) {
         this.listItemsService = listItemsService;
@@ -33,8 +34,8 @@ let ListItemsController = class ListItemsController {
     rename(req, shoppingListId, id, renameListItemDto) {
         return this.listItemsService.rename(req.user.userId, shoppingListId, id, renameListItemDto);
     }
-    toggleComplete(req, shoppingListId, id) {
-        return this.listItemsService.toggleComplete(req.user.userId, shoppingListId, id);
+    setComplete(req, shoppingListId, id, setListItemCompleteDto) {
+        return this.listItemsService.setComplete(req.user.userId, shoppingListId, id, setListItemCompleteDto);
     }
     remove(req, shoppingListId, id) {
         return this.listItemsService.remove(req.user.userId, shoppingListId, id);
@@ -71,15 +72,16 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], ListItemsController.prototype, "rename", null);
 __decorate([
-    (0, common_1.Patch)(":id/toggle-complete"),
+    (0, common_1.Patch)(":id/set-complete"),
     openapi.ApiResponse({ status: 200, type: require("../_gen/prisma-class/list_item").ListItem }),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Param)("shoppingListId")),
     __param(2, (0, common_1.Param)("id")),
+    __param(3, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [types_1.JwtRequest, String, String]),
+    __metadata("design:paramtypes", [types_1.JwtRequest, String, String, set_list_item_complete_dto_1.SetListItemCompleteDto]),
     __metadata("design:returntype", void 0)
-], ListItemsController.prototype, "toggleComplete", null);
+], ListItemsController.prototype, "setComplete", null);
 __decorate([
     (0, common_1.Delete)(":id"),
     openapi.ApiResponse({ status: 200, type: require("../_gen/prisma-class/list_item").ListItem }),
