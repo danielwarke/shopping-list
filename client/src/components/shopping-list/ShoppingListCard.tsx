@@ -24,7 +24,7 @@ export const ShoppingListCard: FC<ShoppingListCardProps> = ({
 }) => {
   const router = useRouter();
   const { userId } = useAuth(false);
-  const isShared = shoppingList.createdByUserId !== userId;
+  const isShared = !!userId && shoppingList.createdByUserId !== userId;
 
   function handleViewShoppingListClick() {
     router.push(`/shopping-lists/${shoppingList.id}`);

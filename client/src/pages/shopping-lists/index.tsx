@@ -44,7 +44,7 @@ export default function ShoppingLists() {
   return (
     <>
       <NavBar title="Shopping Lists" />
-      <Container maxWidth="sm">
+      <Container maxWidth="sm" sx={{ marginTop: "4vh" }}>
         <Box>
           {shoppingLists.map((shoppingList) => (
             <ShoppingListCard
