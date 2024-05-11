@@ -30,6 +30,7 @@ export function useAuth(shouldRedirect?: boolean) {
         setUserId(data.userId);
       })
       .catch(() => {
+        localStorage.removeItem("auth_token");
         redirectToLogin();
       });
   }, [redirectToLogin, router, shouldRedirect]);

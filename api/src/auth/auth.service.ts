@@ -99,6 +99,15 @@ export class AuthService {
     return null;
   }
 
+  async validateUserExists(email: string) {
+    const user = await this.usersService.fineOneByEmail(email);
+    if (!user) {
+      throw new NotFoundException("User does not exist");
+    }
+
+    return user;
+  }
+
   async login(user: User) {
     if (!user.emailVerified) {
       this.emailsService.verifyEmail(user.email, user.name, user.token);
