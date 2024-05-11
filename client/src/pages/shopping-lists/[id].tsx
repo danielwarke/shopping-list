@@ -18,13 +18,16 @@ import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { ShoppingListDraggableItems } from "@/components/shopping-list/shopping-list-details/ShoppingListDraggableItems";
 import { io } from "socket.io-client";
+import { ShoppingListSearchBar } from "@/components/shopping-list/shopping-list-details/ShoppingListSearchBar";
 
 export default function ShoppingListDetails() {
   const router = useRouter();
   const { isAuthenticated, userId } = useAuth(true);
   const shoppingListId = router.query.id as string;
   const queryClient = useQueryClient();
+
   const [autoFocusListItemId, setAutoFocusListItemId] = useState("");
+  const [search, setSearch] = useState("");
 
   const {
     data: shoppingList,
@@ -122,10 +125,16 @@ export default function ShoppingListDetails() {
             />
           )}
           <Box marginTop="2vh" paddingBottom="16vh">
+            <ShoppingListSearchBar
+              shoppingListId={shoppingListId}
+              search={search}
+              setSearch={setSearch}
+            />
             <ShoppingListDraggableItems
               shoppingListId={shoppingListId}
               autoFocusListItemId={autoFocusListItemId}
               handleCreateListItem={handleCreateListItem}
+              search={search}
             />
           </Box>
         </Box>

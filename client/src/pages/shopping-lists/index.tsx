@@ -54,8 +54,8 @@ export default function ShoppingLists() {
           ))}
           {!shoppingLists.length && !isLoading && (
             <Typography variant="h5">
-              Press the button in the bottom right corner to create a new
-              shopping list 🛒
+              No shopping lists found. Press the button in the bottom right
+              corner to create a new shopping list 🛒
             </Typography>
           )}
         </Box>

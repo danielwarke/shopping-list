@@ -16,19 +16,16 @@ export const NavBar: FC<NavBarProps> = ({ title, startComponent }) => {
   }
 
   return (
-    <>
-      <AppBar position="static" sx={{ position: "fixed", top: 0, zIndex: 99 }}>
-        <Toolbar>
-          {startComponent}
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            {title}
-          </Typography>
-          <Button color="inherit" onClick={handleLogout}>
-            Logout
-          </Button>
-        </Toolbar>
-      </AppBar>
-      <Box marginBottom="4em">&nbsp;</Box>
-    </>
+    <AppBar position="static" sx={{ position: "sticky", top: 0, zIndex: 99 }}>
+      <Toolbar>
+        {startComponent}
+        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+          {title}
+        </Typography>
+        <Button color="inherit" onClick={handleLogout}>
+          Logout
+        </Button>
+      </Toolbar>
+    </AppBar>
   );
 };
