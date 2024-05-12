@@ -4,6 +4,7 @@ import { useDebounceState } from "@/hooks/use-debounce-state";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/api/api-client";
 import { UpdateShoppingListDto } from "@/api/client-sdk/Api";
+import { getShoppingListQueryKey } from "@/api/query-keys";
 
 interface ShoppingListNameProps {
   id: string;
@@ -15,12 +16,13 @@ export const ShoppingListName: FC<ShoppingListNameProps> = ({
   currentName,
 }) => {
   const queryClient = useQueryClient();
+  const shoppingListQueryKey = getShoppingListQueryKey(id);
 
   const renameShoppingListMutation = useMutation({
     mutationFn: (data: UpdateShoppingListDto) =>
       apiClient.shoppingLists.shoppingListsControllerRename(id, data),
     onError: () => {
-      queryClient.invalidateQueries({ queryKey: ["shopping-lists", id] });
+      queryClient.invalidateQueries({ queryKey: shoppingListQueryKey });
     },
   });
 

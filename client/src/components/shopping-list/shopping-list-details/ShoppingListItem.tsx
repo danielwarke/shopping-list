@@ -10,6 +10,8 @@ import { useDebounceState } from "@/hooks/use-debounce-state";
 import { Checkbox, IconButton, InputAdornment, TextField } from "@mui/material";
 import { Clear, DragHandle } from "@mui/icons-material";
 import { Draggable } from "react-smooth-dnd";
+import { getItemsQueryKey } from "@/api/query-keys";
+import { useSetItemData } from "@/hooks/use-set-item-data";
 
 interface ShoppingListItemProps {
   shoppingListId: string;
@@ -27,11 +29,15 @@ export const ShoppingListItem: FC<ShoppingListItemProps> = ({
   disableDrag,
 }) => {
   const queryClient = useQueryClient();
+  const itemsQueryKey = getItemsQueryKey(shoppingListId);
   const listItemId = listItem.id;
-  const invalidateCache = () =>
-    queryClient.invalidateQueries({
-      queryKey: ["shopping-lists", shoppingListId, "items"],
+  const { setItemDeleteData } = useSetItemData(shoppingListId);
+
+  function invalidateCache() {
+    return queryClient.invalidateQueries({
+      queryKey: itemsQueryKey,
     });
+  }
 
   const renameListItemMutation = useMutation({
     mutationFn: (data: RenameListItemDto) =>
@@ -60,13 +66,7 @@ export const ShoppingListItem: FC<ShoppingListItemProps> = ({
         listItemId,
       ),
     onSuccess: (deletedListItem) => {
-      queryClient.setQueryData<ListItem[]>(
-        ["shopping-lists", shoppingListId, "items"],
-        (currentData) =>
-          currentData
-            ? currentData.filter((item) => item.id !== deletedListItem.id)
-            : [],
-      );
+      setItemDeleteData(deletedListItem.id);
     },
     onError: invalidateCache,
   });

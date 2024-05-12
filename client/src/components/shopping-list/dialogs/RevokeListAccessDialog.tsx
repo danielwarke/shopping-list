@@ -13,6 +13,7 @@ import { LoadingButton } from "@mui/lab";
 import { ErrorRenderer } from "@/components/ErrorRenderer";
 import { RevokeAccessDto } from "@/api/client-sdk/Api";
 import { useSnackbarContext } from "@/contexts/SnackbarContext";
+import { shoppingListsQueryKey } from "@/api/query-keys";
 
 interface RevokeListAccessDialogProps {
   open: boolean;
@@ -40,7 +41,7 @@ export const RevokeListAccessDialog: FC<RevokeListAccessDialogProps> = ({
       ),
     onSuccess: () => {
       showMessage(`${userName} has been removed from the shopping list`);
-      queryClient.invalidateQueries({ queryKey: ["shopping-lists"] });
+      queryClient.invalidateQueries({ queryKey: shoppingListsQueryKey });
       handleClose();
     },
   });

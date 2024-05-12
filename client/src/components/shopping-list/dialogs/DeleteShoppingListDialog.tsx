@@ -12,6 +12,7 @@ import { apiClient } from "@/api/api-client";
 import { LoadingButton } from "@mui/lab";
 import { ErrorRenderer } from "@/components/ErrorRenderer";
 import { useSnackbarContext } from "@/contexts/SnackbarContext";
+import { shoppingListsQueryKey } from "@/api/query-keys";
 
 interface DeleteShoppingListDialogProps {
   open: boolean;
@@ -38,7 +39,7 @@ export const DeleteShoppingListDialog: FC<DeleteShoppingListDialogProps> = ({
           : "Successfully deleted shopping list",
       );
 
-      queryClient.invalidateQueries({ queryKey: ["shopping-lists"] });
+      queryClient.invalidateQueries({ queryKey: shoppingListsQueryKey });
     },
   });
 

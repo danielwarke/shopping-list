@@ -5,6 +5,8 @@ import { ShoppingListItem } from "@/components/shopping-list/shopping-list-detai
 import { Container as DraggableContainer } from "react-smooth-dnd";
 import { ReorderShoppingListDto } from "@/api/client-sdk/Api";
 import { Typography } from "@mui/material";
+import { getItemsQueryKey } from "@/api/query-keys";
+import { useSetItemData } from "@/hooks/use-set-item-data";
 
 interface ShoppingListDraggableItemsProps {
   shoppingListId: string;
@@ -17,9 +19,11 @@ export const ShoppingListDraggableItems: FC<
   ShoppingListDraggableItemsProps
 > = ({ shoppingListId, autoFocusListItemId, handleCreateListItem, search }) => {
   const queryClient = useQueryClient();
+  const itemsQueryKey = getItemsQueryKey(shoppingListId);
+  const { setItemData } = useSetItemData(shoppingListId);
 
   const { data: listItems = [], isLoading } = useQuery({
-    queryKey: ["shopping-lists", shoppingListId, "items"],
+    queryKey: itemsQueryKey,
     queryFn: () =>
       apiClient.shoppingLists.listItemsControllerFindAll(shoppingListId),
   });
@@ -32,7 +36,7 @@ export const ShoppingListDraggableItems: FC<
       ),
     onError: () => {
       queryClient.invalidateQueries({
-        queryKey: ["shopping-lists", shoppingListId, "items"],
+        queryKey: itemsQueryKey,
       });
     },
   });
@@ -71,11 +75,7 @@ export const ShoppingListDraggableItems: FC<
     const itemToMove = reorderedListItems[removedIndex];
     reorderedListItems.splice(removedIndex, 1);
     reorderedListItems.splice(addedIndex, 0, itemToMove);
-
-    queryClient.setQueryData(
-      ["shopping-lists", shoppingListId, "items"],
-      reorderedListItems,
-    );
+    setItemData(reorderedListItems);
 
     const updatedOrder = reorderedListItems.map(({ id }, index) => ({
       listItemId: id,

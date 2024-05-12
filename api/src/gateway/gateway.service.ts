@@ -5,7 +5,13 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from "@nestjs/websockets";
-import { Socket, Server } from "socket.io";
+import { Server, Socket } from "socket.io";
+import {
+  ItemCompletePayload,
+  ItemRenamedPayload,
+  ItemUpdatedPayload,
+  ServerToClientEvents,
+} from "./types";
 
 @WebSocketGateway({
   cors: {
@@ -14,9 +20,9 @@ import { Socket, Server } from "socket.io";
 })
 export class GatewayService {
   @WebSocketServer()
-  server: Server;
+  server: Server<undefined, ServerToClientEvents>;
 
-  @SubscribeMessage("join_room")
+  @SubscribeMessage("joinRoom")
   joinRoom(
     @MessageBody() shoppingListId: string,
     @ConnectedSocket() socket: Socket,
@@ -24,7 +30,7 @@ export class GatewayService {
     socket.join(shoppingListId);
   }
 
-  @SubscribeMessage("leave_room")
+  @SubscribeMessage("leaveRoom")
   leaveRoom(
     @MessageBody() shoppingListId: string,
     @ConnectedSocket() socket: Socket,
@@ -33,6 +39,18 @@ export class GatewayService {
   }
 
   onListUpdated(shoppingListId: string, userId: string) {
-    this.server.to(shoppingListId).emit("list_updated", { userId });
+    this.server.to(shoppingListId).emit("listUpdated", { userId });
+  }
+
+  onItemDeleted(shoppingListId: string, payload: ItemUpdatedPayload) {
+    this.server.to(shoppingListId).emit("itemDeleted", payload);
+  }
+
+  onItemRenamed(shoppingListId: string, payload: ItemRenamedPayload) {
+    this.server.to(shoppingListId).emit("itemRenamed", payload);
+  }
+
+  onItemComplete(shoppingListId: string, payload: ItemCompletePayload) {
+    this.server.to(shoppingListId).emit("itemComplete", payload);
   }
 }

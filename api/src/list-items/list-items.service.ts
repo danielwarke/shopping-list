@@ -84,9 +84,11 @@ export class ListItemsService {
     id: string,
     renameListItemDto: RenameListItemDto,
   ): Promise<ListItem> {
+    const { name } = renameListItemDto;
+
     const updatedListItem = await this.prisma.listItem.update({
       data: {
-        name: renameListItemDto.name,
+        name,
       },
       where: {
         id: id,
@@ -101,7 +103,11 @@ export class ListItemsService {
       },
     });
 
-    this.gatewayService.onListUpdated(shoppingListId, userId);
+    this.gatewayService.onItemRenamed(shoppingListId, {
+      userId,
+      itemId: id,
+      name,
+    });
 
     return updatedListItem;
   }
@@ -112,9 +118,11 @@ export class ListItemsService {
     id: string,
     setListItemCompleteDto: SetListItemCompleteDto,
   ): Promise<ListItem> {
+    const { complete } = setListItemCompleteDto;
+
     const updatedList = await this.prisma.listItem.update({
       data: {
-        complete: setListItemCompleteDto.complete,
+        complete,
       },
       where: {
         id: id,
@@ -127,7 +135,11 @@ export class ListItemsService {
       },
     });
 
-    this.gatewayService.onListUpdated(shoppingListId, userId);
+    this.gatewayService.onItemComplete(shoppingListId, {
+      userId,
+      itemId: id,
+      complete,
+    });
 
     return updatedList;
   }
@@ -149,7 +161,7 @@ export class ListItemsService {
       },
     });
 
-    this.gatewayService.onListUpdated(shoppingListId, userId);
+    this.gatewayService.onItemDeleted(shoppingListId, { userId, itemId: id });
 
     return deletedListItem;
   }

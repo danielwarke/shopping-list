@@ -2,6 +2,7 @@ import { IconButton, InputAdornment, TextField } from "@mui/material";
 import { Backspace, Search } from "@mui/icons-material";
 import { useQueryClient } from "@tanstack/react-query";
 import { FC } from "react";
+import { getItemsQueryKey } from "@/api/query-keys";
 
 interface ShoppingListSearchBarProps {
   shoppingListId: string;
@@ -15,6 +16,7 @@ export const ShoppingListSearchBar: FC<ShoppingListSearchBarProps> = ({
   setSearch,
 }) => {
   const queryClient = useQueryClient();
+  const itemsQueryKey = getItemsQueryKey(shoppingListId);
 
   return (
     <TextField
@@ -22,7 +24,7 @@ export const ShoppingListSearchBar: FC<ShoppingListSearchBarProps> = ({
       onChange={(e) => setSearch(e.target.value)}
       onFocus={() =>
         queryClient.invalidateQueries({
-          queryKey: ["shopping-lists", shoppingListId, "items"],
+          queryKey: itemsQueryKey,
         })
       }
       fullWidth

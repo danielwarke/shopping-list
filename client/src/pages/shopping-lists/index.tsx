@@ -5,13 +5,14 @@ import { Add } from "@mui/icons-material";
 import { ShoppingListCard } from "@/components/shopping-list/ShoppingListCard";
 import { useAuth } from "@/hooks/use-auth";
 import { NavBar } from "@/components/NavBar";
+import { shoppingListsQueryKey } from "@/api/query-keys";
 
 export default function ShoppingLists() {
   const queryClient = useQueryClient();
   const { isAuthenticated } = useAuth(true);
 
   const { data: shoppingLists = [], isLoading } = useQuery({
-    queryKey: ["shopping-lists"],
+    queryKey: shoppingListsQueryKey,
     queryFn: apiClient.shoppingLists.shoppingListsControllerFindAll,
     enabled: isAuthenticated,
   });
@@ -19,7 +20,7 @@ export default function ShoppingLists() {
   const createShoppingListMutation = useMutation({
     mutationFn: apiClient.shoppingLists.shoppingListsControllerCreate,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["shopping-lists"] });
+      queryClient.invalidateQueries({ queryKey: shoppingListsQueryKey });
     },
   });
 

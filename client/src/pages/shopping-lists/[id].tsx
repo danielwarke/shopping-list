@@ -13,18 +13,22 @@ import {
 import { Add, ArrowBack } from "@mui/icons-material";
 import { ShoppingListName } from "@/components/shopping-list/shopping-list-details/ShoppingListName";
 import { NavBar } from "@/components/NavBar";
-import { CreateListItemDto, ListItem } from "@/api/client-sdk/Api";
-import { useCallback, useEffect, useState } from "react";
+import { CreateListItemDto } from "@/api/client-sdk/Api";
+import { useCallback, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { ShoppingListDraggableItems } from "@/components/shopping-list/shopping-list-details/ShoppingListDraggableItems";
-import { io } from "socket.io-client";
 import { ShoppingListSearchBar } from "@/components/shopping-list/shopping-list-details/ShoppingListSearchBar";
+import { getItemsQueryKey, getShoppingListQueryKey } from "@/api/query-keys";
+import { useSocket } from "@/hooks/use-socket";
 
 export default function ShoppingListDetails() {
   const router = useRouter();
   const { isAuthenticated, userId } = useAuth(true);
   const shoppingListId = router.query.id as string;
+
   const queryClient = useQueryClient();
+  const shoppingListQueryKey = getShoppingListQueryKey(shoppingListId);
+  const itemsQueryKey = getItemsQueryKey(shoppingListId);
 
   const [autoFocusListItemId, setAutoFocusListItemId] = useState("");
   const [search, setSearch] = useState("");
@@ -34,7 +38,7 @@ export default function ShoppingListDetails() {
     isError: shoppingListIsError,
     isLoading: shoppingListIsLoading,
   } = useQuery({
-    queryKey: ["shopping-lists", shoppingListId],
+    queryKey: shoppingListQueryKey,
     queryFn: () =>
       apiClient.shoppingLists.shoppingListsControllerFindOne(shoppingListId),
     enabled: isAuthenticated && !!shoppingListId,
@@ -42,43 +46,17 @@ export default function ShoppingListDetails() {
 
   const invalidateCache = useCallback(() => {
     queryClient.invalidateQueries({
-      queryKey: ["shopping-lists", shoppingListId, "items"],
+      queryKey: itemsQueryKey,
     });
-  }, [queryClient, shoppingListId]);
+  }, [itemsQueryKey, queryClient]);
 
-  const isShared = !!shoppingList?.isShared;
-
-  useEffect(() => {
-    const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-    if (!apiUrl || !shoppingListId || !isAuthenticated || !isShared) {
-      return;
-    }
-
-    const socket = io(apiUrl);
-    socket.on("connect", () => {
-      socket.emit("join_room", shoppingListId);
-    });
-
-    socket.on("list_updated", ({ userId: eventUserId }: { userId: string }) => {
-      if (eventUserId !== userId) {
-        invalidateCache();
-      }
-    });
-
-    return () => {
-      socket.emit("leave_room", shoppingListId);
-    };
-  }, [isAuthenticated, isShared, invalidateCache, shoppingListId, userId]);
+  useSocket(shoppingList?.isShared ? shoppingListId : undefined);
 
   const createListItemMutation = useMutation({
     mutationFn: (data: CreateListItemDto) =>
       apiClient.shoppingLists.listItemsControllerCreate(shoppingListId, data),
     onSuccess: (createdListItem) => {
-      queryClient.setQueryData<ListItem[]>(
-        ["shopping-lists", shoppingListId, "items"],
-        (currentData) =>
-          currentData ? [...currentData, createdListItem] : [createdListItem],
-      );
+      invalidateCache();
       setAutoFocusListItemId(createdListItem.id);
     },
     onError: invalidateCache,
@@ -92,7 +70,7 @@ export default function ShoppingListDetails() {
 
   function handleBackButtonClick() {
     queryClient.invalidateQueries({
-      queryKey: ["shopping-lists", shoppingListId],
+      queryKey: shoppingListQueryKey,
     });
     router.push("/shopping-lists");
   }
