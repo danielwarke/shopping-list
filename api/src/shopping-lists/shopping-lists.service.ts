@@ -181,6 +181,19 @@ export class ShoppingListsService {
     id: string,
     reorderListItemsDto: ReorderShoppingListDto,
   ): Promise<ListItem[]> {
+    const shoppingList = await this.prisma.shoppingList.findUnique({
+      where: {
+        id,
+        users: {
+          some: { id: userId },
+        },
+      },
+    });
+
+    if (!shoppingList) {
+      throw new NotFoundException("Shopping list does not exist");
+    }
+
     const updatedListItems = await this.prisma.$transaction(
       reorderListItemsDto.order
         .sort((a, b) => a.sortOrder - b.sortOrder)
@@ -191,12 +204,7 @@ export class ShoppingListsService {
             },
             where: {
               id: reorderItem.listItemId,
-              shoppingList: {
-                id: id,
-                users: {
-                  some: { id: userId },
-                },
-              },
+              shoppingListId: id,
             },
           });
         }),
