@@ -11,7 +11,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/api/api-client";
 import { LoadingButton } from "@mui/lab";
 import { ErrorRenderer } from "@/components/ErrorRenderer";
-import { RevokeAccessDto } from "@/api/client-sdk/Api";
+import { RevokeAccessDto, ShoppingListWithPreview } from "@/api/client-sdk/Api";
 import { useSnackbarContext } from "@/contexts/SnackbarContext";
 import { shoppingListsQueryKey } from "@/api/query-keys";
 
@@ -39,9 +39,29 @@ export const RevokeListAccessDialog: FC<RevokeListAccessDialogProps> = ({
         shoppingListId,
         data,
       ),
-    onSuccess: () => {
+    onSuccess: (updatedShoppingList) => {
       showMessage(`${userName} has been removed from the shopping list`);
-      queryClient.invalidateQueries({ queryKey: shoppingListsQueryKey });
+      queryClient.setQueryData<ShoppingListWithPreview[]>(
+        shoppingListsQueryKey,
+        (currentData) => {
+          if (!currentData) {
+            return [];
+          }
+
+          return currentData.map((shoppingList) => {
+            if (shoppingList.id === updatedShoppingList.id) {
+              return {
+                ...shoppingList,
+                sharedWithUsers: shoppingList.sharedWithUsers.filter(
+                  (user) => user.email !== email,
+                ),
+              };
+            }
+
+            return shoppingList;
+          });
+        },
+      );
       handleClose();
     },
   });

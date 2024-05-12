@@ -13,6 +13,7 @@ import { LoadingButton } from "@mui/lab";
 import { ErrorRenderer } from "@/components/ErrorRenderer";
 import { useSnackbarContext } from "@/contexts/SnackbarContext";
 import { shoppingListsQueryKey } from "@/api/query-keys";
+import { ShoppingListWithPreview } from "@/api/client-sdk/Api";
 
 interface DeleteShoppingListDialogProps {
   open: boolean;
@@ -32,14 +33,25 @@ export const DeleteShoppingListDialog: FC<DeleteShoppingListDialogProps> = ({
 
   const deleteShoppingListMutation = useMutation({
     mutationFn: apiClient.shoppingLists.shoppingListsControllerRemove,
-    onSuccess: () => {
+    onSuccess: (deletedShoppingList) => {
       showMessage(
         shared
           ? "You have been successfully removed from the shopping list"
           : "Successfully deleted shopping list",
       );
 
-      queryClient.invalidateQueries({ queryKey: shoppingListsQueryKey });
+      queryClient.setQueryData<ShoppingListWithPreview[]>(
+        shoppingListsQueryKey,
+        (currentData) => {
+          if (!currentData) {
+            return [];
+          }
+
+          return currentData.filter(
+            (shoppingList) => shoppingList.id !== deletedShoppingList.id,
+          );
+        },
+      );
     },
   });
 
