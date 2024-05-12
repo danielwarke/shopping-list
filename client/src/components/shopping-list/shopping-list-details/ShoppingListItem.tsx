@@ -59,7 +59,15 @@ export const ShoppingListItem: FC<ShoppingListItemProps> = ({
         shoppingListId,
         listItemId,
       ),
-    onSuccess: invalidateCache,
+    onSuccess: (deletedListItem) => {
+      queryClient.setQueryData<ListItem[]>(
+        ["shopping-lists", shoppingListId, "items"],
+        (currentData) =>
+          currentData
+            ? currentData.filter((item) => item.id !== deletedListItem.id)
+            : [],
+      );
+    },
     onError: invalidateCache,
   });
 

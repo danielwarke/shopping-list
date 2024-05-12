@@ -13,7 +13,7 @@ import {
 import { Add, ArrowBack } from "@mui/icons-material";
 import { ShoppingListName } from "@/components/shopping-list/shopping-list-details/ShoppingListName";
 import { NavBar } from "@/components/NavBar";
-import { CreateListItemDto } from "@/api/client-sdk/Api";
+import { CreateListItemDto, ListItem } from "@/api/client-sdk/Api";
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { ShoppingListDraggableItems } from "@/components/shopping-list/shopping-list-details/ShoppingListDraggableItems";
@@ -40,7 +40,7 @@ export default function ShoppingListDetails() {
     enabled: isAuthenticated && !!shoppingListId,
   });
 
-  const refreshListItems = useCallback(() => {
+  const invalidateCache = useCallback(() => {
     queryClient.invalidateQueries({
       queryKey: ["shopping-lists", shoppingListId, "items"],
     });
@@ -61,22 +61,27 @@ export default function ShoppingListDetails() {
 
     socket.on("list_updated", ({ userId: eventUserId }: { userId: string }) => {
       if (eventUserId !== userId) {
-        refreshListItems();
+        invalidateCache();
       }
     });
 
     return () => {
       socket.emit("leave_room", shoppingListId);
     };
-  }, [isAuthenticated, isShared, refreshListItems, shoppingListId, userId]);
+  }, [isAuthenticated, isShared, invalidateCache, shoppingListId, userId]);
 
   const createListItemMutation = useMutation({
     mutationFn: (data: CreateListItemDto) =>
       apiClient.shoppingLists.listItemsControllerCreate(shoppingListId, data),
     onSuccess: (createdListItem) => {
-      refreshListItems();
+      queryClient.setQueryData<ListItem[]>(
+        ["shopping-lists", shoppingListId, "items"],
+        (currentData) =>
+          currentData ? [...currentData, createdListItem] : [createdListItem],
+      );
       setAutoFocusListItemId(createdListItem.id);
     },
+    onError: invalidateCache,
   });
 
   function handleCreateListItem(sortOrder?: number) {
