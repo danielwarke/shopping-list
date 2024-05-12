@@ -97,7 +97,9 @@ export default function ShoppingListDetails() {
           flexDirection="column"
           marginTop="4vh"
         >
-          {shoppingListIsLoading && <CircularProgress />}
+          {shoppingListIsLoading && (
+            <CircularProgress sx={{ alignSelf: "center" }} />
+          )}
           {shoppingListIsError && (
             <Alert severity="error">Unable to load shopping list.</Alert>
           )}

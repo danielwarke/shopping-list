@@ -1,6 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/api/api-client";
-import { Box, Container, Fab, Tooltip, Typography } from "@mui/material";
+import {
+  Box,
+  CircularProgress,
+  Container,
+  Fab,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import { Add } from "@mui/icons-material";
 import { ShoppingListCard } from "@/components/shopping-lists/ShoppingListCard";
 import { useAuth } from "@/hooks/use-auth";
@@ -46,6 +53,16 @@ export default function ShoppingLists() {
     <>
       <NavBar title="Shopping Lists" />
       <Container maxWidth="sm" sx={{ marginTop: "4vh" }}>
+        {isLoading && (
+          <Box
+            display="flex"
+            justifyContent="center"
+            flexDirection="column"
+            alignItems="center"
+          >
+            <CircularProgress />
+          </Box>
+        )}
         <Box>
           {shoppingLists.map((shoppingList) => (
             <ShoppingListCard
