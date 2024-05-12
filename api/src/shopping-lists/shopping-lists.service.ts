@@ -23,6 +23,11 @@ export class ShoppingListsService {
     return this.prisma.shoppingList.create({
       data: {
         name: createShoppingListDto.name,
+        listItems: {
+          create: {
+            sortOrder: 1,
+          },
+        },
         users: {
           connect: {
             id: userId,
