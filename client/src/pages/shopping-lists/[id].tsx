@@ -23,7 +23,7 @@ import { useSocket } from "@/hooks/use-socket";
 
 export default function ShoppingListDetails() {
   const router = useRouter();
-  const { isAuthenticated, userId } = useAuth(true);
+  const { isAuthenticated } = useAuth(true);
   const shoppingListId = router.query.id as string;
 
   const queryClient = useQueryClient();
