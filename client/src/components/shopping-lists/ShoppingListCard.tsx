@@ -31,6 +31,11 @@ export const ShoppingListCard: FC<ShoppingListCardProps> = ({
     router.push(`/shopping-lists/${shoppingList.id}`);
   }
 
+  const remainingAfterPreview =
+    shoppingList.incompleteItemCount - shoppingList.listItemsPreview.length;
+
+  const hasPreview = shoppingList.listItemsPreview.length > 0;
+
   return (
     <Card variant="outlined" sx={{ marginBottom: "1em" }}>
       <CardHeader
@@ -43,23 +48,25 @@ export const ShoppingListCard: FC<ShoppingListCardProps> = ({
         }
       ></CardHeader>
       <CardContent>
-        {shoppingList.listItemsPreview.length > 0 && (
+        {hasPreview && (
           <Box marginBottom="1em">
             {shoppingList.listItemsPreview.map((listItem, index) => (
               <Typography key={listItem.id} variant="subtitle1">
                 {listItem.name}
-                {index === shoppingList.listItemsPreview.length - 1
-                  ? "..."
-                  : ""}
               </Typography>
             ))}
           </Box>
         )}
-        <Typography variant="subtitle2" color="text.secondary">
-          {shoppingList.incompleteItemCount === 0
-            ? "All items completed"
-            : `${shoppingList.incompleteItemCount} incomplete item${shoppingList.incompleteItemCount !== 1 ? "s" : ""}`}
-        </Typography>
+        {shoppingList.incompleteItemCount === 0 && (
+          <Typography variant="subtitle2" color="text.secondary">
+            All items completed
+          </Typography>
+        )}
+        {remainingAfterPreview > 0 && (
+          <Typography variant="subtitle2" color="text.secondary">
+            {`${remainingAfterPreview} ${hasPreview ? "more" : ""} incomplete item${remainingAfterPreview > 1 ? "s" : ""}`}
+          </Typography>
+        )}
       </CardContent>
       <CardActions>
         <Box
