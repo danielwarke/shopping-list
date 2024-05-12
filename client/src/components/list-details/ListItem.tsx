@@ -1,7 +1,7 @@
 import { FC, KeyboardEvent } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
-  ListItem,
+  ListItem as ListItemInterface,
   RenameListItemDto,
   SetListItemCompleteDto,
 } from "@/api/client-sdk/Api";
@@ -13,15 +13,15 @@ import { Draggable } from "react-smooth-dnd";
 import { getItemsQueryKey } from "@/api/query-keys";
 import { useSetItemData } from "@/hooks/use-set-item-data";
 
-interface ShoppingListItemProps {
+interface ListItemProps {
   shoppingListId: string;
-  listItem: ListItem;
+  listItem: ListItemInterface;
   onEnterKey: (sortOrder: number) => void;
   autoFocus: boolean;
   disableDrag?: boolean;
 }
 
-export const ShoppingListItem: FC<ShoppingListItemProps> = ({
+export const ListItem: FC<ListItemProps> = ({
   shoppingListId,
   listItem,
   onEnterKey,

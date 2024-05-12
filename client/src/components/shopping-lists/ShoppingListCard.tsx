@@ -10,11 +10,11 @@ import {
   Typography,
 } from "@mui/material";
 import { ShoppingListWithPreview } from "@/api/client-sdk/Api";
-import { ShoppingListActionsMenu } from "@/components/shopping-list/ShoppingListActionsMenu";
+import { ShoppingListActionsMenu } from "@/components/shopping-lists/ShoppingListActionsMenu";
 import { useRouter } from "next/router";
 import { useAuth } from "@/hooks/use-auth";
 import { AccountCircle } from "@mui/icons-material";
-import { ShoppingListSharedUser } from "@/components/shopping-list/ShoppingListSharedUser";
+import { ShoppingListSharedUser } from "@/components/shopping-lists/ShoppingListSharedUser";
 
 interface ShoppingListCardProps {
   shoppingList: ShoppingListWithPreview;

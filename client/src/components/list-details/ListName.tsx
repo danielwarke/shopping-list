@@ -6,15 +6,12 @@ import { apiClient } from "@/api/api-client";
 import { UpdateShoppingListDto } from "@/api/client-sdk/Api";
 import { getShoppingListQueryKey } from "@/api/query-keys";
 
-interface ShoppingListNameProps {
+interface ListNameProps {
   id: string;
   currentName: string;
 }
 
-export const ShoppingListName: FC<ShoppingListNameProps> = ({
-  id,
-  currentName,
-}) => {
+export const ListName: FC<ListNameProps> = ({ id, currentName }) => {
   const queryClient = useQueryClient();
   const shoppingListQueryKey = getShoppingListQueryKey(id);
 

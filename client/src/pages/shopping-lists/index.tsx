@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/api/api-client";
 import { Box, Container, Fab, Tooltip, Typography } from "@mui/material";
 import { Add } from "@mui/icons-material";
-import { ShoppingListCard } from "@/components/shopping-list/ShoppingListCard";
+import { ShoppingListCard } from "@/components/shopping-lists/ShoppingListCard";
 import { useAuth } from "@/hooks/use-auth";
 import { NavBar } from "@/components/NavBar";
 import { shoppingListsQueryKey } from "@/api/query-keys";

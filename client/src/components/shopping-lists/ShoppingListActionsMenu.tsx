@@ -1,8 +1,8 @@
 import { MoreVert } from "@mui/icons-material";
 import { IconButton, Menu, MenuItem } from "@mui/material";
 import { FC, useState } from "react";
-import { DeleteShoppingListDialog } from "@/components/shopping-list/dialogs/DeleteShoppingListDialog";
-import { ShareShoppingListDialog } from "@/components/shopping-list/dialogs/ShareShoppingListDialog";
+import { DeleteShoppingListDialog } from "@/components/shopping-lists/dialogs/DeleteShoppingListDialog";
+import { ShareShoppingListDialog } from "@/components/shopping-lists/dialogs/ShareShoppingListDialog";
 
 interface ShoppingListActionMenuProps {
   shoppingListId: string;

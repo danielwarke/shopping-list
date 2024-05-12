@@ -4,13 +4,13 @@ import { useQueryClient } from "@tanstack/react-query";
 import { FC } from "react";
 import { getItemsQueryKey } from "@/api/query-keys";
 
-interface ShoppingListSearchBarProps {
+interface ListSearchBarProps {
   shoppingListId: string;
   search: string;
   setSearch: (value: string) => void;
 }
 
-export const ShoppingListSearchBar: FC<ShoppingListSearchBarProps> = ({
+export const ListSearchBar: FC<ListSearchBarProps> = ({
   shoppingListId,
   search,
   setSearch,

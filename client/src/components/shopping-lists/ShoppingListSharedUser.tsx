@@ -1,7 +1,7 @@
 import { FC, useState } from "react";
 import { AccountCircle } from "@mui/icons-material";
 import { IconButton, Menu, MenuItem, Tooltip } from "@mui/material";
-import { RevokeListAccessDialog } from "@/components/shopping-list/dialogs/RevokeListAccessDialog";
+import { RevokeListAccessDialog } from "@/components/shopping-lists/dialogs/RevokeListAccessDialog";
 
 interface ShoppingListSharedUserProps {
   shoppingListId: string;

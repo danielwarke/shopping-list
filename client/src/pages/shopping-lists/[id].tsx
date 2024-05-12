@@ -11,15 +11,15 @@ import {
   Tooltip,
 } from "@mui/material";
 import { Add, ArrowBack } from "@mui/icons-material";
-import { ShoppingListName } from "@/components/shopping-list/shopping-list-details/ShoppingListName";
 import { NavBar } from "@/components/NavBar";
 import { CreateListItemDto } from "@/api/client-sdk/Api";
 import { useCallback, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
-import { ShoppingListDraggableItems } from "@/components/shopping-list/shopping-list-details/ShoppingListDraggableItems";
-import { ShoppingListSearchBar } from "@/components/shopping-list/shopping-list-details/ShoppingListSearchBar";
 import { getItemsQueryKey, getShoppingListQueryKey } from "@/api/query-keys";
 import { useSocket } from "@/hooks/use-socket";
+import { ListName } from "@/components/list-details/ListName";
+import { ListSearchBar } from "@/components/list-details/ListSearchBar";
+import { DraggableItems } from "@/components/list-details/DraggableItems";
 
 export default function ShoppingListDetails() {
   const router = useRouter();
@@ -103,12 +103,9 @@ export default function ShoppingListDetails() {
           )}
           {shoppingList && (
             <>
-              <ShoppingListName
-                id={shoppingListId}
-                currentName={shoppingList.name}
-              />
+              <ListName id={shoppingListId} currentName={shoppingList.name} />
               <Box marginTop="2vh" paddingBottom="16vh">
-                <ShoppingListSearchBar
+                <ListSearchBar
                   shoppingListId={shoppingListId}
                   search={search}
                   setSearch={(value) => {
@@ -116,7 +113,7 @@ export default function ShoppingListDetails() {
                     setAutoFocusListItemId("");
                   }}
                 />
-                <ShoppingListDraggableItems
+                <DraggableItems
                   shoppingListId={shoppingListId}
                   autoFocusListItemId={autoFocusListItemId}
                   handleCreateListItem={handleCreateListItem}

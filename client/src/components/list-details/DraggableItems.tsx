@@ -1,23 +1,26 @@
 import { FC, useMemo } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/api/api-client";
-import { ShoppingListItem } from "@/components/shopping-list/shopping-list-details/ShoppingListItem";
 import { Container as DraggableContainer } from "react-smooth-dnd";
 import { ReorderShoppingListDto } from "@/api/client-sdk/Api";
 import { Typography } from "@mui/material";
 import { getItemsQueryKey } from "@/api/query-keys";
 import { useSetItemData } from "@/hooks/use-set-item-data";
+import { ListItem } from "@/components/list-details/ListItem";
 
-interface ShoppingListDraggableItemsProps {
+interface DraggableItemsProps {
   shoppingListId: string;
   autoFocusListItemId: string;
   handleCreateListItem: (sortOrder: number) => void;
   search: string;
 }
 
-export const ShoppingListDraggableItems: FC<
-  ShoppingListDraggableItemsProps
-> = ({ shoppingListId, autoFocusListItemId, handleCreateListItem, search }) => {
+export const DraggableItems: FC<DraggableItemsProps> = ({
+  shoppingListId,
+  autoFocusListItemId,
+  handleCreateListItem,
+  search,
+}) => {
   const queryClient = useQueryClient();
   const itemsQueryKey = getItemsQueryKey(shoppingListId);
   const { setItemData } = useSetItemData(shoppingListId);
@@ -93,7 +96,7 @@ export const ShoppingListDraggableItems: FC<
       onDrop={onDropHandler}
     >
       {filteredListItems.map((listItem) => (
-        <ShoppingListItem
+        <ListItem
           key={listItem.id}
           shoppingListId={shoppingListId}
           listItem={listItem}
