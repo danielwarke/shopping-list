@@ -65,13 +65,23 @@ export class ListItemsService {
           : 1;
     }
 
-    const createdListItem = await this.prisma.listItem.create({
-      data: {
-        shoppingListId,
-        name: createListItemDto.name,
-        sortOrder,
-      },
-    });
+    const [createdListItem] = await this.prisma.$transaction([
+      this.prisma.listItem.create({
+        data: {
+          shoppingListId,
+          name: createListItemDto.name,
+          sortOrder,
+        },
+      }),
+      this.prisma.shoppingList.update({
+        data: {
+          updatedAt: new Date(),
+        },
+        where: {
+          id: shoppingListId,
+        },
+      }),
+    ]);
 
     this.gatewayService.onListUpdated(shoppingListId, userId);
 
@@ -89,6 +99,11 @@ export class ListItemsService {
     const updatedListItem = await this.prisma.listItem.update({
       data: {
         name,
+        shoppingList: {
+          update: {
+            createdAt: new Date(),
+          },
+        },
       },
       where: {
         id: id,
@@ -123,6 +138,11 @@ export class ListItemsService {
     const updatedList = await this.prisma.listItem.update({
       data: {
         complete,
+        shoppingList: {
+          update: {
+            updatedAt: new Date(),
+          },
+        },
       },
       where: {
         id: id,
@@ -149,17 +169,27 @@ export class ListItemsService {
     shoppingListId: string,
     id: string,
   ): Promise<ListItem> {
-    const deletedListItem = await this.prisma.listItem.delete({
-      where: {
-        id: id,
-        shoppingList: {
-          id: shoppingListId,
-          users: {
-            some: { id: userId },
+    const [deletedListItem] = await this.prisma.$transaction([
+      this.prisma.listItem.delete({
+        where: {
+          id: id,
+          shoppingList: {
+            id: shoppingListId,
+            users: {
+              some: { id: userId },
+            },
           },
         },
-      },
-    });
+      }),
+      this.prisma.shoppingList.update({
+        data: {
+          updatedAt: new Date(),
+        },
+        where: {
+          id: shoppingListId,
+        },
+      }),
+    ]);
 
     this.gatewayService.onItemDeleted(shoppingListId, { userId, itemId: id });
 

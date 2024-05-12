@@ -191,6 +191,11 @@ export class ShoppingListsService {
         }),
     );
 
+    await this.prisma.shoppingList.update({
+      data: { updatedAt: new Date() },
+      where: { id },
+    });
+
     this.gatewayService.onListUpdated(id, userId);
 
     return updatedListItems;
