@@ -150,14 +150,16 @@ export class ShoppingListsService {
     };
   }
 
-  rename(
+  async rename(
     userId: string,
     id: string,
     updateShoppingListDto: UpdateShoppingListDto,
   ): Promise<ShoppingList> {
-    return this.prisma.shoppingList.update({
+    const { name } = updateShoppingListDto;
+
+    const updatedShoppingList = await this.prisma.shoppingList.update({
       data: {
-        name: updateShoppingListDto.name,
+        name,
       },
       where: {
         id,
@@ -168,6 +170,10 @@ export class ShoppingListsService {
         },
       },
     });
+
+    this.gatewayService.onListRenamed(id, { userId, name });
+
+    return updatedShoppingList;
   }
 
   async reorder(

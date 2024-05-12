@@ -3,7 +3,13 @@ import { io, Socket } from "socket.io-client";
 import { useAuth } from "@/hooks/use-auth";
 import { useSetItemData } from "@/hooks/use-set-item-data";
 import { useQueryClient } from "@tanstack/react-query";
-import { getItemsQueryKey } from "@/api/query-keys";
+import { getItemsQueryKey, getShoppingListQueryKey } from "@/api/query-keys";
+import { ShoppingListWithMetadata } from "@/api/client-sdk/Api";
+
+interface ListRenamedPayload {
+  userId: string;
+  name: string;
+}
 
 interface ItemUpdatedPayload {
   userId: string;
@@ -19,6 +25,7 @@ interface ItemCompletePayload extends ItemUpdatedPayload {
 }
 
 interface ServerToClientEvents {
+  listRenamed: (payload: ListRenamedPayload) => void;
   listUpdated: ({ userId }: { userId: string }) => void;
   itemDeleted: (payload: ItemUpdatedPayload) => void;
   itemRenamed: (payload: ItemRenamedPayload) => void;
@@ -32,6 +39,7 @@ interface ClientToServerEvents {
 
 export function useSocket(shoppingListId: string = "") {
   const queryClient = useQueryClient();
+  const shoppingListQueryKey = getShoppingListQueryKey(shoppingListId);
   const itemsQueryKey = getItemsQueryKey(shoppingListId);
 
   const { isAuthenticated, userId: currentUserId } = useAuth();
@@ -49,6 +57,24 @@ export function useSocket(shoppingListId: string = "") {
 
     socket.on("connect", () => {
       socket.emit("joinRoom", shoppingListId);
+    });
+
+    socket.on("listRenamed", ({ userId, name }) => {
+      if (currentUserId !== userId) {
+        queryClient.setQueryData<ShoppingListWithMetadata>(
+          shoppingListQueryKey,
+          (currentData) => {
+            if (!currentData) {
+              return;
+            }
+
+            return {
+              ...currentData,
+              name,
+            };
+          },
+        );
+      }
     });
 
     socket.on("listUpdated", ({ userId }) => {

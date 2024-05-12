@@ -1,3 +1,8 @@
+export interface ListRenamedPayload {
+  userId: string;
+  name: string;
+}
+
 export interface ItemUpdatedPayload {
   userId: string;
   itemId: string;
@@ -12,6 +17,7 @@ export interface ItemCompletePayload extends ItemUpdatedPayload {
 }
 
 export interface ServerToClientEvents {
+  listRenamed: (payload: ListRenamedPayload) => void;
   listUpdated: ({ userId }: { userId: string }) => void;
   itemDeleted: (payload: ItemUpdatedPayload) => void;
   itemRenamed: (payload: ItemRenamedPayload) => void;

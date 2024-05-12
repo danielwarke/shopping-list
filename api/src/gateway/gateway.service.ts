@@ -10,6 +10,7 @@ import {
   ItemCompletePayload,
   ItemRenamedPayload,
   ItemUpdatedPayload,
+  ListRenamedPayload,
   ServerToClientEvents,
 } from "./types";
 
@@ -40,6 +41,10 @@ export class GatewayService {
 
   onListUpdated(shoppingListId: string, userId: string) {
     this.server.to(shoppingListId).emit("listUpdated", { userId });
+  }
+
+  onListRenamed(shoppingListId: string, payload: ListRenamedPayload) {
+    this.server.to(shoppingListId).emit("listRenamed", payload);
   }
 
   onItemDeleted(shoppingListId: string, payload: ItemUpdatedPayload) {
