@@ -7,10 +7,12 @@ import {
 } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
 import {
+  ItemAppendedPayload,
   ItemCompletePayload,
   ItemRenamedPayload,
   ItemUpdatedPayload,
   ListRenamedPayload,
+  ListReorderedPayload,
   ServerToClientEvents,
 } from "./types";
 
@@ -39,12 +41,16 @@ export class GatewayService {
     socket.leave(shoppingListId);
   }
 
-  onListUpdated(shoppingListId: string, userId: string) {
-    this.server.to(shoppingListId).emit("listUpdated", { userId });
-  }
-
   onListRenamed(shoppingListId: string, payload: ListRenamedPayload) {
     this.server.to(shoppingListId).emit("listRenamed", payload);
+  }
+
+  onListReordered(shoppingListId: string, payload: ListReorderedPayload) {
+    this.server.to(shoppingListId).emit("listReordered", payload);
+  }
+
+  onItemAppended(shoppingListId: string, payload: ItemAppendedPayload) {
+    this.server.to(shoppingListId).emit("itemAppended", payload);
   }
 
   onItemDeleted(shoppingListId: string, payload: ItemUpdatedPayload) {

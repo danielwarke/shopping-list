@@ -1,4 +1,4 @@
-import { ListItem } from "src/_gen/prisma-class/list_item";
+import { ListItem } from "@/api/client-sdk/Api";
 
 export interface ListRenamedPayload {
   userId: string;
@@ -35,4 +35,9 @@ export interface ServerToClientEvents {
   itemRenamed: (payload: ItemRenamedPayload) => void;
   itemComplete: (payload: ItemCompletePayload) => void;
   itemDeleted: (payload: ItemUpdatedPayload) => void;
+}
+
+export interface ClientToServerEvents {
+  joinRoom: (shoppingListId: string) => void;
+  leaveRoom: (shoppingListId: string) => void;
 }

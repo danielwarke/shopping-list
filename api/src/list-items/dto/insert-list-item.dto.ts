@@ -1,11 +1,10 @@
 import { IsNumber, IsOptional, IsString } from "class-validator";
 
-export class CreateListItemDto {
+export class InsertListItemDto {
   @IsString()
   @IsOptional()
   name?: string;
 
   @IsNumber()
-  @IsOptional()
-  sortOrder?: number;
+  sortOrder: number;
 }

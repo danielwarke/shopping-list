@@ -2,9 +2,10 @@ import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../database/prisma.service";
 import { ListItem } from "../_gen/prisma-class/list_item";
 import { RenameListItemDto } from "./dto/rename-list-item.dto";
-import { CreateListItemDto } from "./dto/create-list-item.dto";
+import { AppendListItemDto } from "./dto/append-list-item.dto";
 import { GatewayService } from "../gateway/gateway.service";
 import { SetListItemCompleteDto } from "./dto/set-list-item-complete.dto";
+import { InsertListItemDto } from "./dto/insert-list-item.dto";
 
 @Injectable()
 export class ListItemsService {
@@ -32,10 +33,10 @@ export class ListItemsService {
     });
   }
 
-  async create(
+  async append(
     userId: string,
     shoppingListId: string,
-    createListItemDto: CreateListItemDto,
+    appendListItemDto: AppendListItemDto,
   ): Promise<ListItem> {
     const shoppingList = await this.prisma.shoppingList.findUniqueOrThrow({
       select: {
@@ -57,19 +58,16 @@ export class ListItemsService {
       },
     });
 
-    let sortOrder = createListItemDto.sortOrder;
-    if (!sortOrder) {
-      sortOrder =
-        shoppingList.listItems.length > 0
-          ? shoppingList.listItems[0].sortOrder + 1
-          : 1;
-    }
+    const sortOrder =
+      shoppingList.listItems.length > 0
+        ? shoppingList.listItems[0].sortOrder + 1
+        : 1;
 
     const [createdListItem] = await this.prisma.$transaction([
       this.prisma.listItem.create({
         data: {
           shoppingListId,
-          name: createListItemDto.name,
+          name: appendListItemDto.name,
           sortOrder,
         },
       }),
@@ -83,9 +81,72 @@ export class ListItemsService {
       }),
     ]);
 
-    this.gatewayService.onListUpdated(shoppingListId, userId);
+    this.gatewayService.onItemAppended(shoppingListId, {
+      userId,
+      appendedItem: createdListItem,
+    });
 
     return createdListItem;
+  }
+
+  async insert(
+    userId: string,
+    shoppingListId: string,
+    insertListItemDto: InsertListItemDto,
+  ): Promise<ListItem[]> {
+    const [_, shoppingList] = await this.prisma.$transaction([
+      this.prisma.listItem.create({
+        data: {
+          shoppingListId,
+          name: insertListItemDto.name,
+          sortOrder: insertListItemDto.sortOrder,
+        },
+      }),
+      this.prisma.shoppingList.update({
+        include: {
+          listItems: {
+            select: {
+              id: true,
+            },
+            orderBy: [
+              {
+                sortOrder: "asc",
+              },
+              { createdAt: "asc" },
+            ],
+          },
+        },
+        data: {
+          updatedAt: new Date(),
+        },
+        where: {
+          id: shoppingListId,
+          users: {
+            some: { id: userId },
+          },
+        },
+      }),
+    ]);
+
+    const updatedListItems = await this.prisma.$transaction(
+      shoppingList.listItems.map((listItem, index) => {
+        return this.prisma.listItem.update({
+          data: {
+            sortOrder: index + 1,
+          },
+          where: {
+            id: listItem.id,
+          },
+        });
+      }),
+    );
+
+    this.gatewayService.onListReordered(shoppingListId, {
+      userId,
+      reorderedList: updatedListItems.sort((a, b) => a.sortOrder - b.sortOrder),
+    });
+
+    return updatedListItems;
   }
 
   async rename(

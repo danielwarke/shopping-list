@@ -5,37 +5,7 @@ import { useSetItemData } from "@/hooks/use-set-item-data";
 import { useQueryClient } from "@tanstack/react-query";
 import { getItemsQueryKey, getShoppingListQueryKey } from "@/api/query-keys";
 import { ShoppingListWithMetadata } from "@/api/client-sdk/Api";
-
-interface ListRenamedPayload {
-  userId: string;
-  name: string;
-}
-
-interface ItemUpdatedPayload {
-  userId: string;
-  itemId: string;
-}
-
-interface ItemRenamedPayload extends ItemUpdatedPayload {
-  name: string;
-}
-
-interface ItemCompletePayload extends ItemUpdatedPayload {
-  complete: boolean;
-}
-
-interface ServerToClientEvents {
-  listRenamed: (payload: ListRenamedPayload) => void;
-  listUpdated: ({ userId }: { userId: string }) => void;
-  itemDeleted: (payload: ItemUpdatedPayload) => void;
-  itemRenamed: (payload: ItemRenamedPayload) => void;
-  itemComplete: (payload: ItemCompletePayload) => void;
-}
-
-interface ClientToServerEvents {
-  joinRoom: (shoppingListId: string) => void;
-  leaveRoom: (shoppingListId: string) => void;
-}
+import { ClientToServerEvents, ServerToClientEvents } from "./socket.types";
 
 export function useSocket(shoppingListId: string = "") {
   const queryClient = useQueryClient();
@@ -43,8 +13,13 @@ export function useSocket(shoppingListId: string = "") {
   const itemsQueryKey = getItemsQueryKey(shoppingListId);
 
   const { isAuthenticated, userId: currentUserId } = useAuth();
-  const { setItemRenameData, setItemCompleteData, setItemDeleteData } =
-    useSetItemData(shoppingListId);
+  const {
+    setItemData,
+    setItemAppendedData,
+    setItemRenameData,
+    setItemCompleteData,
+    setItemDeleteData,
+  } = useSetItemData(shoppingListId);
 
   useEffect(() => {
     const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -77,9 +52,15 @@ export function useSocket(shoppingListId: string = "") {
       }
     });
 
-    socket.on("listUpdated", ({ userId }) => {
+    socket.on("listReordered", ({ userId, reorderedList }) => {
       if (currentUserId !== userId) {
-        queryClient.invalidateQueries({ queryKey: itemsQueryKey });
+        setItemData(reorderedList);
+      }
+    });
+
+    socket.on("itemAppended", ({ userId, appendedItem }) => {
+      if (currentUserId !== userId) {
+        setItemAppendedData(appendedItem);
       }
     });
 
@@ -113,5 +94,8 @@ export function useSocket(shoppingListId: string = "") {
     setItemRenameData,
     setItemCompleteData,
     currentUserId,
+    shoppingListQueryKey,
+    setItemData,
+    setItemAppendedData,
   ]);
 }

@@ -12,26 +12,25 @@ import {
 } from "@mui/material";
 import { Add, ArrowBack } from "@mui/icons-material";
 import { NavBar } from "@/components/NavBar";
-import { CreateListItemDto } from "@/api/client-sdk/Api";
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { getItemsQueryKey, getShoppingListQueryKey } from "@/api/query-keys";
 import { useSocket } from "@/hooks/use-socket";
 import { ListName } from "@/components/list-details/ListName";
-import { ListSearchBar } from "@/components/list-details/ListSearchBar";
 import { DraggableItems } from "@/components/list-details/DraggableItems";
+import { useSetItemData } from "@/hooks/use-set-item-data";
+import { AppendListItemDto } from "@/api/client-sdk/Api";
 
 export default function ShoppingListDetails() {
   const router = useRouter();
   const { isAuthenticated } = useAuth(true);
   const shoppingListId = router.query.id as string;
 
+  const { setItemAppendedData } = useSetItemData(shoppingListId);
+
   const queryClient = useQueryClient();
   const shoppingListQueryKey = getShoppingListQueryKey(shoppingListId);
   const itemsQueryKey = getItemsQueryKey(shoppingListId);
-
-  const [autoFocusListItemId, setAutoFocusListItemId] = useState("");
-  const [search, setSearch] = useState("");
 
   const {
     data: shoppingList,
@@ -52,21 +51,12 @@ export default function ShoppingListDetails() {
 
   useSocket(shoppingList?.isShared ? shoppingListId : undefined);
 
-  const createListItemMutation = useMutation({
-    mutationFn: (data: CreateListItemDto) =>
-      apiClient.shoppingLists.listItemsControllerCreate(shoppingListId, data),
-    onSuccess: (createdListItem) => {
-      invalidateCache();
-      setAutoFocusListItemId(createdListItem.id);
-    },
+  const appendListItemMutation = useMutation({
+    mutationFn: (data: AppendListItemDto) =>
+      apiClient.shoppingLists.listItemsControllerAppend(shoppingListId, data),
+    onSuccess: setItemAppendedData,
     onError: invalidateCache,
   });
-
-  function handleCreateListItem(sortOrder?: number) {
-    createListItemMutation.mutate({
-      sortOrder,
-    });
-  }
 
   function handleBackButtonClick() {
     queryClient.invalidateQueries({
@@ -107,26 +97,13 @@ export default function ShoppingListDetails() {
             <>
               <ListName id={shoppingListId} currentName={shoppingList.name} />
               <Box marginTop="2vh" paddingBottom="16vh">
-                <ListSearchBar
-                  shoppingListId={shoppingListId}
-                  search={search}
-                  setSearch={(value) => {
-                    setSearch(value);
-                    setAutoFocusListItemId("");
-                  }}
-                />
-                <DraggableItems
-                  shoppingListId={shoppingListId}
-                  autoFocusListItemId={autoFocusListItemId}
-                  handleCreateListItem={handleCreateListItem}
-                  search={search}
-                />
+                <DraggableItems shoppingListId={shoppingListId} />
               </Box>
               <Tooltip title="New List Item">
                 <Fab
                   color="primary"
                   sx={{ position: "fixed", bottom: "2em", right: "2em" }}
-                  onClick={() => handleCreateListItem()}
+                  onClick={() => appendListItemMutation.mutate({})}
                 >
                   <Add />
                 </Fab>

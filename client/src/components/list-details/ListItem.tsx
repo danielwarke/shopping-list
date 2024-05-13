@@ -16,7 +16,7 @@ import { useSetItemData } from "@/hooks/use-set-item-data";
 interface ListItemProps {
   shoppingListId: string;
   listItem: ListItemInterface;
-  onEnterKey: (sortOrder: number) => void;
+  onEnterKey: () => void;
   autoFocus: boolean;
   disableDrag?: boolean;
 }
@@ -82,7 +82,7 @@ export const ListItem: FC<ListItemProps> = ({
 
   function handleKeyDown(e: KeyboardEvent) {
     if (e.code === "Enter") {
-      onEnterKey(listItem.sortOrder);
+      onEnterKey();
     }
 
     if (e.code === "Backspace" && name === "") {

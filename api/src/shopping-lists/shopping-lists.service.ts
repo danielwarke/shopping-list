@@ -215,7 +215,10 @@ export class ShoppingListsService {
       where: { id },
     });
 
-    this.gatewayService.onListUpdated(id, userId);
+    this.gatewayService.onListReordered(id, {
+      userId,
+      reorderedList: updatedListItems,
+    });
 
     return updatedListItems;
   }

@@ -24,6 +24,15 @@ export function useSetItemData(shoppingListId: string) {
     [itemsQueryKey, queryClient],
   );
 
+  const setItemAppendedData = useCallback(
+    (createdItem: ListItem) => {
+      setItemData((currentData) => {
+        return [...currentData, createdItem];
+      });
+    },
+    [setItemData],
+  );
+
   const setItemRenameData = useCallback(
     (itemId: string, name: string) => {
       setItemData((currentData) =>
@@ -57,8 +66,9 @@ export function useSetItemData(shoppingListId: string) {
 
   return {
     setItemData,
-    setItemDeleteData,
+    setItemAppendedData,
     setItemRenameData,
     setItemCompleteData,
+    setItemDeleteData,
   };
 }

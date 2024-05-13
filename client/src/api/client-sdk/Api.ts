@@ -67,7 +67,6 @@ export interface ListItem {
 export interface ShoppingListWithPreview {
   id: string;
   name: string;
-  createdByUserId: string;
   /** @format date-time */
   createdAt: string;
   /** @format date-time */
@@ -102,9 +101,13 @@ export interface ReorderShoppingListDto {
   order: ReorderItem[];
 }
 
-export interface CreateListItemDto {
+export interface AppendListItemDto {
   name?: string;
-  sortOrder?: number;
+}
+
+export interface InsertListItemDto {
+  name?: string;
+  sortOrder: number;
 }
 
 export interface RenameListItemDto {
@@ -268,20 +271,6 @@ export class HttpClient<SecurityDataType = unknown> {
  * A shopping list API which uses websockets to present live updates
  */
 export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
-  /**
-   * No description
-   *
-   * @name AppControllerGetHello
-   * @request GET:/
-   */
-  appControllerGetHello = (params: RequestParams = {}) =>
-    this.request<string, any>({
-      path: `/`,
-      method: "GET",
-      format: "json",
-      ...params,
-    });
-
   auth = {
     /**
      * No description
@@ -509,13 +498,32 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * No description
      *
      * @tags items
-     * @name ListItemsControllerCreate
+     * @name ListItemsControllerAppend
      * @request POST:/shopping-lists/{shoppingListId}/items
      * @secure
      */
-    listItemsControllerCreate: (shoppingListId: string, data: CreateListItemDto, params: RequestParams = {}) =>
+    listItemsControllerAppend: (shoppingListId: string, data: AppendListItemDto, params: RequestParams = {}) =>
       this.request<ListItem, any>({
         path: `/shopping-lists/${shoppingListId}/items`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags items
+     * @name ListItemsControllerInsert
+     * @request POST:/shopping-lists/{shoppingListId}/items/insert
+     * @secure
+     */
+    listItemsControllerInsert: (shoppingListId: string, data: InsertListItemDto, params: RequestParams = {}) =>
+      this.request<ListItem[], any>({
+        path: `/shopping-lists/${shoppingListId}/items/insert`,
         method: "POST",
         body: data,
         secure: true,

@@ -11,9 +11,10 @@ import {
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { ListItemsService } from "./list-items.service";
 import { RenameListItemDto } from "./dto/rename-list-item.dto";
-import { CreateListItemDto } from "./dto/create-list-item.dto";
+import { AppendListItemDto } from "./dto/append-list-item.dto";
 import { JwtRequest } from "../types";
 import { SetListItemCompleteDto } from "./dto/set-list-item-complete.dto";
+import { InsertListItemDto } from "./dto/insert-list-item.dto";
 
 @Controller()
 @ApiTags("items")
@@ -30,15 +31,28 @@ export class ListItemsController {
   }
 
   @Post()
-  create(
+  append(
     @Req() req: JwtRequest,
     @Param("shoppingListId") shoppingListId: string,
-    @Body() createListItemDto: CreateListItemDto,
+    @Body() appendListItemDto: AppendListItemDto,
   ) {
-    return this.listItemsService.create(
+    return this.listItemsService.append(
       req.user.userId,
       shoppingListId,
-      createListItemDto,
+      appendListItemDto,
+    );
+  }
+
+  @Post("insert")
+  insert(
+    @Req() req: JwtRequest,
+    @Param("shoppingListId") shoppingListId: string,
+    @Body() insertListItemDto: InsertListItemDto,
+  ) {
+    return this.listItemsService.insert(
+      req.user.userId,
+      shoppingListId,
+      insertListItemDto,
     );
   }
 
