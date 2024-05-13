@@ -72,7 +72,9 @@ export const ListItem: FC<ListItemProps> = ({
   });
 
   const [name, setName] = useDebounceState(listItem.name, (newName) => {
-    renameListItemMutation.mutate({ name: newName });
+    if (newName !== listItem.name) {
+      renameListItemMutation.mutate({ name: newName });
+    }
   });
 
   const [complete, setComplete] = useDebounceState(
@@ -80,8 +82,12 @@ export const ListItem: FC<ListItemProps> = ({
     (newComplete) => setCompleteMutation.mutate({ complete: newComplete }),
   );
 
-  function handleKeyDown(e: KeyboardEvent) {
+  async function handleKeyDown(e: KeyboardEvent) {
     if (e.code === "Enter") {
+      if (name !== listItem.name) {
+        await renameListItemMutation.mutateAsync({ name });
+      }
+
       onEnterKey();
     }
 
