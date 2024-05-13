@@ -50,7 +50,7 @@ export const ShoppingListCard: FC<ShoppingListCardProps> = ({
       <CardContent>
         {hasPreview && (
           <Box marginBottom="1em">
-            {shoppingList.listItemsPreview.map((listItem, index) => (
+            {shoppingList.listItemsPreview.map((listItem) => (
               <Typography key={listItem.id} variant="subtitle1">
                 {listItem.name}
               </Typography>
