@@ -1,16 +1,15 @@
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { io, Socket } from "socket.io-client";
 import { useAuth } from "@/hooks/use-auth";
 import { useSetItemData } from "@/hooks/use-set-item-data";
 import { useQueryClient } from "@tanstack/react-query";
-import { getItemsQueryKey, getShoppingListQueryKey } from "@/api/query-keys";
+import { getShoppingListQueryKey } from "@/api/query-keys";
 import { ShoppingListWithMetadata } from "@/api/client-sdk/Api";
 import { ClientToServerEvents, ServerToClientEvents } from "./socket.types";
 
 export function useSocket(shoppingListId: string = "") {
   const queryClient = useQueryClient();
   const shoppingListQueryKey = getShoppingListQueryKey(shoppingListId);
-  const itemsQueryKey = getItemsQueryKey(shoppingListId);
 
   const { isAuthenticated, userId: currentUserId } = useAuth();
   const {
@@ -20,6 +19,25 @@ export function useSocket(shoppingListId: string = "") {
     setItemCompleteData,
     setItemDeleteData,
   } = useSetItemData(shoppingListId);
+
+  const setListRenameData = useCallback(
+    (name: string) => {
+      queryClient.setQueryData<ShoppingListWithMetadata>(
+        shoppingListQueryKey,
+        (currentData) => {
+          if (!currentData) {
+            return;
+          }
+
+          return {
+            ...currentData,
+            name,
+          };
+        },
+      );
+    },
+    [queryClient, shoppingListQueryKey],
+  );
 
   useEffect(() => {
     const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -36,19 +54,7 @@ export function useSocket(shoppingListId: string = "") {
 
     socket.on("listRenamed", ({ userId, name }) => {
       if (currentUserId !== userId) {
-        queryClient.setQueryData<ShoppingListWithMetadata>(
-          shoppingListQueryKey,
-          (currentData) => {
-            if (!currentData) {
-              return;
-            }
-
-            return {
-              ...currentData,
-              name,
-            };
-          },
-        );
+        setListRenameData(name);
       }
     });
 
@@ -86,16 +92,14 @@ export function useSocket(shoppingListId: string = "") {
       socket.emit("leaveRoom", shoppingListId);
     };
   }, [
+    currentUserId,
     isAuthenticated,
-    shoppingListId,
-    queryClient,
-    itemsQueryKey,
+    setItemAppendedData,
+    setItemCompleteData,
+    setItemData,
     setItemDeleteData,
     setItemRenameData,
-    setItemCompleteData,
-    currentUserId,
-    shoppingListQueryKey,
-    setItemData,
-    setItemAppendedData,
+    setListRenameData,
+    shoppingListId,
   ]);
 }
