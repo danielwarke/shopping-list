@@ -38,10 +38,7 @@ export const DraggableItems: FC = () => {
 
   const reorderListItemsMutation = useMutation({
     mutationFn: (data: ReorderShoppingListDto) =>
-      apiClient.shoppingLists.shoppingListsControllerReorder(
-        shoppingListId,
-        data,
-      ),
+      apiClient.shoppingLists.listItemsControllerReorder(shoppingListId, data),
     onError: invalidateCache,
   });
 

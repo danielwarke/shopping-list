@@ -3,8 +3,6 @@ import { CreateShoppingListDto } from "./dto/create-shopping-list.dto";
 import { UpdateShoppingListDto } from "./dto/update-shopping-list.dto";
 import { PrismaService } from "../database/prisma.service";
 import { ShoppingList } from "../_gen/prisma-class/shopping_list";
-import { ReorderShoppingListDto } from "./dto/reorder-shopping-list.dto";
-import { ListItem } from "src/_gen/prisma-class/list_item";
 import { ShoppingListWithPreview } from "./dto/shopping-list-with-preview.dto";
 import { ShoppingListWithMetadata } from "./dto/shopping-list-with-metadata.dto";
 import { GatewayService } from "../gateway/gateway.service";
@@ -174,53 +172,6 @@ export class ShoppingListsService {
     this.gatewayService.onListRenamed(id, { userId, name });
 
     return updatedShoppingList;
-  }
-
-  async reorder(
-    userId: string,
-    id: string,
-    reorderListItemsDto: ReorderShoppingListDto,
-  ): Promise<ListItem[]> {
-    const shoppingList = await this.prisma.shoppingList.findUnique({
-      where: {
-        id,
-        users: {
-          some: { id: userId },
-        },
-      },
-    });
-
-    if (!shoppingList) {
-      throw new NotFoundException("Shopping list does not exist");
-    }
-
-    const updatedListItems = await this.prisma.$transaction(
-      reorderListItemsDto.order
-        .sort((a, b) => a.sortOrder - b.sortOrder)
-        .map((reorderItem) => {
-          return this.prisma.listItem.update({
-            data: {
-              sortOrder: reorderItem.sortOrder,
-            },
-            where: {
-              id: reorderItem.listItemId,
-              shoppingListId: id,
-            },
-          });
-        }),
-    );
-
-    await this.prisma.shoppingList.update({
-      data: { updatedAt: new Date() },
-      where: { id },
-    });
-
-    this.gatewayService.onListReordered(id, {
-      userId,
-      reorderedList: updatedListItems,
-    });
-
-    return updatedListItems;
   }
 
   async remove(userId: string, id: string): Promise<ShoppingList> {

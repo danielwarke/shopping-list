@@ -10,6 +10,7 @@ import { AppendListItemDto } from "./dto/append-list-item.dto";
 import { GatewayService } from "../gateway/gateway.service";
 import { SetListItemCompleteDto } from "./dto/set-list-item-complete.dto";
 import { InsertListItemDto } from "./dto/insert-list-item.dto";
+import { ReorderShoppingListDto } from "./dto/reorder-shopping-list.dto";
 
 @Injectable()
 export class ListItemsService {
@@ -190,6 +191,53 @@ export class ListItemsService {
     });
 
     return updatedListItem;
+  }
+
+  async reorder(
+    userId: string,
+    shoppingListId: string,
+    reorderListItemsDto: ReorderShoppingListDto,
+  ): Promise<ListItem[]> {
+    const shoppingList = await this.prisma.shoppingList.findUnique({
+      where: {
+        id: shoppingListId,
+        users: {
+          some: { id: userId },
+        },
+      },
+    });
+
+    if (!shoppingList) {
+      throw new NotFoundException("Shopping list does not exist");
+    }
+
+    const updatedListItems = await this.prisma.$transaction(
+      reorderListItemsDto.order
+        .sort((a, b) => a.sortOrder - b.sortOrder)
+        .map((reorderItem) => {
+          return this.prisma.listItem.update({
+            data: {
+              sortOrder: reorderItem.sortOrder,
+            },
+            where: {
+              id: reorderItem.listItemId,
+              shoppingListId,
+            },
+          });
+        }),
+    );
+
+    await this.prisma.shoppingList.update({
+      data: { updatedAt: new Date() },
+      where: { id: shoppingListId },
+    });
+
+    this.gatewayService.onListReordered(shoppingListId, {
+      userId,
+      reorderedList: updatedListItems,
+    });
+
+    return updatedListItems;
   }
 
   async setComplete(

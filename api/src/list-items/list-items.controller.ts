@@ -15,6 +15,7 @@ import { AppendListItemDto } from "./dto/append-list-item.dto";
 import { JwtRequest } from "../types";
 import { SetListItemCompleteDto } from "./dto/set-list-item-complete.dto";
 import { InsertListItemDto } from "./dto/insert-list-item.dto";
+import { ReorderShoppingListDto } from "./dto/reorder-shopping-list.dto";
 
 @Controller()
 @ApiTags("items")
@@ -53,6 +54,19 @@ export class ListItemsController {
       req.user.userId,
       shoppingListId,
       insertListItemDto,
+    );
+  }
+
+  @Patch("reorder")
+  reorder(
+    @Req() req: JwtRequest,
+    @Param("shoppingListId") shoppingListId: string,
+    @Body() reorderShoppingListDto: ReorderShoppingListDto,
+  ) {
+    return this.listItemsService.reorder(
+      req.user.userId,
+      shoppingListId,
+      reorderShoppingListDto,
     );
   }
 

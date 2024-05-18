@@ -12,7 +12,6 @@ import { ShoppingListsService } from "./shopping-lists.service";
 import { CreateShoppingListDto } from "./dto/create-shopping-list.dto";
 import { UpdateShoppingListDto } from "./dto/update-shopping-list.dto";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
-import { ReorderShoppingListDto } from "./dto/reorder-shopping-list.dto";
 import { JwtRequest } from "../types";
 
 @Controller()
@@ -52,19 +51,6 @@ export class ShoppingListsController {
       req.user.userId,
       id,
       updateShoppingListDto,
-    );
-  }
-
-  @Patch(":id/reorder")
-  reorder(
-    @Req() req: JwtRequest,
-    @Param("id") id: string,
-    @Body() reorderShoppingListDto: ReorderShoppingListDto,
-  ) {
-    return this.shoppingListsService.reorder(
-      req.user.userId,
-      id,
-      reorderShoppingListDto,
     );
   }
 

@@ -93,15 +93,6 @@ export interface UpdateShoppingListDto {
   name?: string;
 }
 
-export interface ReorderItem {
-  listItemId: string;
-  sortOrder: number;
-}
-
-export interface ReorderShoppingListDto {
-  order: ReorderItem[];
-}
-
 export interface AppendListItemDto {
   name?: string;
 }
@@ -109,6 +100,15 @@ export interface AppendListItemDto {
 export interface InsertListItemDto {
   name?: string;
   sortOrder: number;
+}
+
+export interface ReorderItem {
+  listItemId: string;
+  sortOrder: number;
+}
+
+export interface ReorderShoppingListDto {
+  order: ReorderItem[];
 }
 
 export interface RenameListItemDto {
@@ -462,25 +462,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     /**
      * No description
      *
-     * @tags shopping-lists
-     * @name ShoppingListsControllerReorder
-     * @request PATCH:/shopping-lists/{id}/reorder
-     * @secure
-     */
-    shoppingListsControllerReorder: (id: string, data: ReorderShoppingListDto, params: RequestParams = {}) =>
-      this.request<ListItem[], any>({
-        path: `/shopping-lists/${id}/reorder`,
-        method: "PATCH",
-        body: data,
-        secure: true,
-        type: ContentType.Json,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
      * @tags items
      * @name ListItemsControllerFindAll
      * @request GET:/shopping-lists/{shoppingListId}/items
@@ -526,6 +507,25 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       this.request<ListItem[], any>({
         path: `/shopping-lists/${shoppingListId}/items/insert`,
         method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags items
+     * @name ListItemsControllerReorder
+     * @request PATCH:/shopping-lists/{shoppingListId}/items/reorder
+     * @secure
+     */
+    listItemsControllerReorder: (shoppingListId: string, data: ReorderShoppingListDto, params: RequestParams = {}) =>
+      this.request<ListItem[], any>({
+        path: `/shopping-lists/${shoppingListId}/items/reorder`,
+        method: "PATCH",
         body: data,
         secure: true,
         type: ContentType.Json,
