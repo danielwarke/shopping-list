@@ -13,6 +13,7 @@ import { CreateShoppingListDto } from "./dto/create-shopping-list.dto";
 import { UpdateShoppingListDto } from "./dto/update-shopping-list.dto";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { JwtRequest } from "../types";
+import { SetListColorDto } from "./dto/set-list-color.dto";
 
 @Controller()
 @ApiTags("shopping-lists")
@@ -36,6 +37,11 @@ export class ShoppingListsController {
     return this.shoppingListsService.findAll(req.user.userId);
   }
 
+  @Get("colors")
+  listColors() {
+    return this.shoppingListsService.listColors();
+  }
+
   @Get(":id")
   findOne(@Req() req: JwtRequest, @Param("id") id: string) {
     return this.shoppingListsService.findOne(req.user.userId, id);
@@ -51,6 +57,19 @@ export class ShoppingListsController {
       req.user.userId,
       id,
       updateShoppingListDto,
+    );
+  }
+
+  @Patch(":id/color")
+  setColor(
+    @Req() req: JwtRequest,
+    @Param("id") id: string,
+    @Body() setListColorDto: SetListColorDto,
+  ) {
+    return this.shoppingListsService.setColor(
+      req.user.userId,
+      id,
+      setListColorDto,
     );
   }
 
