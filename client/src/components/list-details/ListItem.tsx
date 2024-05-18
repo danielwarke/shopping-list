@@ -8,7 +8,7 @@ import {
 import { apiClient } from "@/api/api-client";
 import { useDebounceState } from "@/hooks/use-debounce-state";
 import { Checkbox, IconButton, InputAdornment, TextField } from "@mui/material";
-import { Clear, DragHandle, DragIndicator } from "@mui/icons-material";
+import { Clear, DragIndicator } from "@mui/icons-material";
 import { Draggable } from "react-smooth-dnd";
 import { getItemsQueryKey } from "@/api/query-keys";
 import { useSetItemData } from "@/hooks/use-set-item-data";
