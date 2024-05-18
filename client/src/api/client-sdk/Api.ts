@@ -13,6 +13,7 @@ export interface SignUpDto {
   name: string;
   email: string;
   password: string;
+  inviteToken?: string;
 }
 
 export interface LoginDto {

@@ -8,6 +8,7 @@ import { ErrorRenderer } from "@/components/ErrorRenderer";
 
 export default function SignUp() {
   const router = useRouter();
+  const token = router.query.token as string;
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -26,6 +27,7 @@ export default function SignUp() {
       name,
       email,
       password,
+      inviteToken: token,
     });
   }
 

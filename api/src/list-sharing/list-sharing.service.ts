@@ -10,7 +10,7 @@ import { RevokeAccessDto } from "./dto/revoke-access.dto";
 @Injectable()
 export class ListSharingService {
   constructor(
-    private prisma: PrismaService,
+    private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
     private readonly emailsService: EmailsService,
   ) {}
@@ -29,34 +29,44 @@ export class ListSharingService {
       },
     });
 
+    const { email: inviteeEmail } = shareShoppingListDto;
+
     const invitee = await this.prisma.user.findUnique({
       where: {
-        email: shareShoppingListDto.email,
+        email: inviteeEmail,
       },
     });
 
-    if (invitee) {
-      if (invitee.id === userId) {
-        throw new ConflictException(
-          "You can't share a shopping list with yourself",
-        );
-      }
-
-      // we don't want the inviter to know if this was successful or not to avoid leaking user accounts
-      try {
-        const payload = { sub: invitee.id, shoppingListId: shoppingList.id };
-        const token = this.jwtService.sign(payload);
-        this.emailsService.shareShoppingList(
-          invitee.email,
-          userName,
-          invitee.name,
-          shoppingList.name,
-          token,
-        );
-      } catch (e) {
-        console.error(e);
-      }
+    if (!invitee) {
+      const payload = {
+        sub: inviteeEmail,
+        shoppingListId: shoppingList.id,
+      };
+      const token = this.jwtService.sign(payload);
+      this.emailsService.inviteToApp(
+        inviteeEmail,
+        userName,
+        shoppingList.name,
+        token,
+      );
+      return;
     }
+
+    if (invitee.id === userId) {
+      throw new ConflictException(
+        "You can't share a shopping list with yourself",
+      );
+    }
+
+    const payload = { sub: invitee.id, shoppingListId: shoppingList.id };
+    const token = this.jwtService.sign(payload);
+    this.emailsService.shareShoppingList(
+      inviteeEmail,
+      userName,
+      invitee.name,
+      shoppingList.name,
+      token,
+    );
   }
 
   async revokeAccess(

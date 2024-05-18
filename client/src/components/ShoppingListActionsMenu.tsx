@@ -87,7 +87,11 @@ export const ShoppingListActionsMenu: FC<ShoppingListActionMenuProps> = ({
             Remove checked items
           </MenuItem>
         )}
-        {!shared && <MenuItem onClick={handleOpenShareDialog}>Share</MenuItem>}
+        {!shared && (
+          <MenuItem
+            onClick={handleOpenShareDialog}
+          >{`Share ${detail ? "list" : ""}`}</MenuItem>
+        )}
         <MenuItem onClick={handleOpenDeleteDialog}>{deleteLabel}</MenuItem>
       </Menu>
       <ShareShoppingListDialog

@@ -42,6 +42,26 @@ export class EmailsService {
     });
   }
 
+  inviteToApp(
+    toEmail: string,
+    inviter: string,
+    shoppingList: string,
+    token: string,
+  ) {
+    const url = this.buildUrl("sign-up", token);
+
+    return this.mailerService.sendMail({
+      to: toEmail,
+      subject: "Invite to Shopping List Application",
+      template: "./invite-user",
+      context: {
+        inviter,
+        shoppingList,
+        url,
+      },
+    });
+  }
+
   shareShoppingList(
     toEmail: string,
     inviter: string,
@@ -53,8 +73,8 @@ export class EmailsService {
 
     return this.mailerService.sendMail({
       to: toEmail,
-      subject: "Shopping List - Invite to Share Shopping List",
-      template: "./invite-user",
+      subject: "Invite to Share Shopping List",
+      template: "./invite-to-share",
       context: {
         inviter,
         invitee,

@@ -14,6 +14,7 @@ import { User } from "@prisma/client";
 import { ResetPasswordDto } from "./dto/reset-password.dto";
 import { VerifyEmailDto } from "./dto/verify-email.dto";
 import { EmailsService } from "../emails/emails.service";
+import { PrismaService } from "../database/prisma.service";
 
 @Injectable()
 export class AuthService {
@@ -21,6 +22,7 @@ export class AuthService {
 
   constructor(
     private readonly usersService: UsersService,
+    private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
     private readonly emailsService: EmailsService,
   ) {}
@@ -60,7 +62,7 @@ export class AuthService {
   }
 
   async signup(signUpDto: SignUpDto) {
-    const { name, email } = signUpDto;
+    const { name, email, inviteToken } = signUpDto;
     const existingUser = await this.usersService.fineOneByEmail(email);
     if (existingUser) {
       throw new ConflictException(
@@ -75,6 +77,10 @@ export class AuthService {
       password: hashedPass,
     });
 
+    if (inviteToken) {
+      await this.acceptAppInvite(email, inviteToken);
+    }
+
     const tokenPayload = { sub: user.id, type: "email" };
     const verifyEmailToken = this.jwtService.sign(tokenPayload, {
       expiresIn: "1 year",
@@ -84,6 +90,32 @@ export class AuthService {
 
     const { password, ...rest } = user;
     return rest;
+  }
+
+  private async acceptAppInvite(email: string, inviteToken: string) {
+    try {
+      const { sub, shoppingListId } = await this.jwtService.verifyAsync<{
+        sub: string;
+        shoppingListId: string;
+      }>(inviteToken);
+
+      if (sub === email) {
+        return this.prisma.shoppingList.update({
+          data: {
+            users: {
+              connect: {
+                email,
+              },
+            },
+          },
+          where: {
+            id: shoppingListId,
+          },
+        });
+      }
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   async validateUser(email: string, pass: string) {
@@ -97,15 +129,6 @@ export class AuthService {
     }
 
     return null;
-  }
-
-  async validateUserExists(email: string) {
-    const user = await this.usersService.fineOneByEmail(email);
-    if (!user) {
-      throw new NotFoundException("User does not exist");
-    }
-
-    return user;
   }
 
   async login(user: User) {

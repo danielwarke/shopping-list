@@ -29,19 +29,24 @@ export const ShareShoppingListDialog: FC<ShareShoppingListDialogProps> = ({
   const { showMessage } = useSnackbarContext();
   const [email, setEmail] = useState("");
 
+  function close() {
+    handleClose();
+    setEmail("");
+  }
+
   const shareShoppingListMutation = useMutation({
     mutationFn: (data: ShareShoppingListDto) =>
       apiClient.listSharing.listSharingControllerShare(shoppingListId, data),
     onSuccess: () => {
       showMessage(
-        "If a user account exists, they will receive an email invite to start sharing this shopping list.",
+        `An invite was sent to ${email} to start sharing this shopping list.`,
       );
-      handleClose();
+      close();
     },
   });
 
   return (
-    <Dialog onClose={() => handleClose()} open={open}>
+    <Dialog onClose={() => close()} open={open}>
       <DialogTitle>Share Shopping List</DialogTitle>
       <DialogContent>
         <ErrorRenderer
@@ -61,7 +66,7 @@ export const ShareShoppingListDialog: FC<ShareShoppingListDialogProps> = ({
         />
       </DialogContent>
       <DialogActions>
-        <Button onClick={() => handleClose()}>Cancel</Button>
+        <Button onClick={() => close()}>Cancel</Button>
         <LoadingButton
           disabled={!email}
           onClick={() => shareShoppingListMutation.mutate({ email })}
