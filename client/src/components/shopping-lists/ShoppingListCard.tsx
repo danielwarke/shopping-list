@@ -79,7 +79,11 @@ export const ShoppingListCard: FC<ShoppingListCardProps> = ({
           justifyContent="space-between"
           width="100%"
         >
-          <Button onClick={handleViewShoppingListClick} size="small">
+          <Button
+            onClick={handleViewShoppingListClick}
+            size="small"
+            color={shoppingList.colorId ? "inherit" : "primary"}
+          >
             View
           </Button>
           {isShared && (
