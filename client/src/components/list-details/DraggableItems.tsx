@@ -133,6 +133,13 @@ export const DraggableItems: FC<DraggableItemsProps> = ({ shoppingListId }) => {
           setAutoFocusListItemId("");
         }}
       />
+      {search.length > 0 &&
+        listItems.length > 0 &&
+        filteredListItems.length === 0 && (
+          <Typography variant="subtitle1" sx={{ marginTop: "1vh" }}>
+            No list items found
+          </Typography>
+        )}
       {/* @ts-ignore */}
       <DraggableContainer
         dragHandleSelector=".drag-handle"
