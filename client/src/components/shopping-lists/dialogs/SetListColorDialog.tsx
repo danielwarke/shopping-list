@@ -81,7 +81,11 @@ export const SetListColorDialog: FC<SetListColorDialogProps> = ({
         >
           <MenuItem value="default">Default</MenuItem>
           {colors.map((color) => (
-            <MenuItem value={color.id} sx={{ backgroundColor: color.hex }}>
+            <MenuItem
+              key={color.id}
+              value={color.id}
+              sx={{ backgroundColor: color.hex }}
+            >
               {color.name}
             </MenuItem>
           ))}

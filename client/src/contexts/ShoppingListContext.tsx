@@ -8,7 +8,7 @@ import {
 import { ShoppingListWithMetadata } from "@/api/client-sdk/Api";
 import { useSocket } from "@/hooks/use-socket";
 import { useAuth } from "@/hooks/use-auth";
-import { Box, Container } from "@mui/material";
+import { Box } from "@mui/material";
 
 type ListDetails = ShoppingListWithMetadata & { shared?: "self" | "other" };
 
