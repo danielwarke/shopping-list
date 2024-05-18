@@ -11,7 +11,6 @@ import {
   ItemCompletePayload,
   ItemRenamedPayload,
   ItemsDeletedPayload,
-  ItemUpdatedPayload,
   ListRenamedPayload,
   ListReorderedPayload,
   ServerToClientEvents,

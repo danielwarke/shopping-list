@@ -4,7 +4,7 @@ import { FC, useMemo, useState } from "react";
 import { DeleteShoppingListDialog } from "@/components/shopping-lists/dialogs/DeleteShoppingListDialog";
 import { ShareShoppingListDialog } from "@/components/shopping-lists/dialogs/ShareShoppingListDialog";
 import { useRouter } from "next/router";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { apiClient } from "@/api/api-client";
 import { useSetItemData } from "@/hooks/use-set-item-data";
 
