@@ -66,7 +66,7 @@ export const ListItem: FC<ListItemProps> = ({
         listItemId,
       ),
     onSuccess: (deletedListItem) => {
-      setItemDeleteData(deletedListItem.id);
+      setItemDeleteData([deletedListItem.id]);
     },
     onError: invalidateCache,
   });
