@@ -584,6 +584,23 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * No description
      *
      * @tags items
+     * @name ListItemsControllerRemoveCompleteItems
+     * @request DELETE:/shopping-lists/{shoppingListId}/items/complete
+     * @secure
+     */
+    listItemsControllerRemoveCompleteItems: (shoppingListId: string, params: RequestParams = {}) =>
+      this.request<ListItem[], any>({
+        path: `/shopping-lists/${shoppingListId}/items/complete`,
+        method: "DELETE",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags items
      * @name ListItemsControllerRemove
      * @request DELETE:/shopping-lists/{shoppingListId}/items/{id}
      * @secure

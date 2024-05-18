@@ -1,4 +1,8 @@
-import { Injectable } from "@nestjs/common";
+import {
+  Injectable,
+  NotFoundException,
+  UnprocessableEntityException,
+} from "@nestjs/common";
 import { PrismaService } from "../database/prisma.service";
 import { ListItem } from "../_gen/prisma-class/list_item";
 import { RenameListItemDto } from "./dto/rename-list-item.dto";
@@ -162,7 +166,7 @@ export class ListItemsService {
         name,
         shoppingList: {
           update: {
-            createdAt: new Date(),
+            updatedAt: new Date(),
           },
         },
       },
@@ -258,5 +262,60 @@ export class ListItemsService {
     });
 
     return deletedListItem;
+  }
+
+  async removeCompleteItems(
+    userId: string,
+    shoppingListId: string,
+  ): Promise<ListItem[]> {
+    const shoppingList = await this.prisma.shoppingList.findUnique({
+      include: {
+        listItems: {
+          where: {
+            complete: true,
+          },
+        },
+      },
+      where: {
+        id: shoppingListId,
+        users: {
+          some: { id: userId },
+        },
+      },
+    });
+
+    if (!shoppingList) {
+      throw new NotFoundException("Shopping list does not exist");
+    }
+
+    if (shoppingList.listItems.length === 0) {
+      throw new UnprocessableEntityException("No items found to delete");
+    }
+
+    await this.prisma.$transaction([
+      this.prisma.listItem.deleteMany({
+        where: {
+          shoppingListId,
+          complete: true,
+        },
+      }),
+      this.prisma.shoppingList.update({
+        data: {
+          updatedAt: new Date(),
+        },
+        where: {
+          id: shoppingListId,
+        },
+      }),
+    ]);
+
+    const deletedItemIds = shoppingList.listItems.map((item) => item.id);
+
+    this.gatewayService.onItemsDeleted(shoppingListId, {
+      userId,
+      itemIds: deletedItemIds,
+    });
+
+    return shoppingList.listItems;
   }
 }

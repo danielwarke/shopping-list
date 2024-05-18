@@ -1,9 +1,12 @@
 import { MoreVert } from "@mui/icons-material";
 import { IconButton, Menu, MenuItem } from "@mui/material";
-import { FC, useState } from "react";
+import { FC, useMemo, useState } from "react";
 import { DeleteShoppingListDialog } from "@/components/shopping-lists/dialogs/DeleteShoppingListDialog";
 import { ShareShoppingListDialog } from "@/components/shopping-lists/dialogs/ShareShoppingListDialog";
 import { useRouter } from "next/router";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiClient } from "@/api/api-client";
+import { useSetItemData } from "@/hooks/use-set-item-data";
 
 interface ShoppingListActionMenuProps {
   shoppingListId: string;
@@ -17,6 +20,19 @@ export const ShoppingListActionsMenu: FC<ShoppingListActionMenuProps> = ({
   detail,
 }) => {
   const router = useRouter();
+
+  const { setItemDeleteData } = useSetItemData(shoppingListId);
+
+  const removeCompleteItemsMutation = useMutation({
+    mutationFn: () =>
+      apiClient.shoppingLists.listItemsControllerRemoveCompleteItems(
+        shoppingListId,
+      ),
+    onSuccess: (deletedItems) => {
+      const itemIds = deletedItems.map((item) => item.id);
+      setItemDeleteData(itemIds);
+    },
+  });
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [openDialog, setOpenDialog] = useState<"share" | "delete" | null>(null);
@@ -38,6 +54,14 @@ export const ShoppingListActionsMenu: FC<ShoppingListActionMenuProps> = ({
     setOpenDialog("delete");
   }
 
+  const deleteLabel = useMemo(() => {
+    if (shared) {
+      return `Remove ${detail ? "yourself from list" : ""}`;
+    }
+
+    return `Delete ${detail ? "list" : ""}`;
+  }, [detail, shared]);
+
   return (
     <div>
       <IconButton
@@ -53,10 +77,18 @@ export const ShoppingListActionsMenu: FC<ShoppingListActionMenuProps> = ({
         open={!!anchorEl}
         onClose={handleClose}
       >
+        {detail && (
+          <MenuItem
+            onClick={() => {
+              removeCompleteItemsMutation.mutate();
+              handleClose();
+            }}
+          >
+            Remove checked items
+          </MenuItem>
+        )}
         {!shared && <MenuItem onClick={handleOpenShareDialog}>Share</MenuItem>}
-        <MenuItem onClick={handleOpenDeleteDialog}>
-          {shared ? "Remove" : "Delete"}
-        </MenuItem>
+        <MenuItem onClick={handleOpenDeleteDialog}>{deleteLabel}</MenuItem>
       </Menu>
       <ShareShoppingListDialog
         open={openDialog === "share"}

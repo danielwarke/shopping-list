@@ -86,6 +86,17 @@ export class ListItemsController {
     );
   }
 
+  @Delete("complete")
+  removeCompleteItems(
+    @Req() req: JwtRequest,
+    @Param("shoppingListId") shoppingListId: string,
+  ) {
+    return this.listItemsService.removeCompleteItems(
+      req.user.userId,
+      shoppingListId,
+    );
+  }
+
   @Delete(":id")
   remove(
     @Req() req: JwtRequest,
