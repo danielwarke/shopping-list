@@ -5,13 +5,10 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/api/api-client";
 import { UpdateShoppingListDto } from "@/api/client-sdk/Api";
 import { getShoppingListQueryKey } from "@/api/query-keys";
+import { useShoppingListContext } from "@/contexts/ShoppingListContext";
 
-interface ListNameProps {
-  id: string;
-  currentName: string;
-}
-
-export const ListName: FC<ListNameProps> = ({ id, currentName }) => {
+export const ListName: FC = () => {
+  const { id, name: currentName } = useShoppingListContext();
   const queryClient = useQueryClient();
   const shoppingListQueryKey = getShoppingListQueryKey(id);
 

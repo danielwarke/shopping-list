@@ -13,12 +13,10 @@ import { getItemsQueryKey } from "@/api/query-keys";
 import { useSetItemData } from "@/hooks/use-set-item-data";
 import { ListItem } from "@/components/list-details/ListItem";
 import { ListSearchBar } from "@/components/list-details/ListSearchBar";
+import { useShoppingListContext } from "@/contexts/ShoppingListContext";
 
-interface DraggableItemsProps {
-  shoppingListId: string;
-}
-
-export const DraggableItems: FC<DraggableItemsProps> = ({ shoppingListId }) => {
+export const DraggableItems: FC = () => {
+  const { id: shoppingListId } = useShoppingListContext();
   const queryClient = useQueryClient();
   const itemsQueryKey = getItemsQueryKey(shoppingListId);
   const { setItemData, setItemAppendedData } = useSetItemData(shoppingListId);
@@ -126,7 +124,6 @@ export const DraggableItems: FC<DraggableItemsProps> = ({ shoppingListId }) => {
   return (
     <>
       <ListSearchBar
-        shoppingListId={shoppingListId}
         search={search}
         setSearch={(value) => {
           setSearch(value);
@@ -149,7 +146,6 @@ export const DraggableItems: FC<DraggableItemsProps> = ({ shoppingListId }) => {
         {filteredListItems.map((listItem) => (
           <ListItem
             key={listItem.id}
-            shoppingListId={shoppingListId}
             listItem={listItem}
             onEnterKey={() => onEnterKeyHandler(listItem)}
             autoFocus={listItem.id === autoFocusListItemId}

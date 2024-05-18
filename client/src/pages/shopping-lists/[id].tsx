@@ -12,9 +12,9 @@ import { ArrowBack } from "@mui/icons-material";
 import { NavBar } from "@/components/NavBar";
 import { useAuth } from "@/hooks/use-auth";
 import { getShoppingListQueryKey } from "@/api/query-keys";
-import { useSocket } from "@/hooks/use-socket";
 import { ListDetails } from "@/components/list-details/ListDetails";
 import { ShoppingListActionsMenu } from "@/components/ShoppingListActionsMenu";
+import ShoppingListContextProvider from "@/contexts/ShoppingListContext";
 
 export default function ShoppingListDetails() {
   const router = useRouter();
@@ -35,8 +35,6 @@ export default function ShoppingListDetails() {
     enabled: isAuthenticated && !!shoppingListId,
   });
 
-  useSocket(shoppingList?.isShared ? shoppingListId : undefined);
-
   const isShared = !!userId && shoppingList?.createdByUserId !== userId;
 
   function handleBackButtonClick() {
@@ -47,7 +45,7 @@ export default function ShoppingListDetails() {
   }
 
   return (
-    <>
+    <ShoppingListContextProvider shoppingList={shoppingList}>
       <NavBar
         title="Shopping List Details"
         startComponent={
@@ -81,14 +79,9 @@ export default function ShoppingListDetails() {
           {shoppingListIsError && (
             <Alert severity="error">Unable to load shopping list.</Alert>
           )}
-          {shoppingList && (
-            <ListDetails
-              shoppingListId={shoppingListId}
-              shoppingListName={shoppingList.name}
-            />
-          )}
+          {shoppingList && <ListDetails />}
         </Box>
       </Container>
-    </>
+    </ShoppingListContextProvider>
   );
 }

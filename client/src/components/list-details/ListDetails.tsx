@@ -5,42 +5,34 @@ import { Add } from "@mui/icons-material";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/api/api-client";
 import { AppendListItemDto } from "@/api/client-sdk/Api";
-import { FC, useCallback } from "react";
+import { FC } from "react";
 import { useSetItemData } from "@/hooks/use-set-item-data";
 import { getItemsQueryKey } from "@/api/query-keys";
+import { useShoppingListContext } from "@/contexts/ShoppingListContext";
 
-interface ListDetailsProps {
-  shoppingListId: string;
-  shoppingListName: string;
-}
-
-export const ListDetails: FC<ListDetailsProps> = ({
-  shoppingListId,
-  shoppingListName,
-}) => {
+export const ListDetails: FC = () => {
+  const { id: shoppingListId } = useShoppingListContext();
   const queryClient = useQueryClient();
 
   const { setItemAppendedData } = useSetItemData(shoppingListId);
   const itemsQueryKey = getItemsQueryKey(shoppingListId);
 
-  const invalidateCache = useCallback(() => {
-    queryClient.invalidateQueries({
-      queryKey: itemsQueryKey,
-    });
-  }, [itemsQueryKey, queryClient]);
-
   const appendListItemMutation = useMutation({
     mutationFn: (data: AppendListItemDto) =>
       apiClient.shoppingLists.listItemsControllerAppend(shoppingListId, data),
     onSuccess: setItemAppendedData,
-    onError: invalidateCache,
+    onError: () => {
+      queryClient.invalidateQueries({
+        queryKey: itemsQueryKey,
+      });
+    },
   });
 
   return (
     <>
-      <ListName id={shoppingListId} currentName={shoppingListName} />
+      <ListName />
       <Box marginTop="2vh" paddingBottom="16vh">
-        <DraggableItems shoppingListId={shoppingListId} />
+        <DraggableItems />
       </Box>
       <Tooltip title="New List Item">
         <Fab

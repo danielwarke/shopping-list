@@ -3,18 +3,18 @@ import { Backspace, Search } from "@mui/icons-material";
 import { useQueryClient } from "@tanstack/react-query";
 import { FC } from "react";
 import { getItemsQueryKey } from "@/api/query-keys";
+import { useShoppingListContext } from "@/contexts/ShoppingListContext";
 
 interface ListSearchBarProps {
-  shoppingListId: string;
   search: string;
   setSearch: (value: string) => void;
 }
 
 export const ListSearchBar: FC<ListSearchBarProps> = ({
-  shoppingListId,
   search,
   setSearch,
 }) => {
+  const { id: shoppingListId } = useShoppingListContext();
   const queryClient = useQueryClient();
   const itemsQueryKey = getItemsQueryKey(shoppingListId);
 

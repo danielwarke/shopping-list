@@ -14,7 +14,6 @@ import { getItemsQueryKey } from "@/api/query-keys";
 import { useSetItemData } from "@/hooks/use-set-item-data";
 
 interface ListItemProps {
-  shoppingListId: string;
   listItem: ListItemInterface;
   onEnterKey: () => void;
   autoFocus: boolean;
@@ -22,15 +21,16 @@ interface ListItemProps {
 }
 
 export const ListItem: FC<ListItemProps> = ({
-  shoppingListId,
   listItem,
   onEnterKey,
   autoFocus,
   disableDrag,
 }) => {
+  const listItemId = listItem.id;
+  const shoppingListId = listItem.shoppingListId;
+
   const queryClient = useQueryClient();
   const itemsQueryKey = getItemsQueryKey(shoppingListId);
-  const listItemId = listItem.id;
   const { setItemDeleteData } = useSetItemData(shoppingListId);
 
   function invalidateCache() {
