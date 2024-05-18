@@ -37,13 +37,17 @@ export const ShoppingListCard: FC<ShoppingListCardProps> = ({
   }
 
   return (
-    <Card variant="outlined" sx={{ marginBottom: "1em" }}>
+    <Card
+      variant="outlined"
+      sx={{ marginBottom: "1em", backgroundColor: shoppingList.color?.hex }}
+    >
       <CardHeader
         title={shoppingList.name}
         action={
           <ShoppingListActionsMenu
             shoppingListId={shoppingList.id}
             shared={isShared}
+            colorId={shoppingList.colorId}
           />
         }
       ></CardHeader>

@@ -7,15 +7,18 @@ import { useRouter } from "next/router";
 import { useMutation } from "@tanstack/react-query";
 import { apiClient } from "@/api/api-client";
 import { useSetItemData } from "@/hooks/use-set-item-data";
+import { SetListColorDialog } from "@/components/shopping-lists/dialogs/SetListColorDialog";
 
 interface ShoppingListActionMenuProps {
   shoppingListId: string;
+  colorId?: string;
   shared?: boolean;
   detail?: boolean;
 }
 
 export const ShoppingListActionsMenu: FC<ShoppingListActionMenuProps> = ({
   shoppingListId,
+  colorId,
   shared,
   detail,
 }) => {
@@ -35,7 +38,9 @@ export const ShoppingListActionsMenu: FC<ShoppingListActionMenuProps> = ({
   });
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [openDialog, setOpenDialog] = useState<"share" | "delete" | null>(null);
+  const [openDialog, setOpenDialog] = useState<
+    "share" | "setColor" | "delete" | null
+  >(null);
 
   const handleMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -50,6 +55,10 @@ export const ShoppingListActionsMenu: FC<ShoppingListActionMenuProps> = ({
     setOpenDialog("share");
   }
 
+  function handleOpenSetColorDialog() {
+    setOpenDialog("setColor");
+  }
+
   function handleOpenDeleteDialog() {
     setOpenDialog("delete");
   }
@@ -59,7 +68,7 @@ export const ShoppingListActionsMenu: FC<ShoppingListActionMenuProps> = ({
       return `Remove ${detail ? "yourself from list" : ""}`;
     }
 
-    return `Delete ${detail ? "list" : ""}`;
+    return "Delete";
   }, [detail, shared]);
 
   return (
@@ -77,6 +86,12 @@ export const ShoppingListActionsMenu: FC<ShoppingListActionMenuProps> = ({
         open={!!anchorEl}
         onClose={handleClose}
       >
+        {!shared && (
+          <>
+            <MenuItem onClick={handleOpenShareDialog}>Share</MenuItem>
+            <MenuItem onClick={handleOpenSetColorDialog}>Set color</MenuItem>
+          </>
+        )}
         {detail && (
           <MenuItem
             onClick={() => {
@@ -87,16 +102,17 @@ export const ShoppingListActionsMenu: FC<ShoppingListActionMenuProps> = ({
             Remove checked items
           </MenuItem>
         )}
-        {!shared && (
-          <MenuItem
-            onClick={handleOpenShareDialog}
-          >{`Share ${detail ? "list" : ""}`}</MenuItem>
-        )}
         <MenuItem onClick={handleOpenDeleteDialog}>{deleteLabel}</MenuItem>
       </Menu>
       <ShareShoppingListDialog
         open={openDialog === "share"}
         handleClose={handleClose}
+        shoppingListId={shoppingListId}
+      />
+      <SetListColorDialog
+        open={openDialog === "setColor"}
+        handleClose={handleClose}
+        initialColorId={colorId}
         shoppingListId={shoppingListId}
       />
       <DeleteShoppingListDialog

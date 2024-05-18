@@ -3,13 +3,15 @@ import { AppBar, Button, Toolbar, Typography } from "@mui/material";
 import { useRouter } from "next/router";
 
 interface NavBarProps {
-  title: string;
+  title?: string;
+  transparent?: boolean;
   startComponent?: React.ReactNode;
   endComponent?: React.ReactNode;
 }
 
 export const NavBar: FC<NavBarProps> = ({
   title,
+  transparent,
   startComponent,
   endComponent,
 }) => {
@@ -21,7 +23,11 @@ export const NavBar: FC<NavBarProps> = ({
   }
 
   return (
-    <AppBar position="sticky" sx={{ top: 0, zIndex: 99 }}>
+    <AppBar
+      color={transparent ? "transparent" : undefined}
+      position="sticky"
+      sx={{ top: 0, zIndex: 99 }}
+    >
       <Toolbar>
         {startComponent}
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>

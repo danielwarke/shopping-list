@@ -11,7 +11,7 @@ import { getItemsQueryKey } from "@/api/query-keys";
 import { useShoppingListContext } from "@/contexts/ShoppingListContext";
 
 export const ListDetails: FC = () => {
-  const { id: shoppingListId } = useShoppingListContext();
+  const { id: shoppingListId, colorId } = useShoppingListContext();
   const queryClient = useQueryClient();
 
   const { setItemAppendedData } = useSetItemData(shoppingListId);
@@ -36,7 +36,7 @@ export const ListDetails: FC = () => {
       </Box>
       <Tooltip title="New List Item">
         <Fab
-          color="primary"
+          color={colorId ? "default" : "primary"}
           sx={{ position: "fixed", bottom: "2em", right: "2em" }}
           onClick={() => appendListItemMutation.mutate({})}
         >

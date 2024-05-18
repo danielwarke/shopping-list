@@ -47,7 +47,8 @@ export default function ShoppingListDetails() {
   return (
     <ShoppingListContextProvider shoppingList={shoppingList}>
       <NavBar
-        title="Shopping List Details"
+        title="List Details"
+        transparent={!!shoppingList?.colorId}
         startComponent={
           <IconButton
             size="large"
@@ -62,6 +63,7 @@ export default function ShoppingListDetails() {
           <ShoppingListActionsMenu
             shoppingListId={shoppingListId}
             shared={isShared}
+            colorId={shoppingList?.colorId}
             detail
           />
         }

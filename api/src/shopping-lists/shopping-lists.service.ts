@@ -7,6 +7,7 @@ import { ShoppingListWithPreview } from "./dto/shopping-list-with-preview.dto";
 import { ShoppingListWithMetadata } from "./dto/shopping-list-with-metadata.dto";
 import { GatewayService } from "../gateway/gateway.service";
 import { SetListColorDto } from "./dto/set-list-color.dto";
+import { ListColor } from "../_gen/prisma-class/list_color";
 
 @Injectable()
 export class ShoppingListsService {
@@ -57,6 +58,7 @@ export class ShoppingListsService {
             },
           },
         },
+        color: true,
         listItems: {
           take: 3,
           where: {
@@ -118,6 +120,7 @@ export class ShoppingListsService {
   async findOne(userId: string, id: string): Promise<ShoppingListWithMetadata> {
     const shoppingList = await this.prisma.shoppingList.findUnique({
       include: {
+        color: true,
         _count: {
           select: {
             users: true,
@@ -211,11 +214,15 @@ export class ShoppingListsService {
     });
   }
 
-  async listColors() {
+  async listColors(): Promise<ListColor[]> {
     return this.prisma.listColor.findMany();
   }
 
-  async setColor(userId: string, id: string, setListColorDto: SetListColorDto) {
+  async setColor(
+    userId: string,
+    id: string,
+    setListColorDto: SetListColorDto,
+  ): Promise<ShoppingList> {
     const { colorId } = setListColorDto;
 
     return this.prisma.shoppingList.update({

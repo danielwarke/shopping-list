@@ -12,6 +12,7 @@ import { Clear, DragHandle } from "@mui/icons-material";
 import { Draggable } from "react-smooth-dnd";
 import { getItemsQueryKey } from "@/api/query-keys";
 import { useSetItemData } from "@/hooks/use-set-item-data";
+import { useShoppingListContext } from "@/contexts/ShoppingListContext";
 
 interface ListItemProps {
   listItem: ListItemInterface;
@@ -28,6 +29,7 @@ export const ListItem: FC<ListItemProps> = ({
 }) => {
   const listItemId = listItem.id;
   const shoppingListId = listItem.shoppingListId;
+  const { colorId } = useShoppingListContext();
 
   const queryClient = useQueryClient();
   const itemsQueryKey = getItemsQueryKey(shoppingListId);
@@ -123,6 +125,7 @@ export const ListItem: FC<ListItemProps> = ({
               <Checkbox
                 checked={complete}
                 onChange={(e) => setComplete(e.target.checked)}
+                color={colorId ? "default" : "primary"}
               />
             </InputAdornment>
           ),
@@ -139,6 +142,7 @@ export const ListItem: FC<ListItemProps> = ({
               color: "gray",
             },
           }),
+          disableUnderline: !!colorId,
         }}
       />
     </Draggable>

@@ -46,6 +46,13 @@ export interface ShoppingList {
   createdAt: string;
   /** @format date-time */
   updatedAt?: string;
+  colorId?: string;
+}
+
+export interface ListColor {
+  id: string;
+  name: string;
+  hex: string;
 }
 
 export interface SharedUser {
@@ -72,6 +79,8 @@ export interface ShoppingListWithPreview {
   createdAt: string;
   /** @format date-time */
   updatedAt?: string;
+  colorId?: string;
+  color?: ListColor;
   createdByUser: SharedUser;
   sharedWithUsers: SharedUser[];
   listItemsPreview: ListItem[];
@@ -86,11 +95,17 @@ export interface ShoppingListWithMetadata {
   createdAt: string;
   /** @format date-time */
   updatedAt?: string;
+  colorId?: string;
+  color?: ListColor;
   isShared: boolean;
 }
 
 export interface UpdateShoppingListDto {
   name?: string;
+}
+
+export interface SetListColorDto {
+  colorId?: string;
 }
 
 export interface AppendListItemDto {
@@ -410,6 +425,23 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * No description
      *
      * @tags shopping-lists
+     * @name ShoppingListsControllerListColors
+     * @request GET:/shopping-lists/colors
+     * @secure
+     */
+    shoppingListsControllerListColors: (params: RequestParams = {}) =>
+      this.request<ListColor[], any>({
+        path: `/shopping-lists/colors`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags shopping-lists
      * @name ShoppingListsControllerFindOne
      * @request GET:/shopping-lists/{id}
      * @secure
@@ -451,6 +483,25 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     shoppingListsControllerRename: (id: string, data: UpdateShoppingListDto, params: RequestParams = {}) =>
       this.request<ShoppingList, any>({
         path: `/shopping-lists/${id}/rename`,
+        method: "PATCH",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags shopping-lists
+     * @name ShoppingListsControllerSetColor
+     * @request PATCH:/shopping-lists/{id}/color
+     * @secure
+     */
+    shoppingListsControllerSetColor: (id: string, data: SetListColorDto, params: RequestParams = {}) =>
+      this.request<ShoppingList, any>({
+        path: `/shopping-lists/${id}/color`,
         method: "PATCH",
         body: data,
         secure: true,
