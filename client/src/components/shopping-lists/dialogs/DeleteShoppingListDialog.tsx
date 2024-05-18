@@ -17,7 +17,7 @@ import { ShoppingListWithPreview } from "@/api/client-sdk/Api";
 
 interface DeleteShoppingListDialogProps {
   open: boolean;
-  handleClose: () => void;
+  handleClose: (deleted?: boolean) => void;
   shoppingListId: string;
   shared?: boolean;
 }
@@ -52,11 +52,13 @@ export const DeleteShoppingListDialog: FC<DeleteShoppingListDialogProps> = ({
           );
         },
       );
+
+      handleClose(true);
     },
   });
 
   return (
-    <Dialog onClose={handleClose} open={open}>
+    <Dialog onClose={() => handleClose()} open={open}>
       <DialogTitle>Please Confirm</DialogTitle>
       <DialogContent>
         <ErrorRenderer
@@ -68,7 +70,7 @@ export const DeleteShoppingListDialog: FC<DeleteShoppingListDialogProps> = ({
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose}>Cancel</Button>
+        <Button onClick={() => handleClose()}>Cancel</Button>
         <LoadingButton
           onClick={() => deleteShoppingListMutation.mutate(shoppingListId)}
           loading={deleteShoppingListMutation.isPending}

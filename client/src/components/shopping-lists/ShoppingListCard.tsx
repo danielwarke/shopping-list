@@ -10,11 +10,11 @@ import {
   Typography,
 } from "@mui/material";
 import { ShoppingListWithPreview } from "@/api/client-sdk/Api";
-import { ShoppingListActionsMenu } from "@/components/shopping-lists/ShoppingListActionsMenu";
 import { useRouter } from "next/router";
 import { useAuth } from "@/hooks/use-auth";
 import { AccountCircle } from "@mui/icons-material";
 import { ShoppingListSharedUser } from "@/components/shopping-lists/ShoppingListSharedUser";
+import { ShoppingListActionsMenu } from "@/components/ShoppingListActionsMenu";
 
 interface ShoppingListCardProps {
   shoppingList: ShoppingListWithPreview;
@@ -27,14 +27,14 @@ export const ShoppingListCard: FC<ShoppingListCardProps> = ({
   const { userId, email } = useAuth(false);
   const isShared = !!userId && shoppingList.createdByUser.email !== email;
 
-  function handleViewShoppingListClick() {
-    router.push(`/shopping-lists/${shoppingList.id}`);
-  }
-
   const remainingAfterPreview =
     shoppingList.incompleteItemCount - shoppingList.listItemsPreview.length;
 
   const hasPreview = shoppingList.listItemsPreview.length > 0;
+
+  function handleViewShoppingListClick() {
+    router.push(`/shopping-lists/${shoppingList.id}`);
+  }
 
   return (
     <Card variant="outlined" sx={{ marginBottom: "1em" }}>

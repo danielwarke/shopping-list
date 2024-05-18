@@ -5,9 +5,14 @@ import { useRouter } from "next/router";
 interface NavBarProps {
   title: string;
   startComponent?: React.ReactNode;
+  endComponent?: React.ReactNode;
 }
 
-export const NavBar: FC<NavBarProps> = ({ title, startComponent }) => {
+export const NavBar: FC<NavBarProps> = ({
+  title,
+  startComponent,
+  endComponent,
+}) => {
   const router = useRouter();
 
   function handleLogout() {
@@ -22,9 +27,11 @@ export const NavBar: FC<NavBarProps> = ({ title, startComponent }) => {
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
           {title}
         </Typography>
-        <Button color="inherit" onClick={handleLogout}>
-          Logout
-        </Button>
+        {endComponent || (
+          <Button color="inherit" onClick={handleLogout}>
+            Logout
+          </Button>
+        )}
       </Toolbar>
     </AppBar>
   );

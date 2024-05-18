@@ -14,10 +14,11 @@ import { useAuth } from "@/hooks/use-auth";
 import { getShoppingListQueryKey } from "@/api/query-keys";
 import { useSocket } from "@/hooks/use-socket";
 import { ListDetails } from "@/components/list-details/ListDetails";
+import { ShoppingListActionsMenu } from "@/components/ShoppingListActionsMenu";
 
 export default function ShoppingListDetails() {
   const router = useRouter();
-  const { isAuthenticated } = useAuth(true);
+  const { isAuthenticated, userId } = useAuth(true);
   const shoppingListId = router.query.id as string;
 
   const queryClient = useQueryClient();
@@ -35,6 +36,8 @@ export default function ShoppingListDetails() {
   });
 
   useSocket(shoppingList?.isShared ? shoppingListId : undefined);
+
+  const isShared = !!userId && shoppingList?.createdByUserId !== userId;
 
   function handleBackButtonClick() {
     queryClient.invalidateQueries({
@@ -56,6 +59,13 @@ export default function ShoppingListDetails() {
           >
             <ArrowBack />
           </IconButton>
+        }
+        endComponent={
+          <ShoppingListActionsMenu
+            shoppingListId={shoppingListId}
+            shared={isShared}
+            detail
+          />
         }
       />
       <Container maxWidth="sm">
