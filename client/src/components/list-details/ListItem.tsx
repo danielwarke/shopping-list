@@ -103,13 +103,11 @@ export const ListItem: FC<ListItemProps> = ({
         value={name}
         onChange={(e) => setName(e.target.value)}
         onKeyDown={handleKeyDown}
-        disabled={complete}
         autoFocus={autoFocus}
         placeholder="List item"
         fullWidth
         sx={{
           marginTop: "1em",
-          ...(complete && { textDecoration: "line-through" }),
         }}
         variant="standard"
         InputProps={{
@@ -135,6 +133,12 @@ export const ListItem: FC<ListItemProps> = ({
               </IconButton>
             </InputAdornment>
           ),
+          ...(complete && {
+            sx: {
+              textDecoration: "line-through",
+              color: "gray",
+            },
+          }),
         }}
       />
     </Draggable>
