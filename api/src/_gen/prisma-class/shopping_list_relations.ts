@@ -1,6 +1,7 @@
 import { ListItem } from './list_item'
 import { User } from './user'
-import { ApiProperty } from '@nestjs/swagger'
+import { ListColor } from './list_color'
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 
 export class ShoppingListRelations {
 	@ApiProperty({ isArray: true, type: () => ListItem })
@@ -11,4 +12,7 @@ export class ShoppingListRelations {
 
 	@ApiProperty({ type: () => User })
 	createdByUser: User
+
+	@ApiPropertyOptional({ type: () => ListColor })
+	color?: ListColor
 }

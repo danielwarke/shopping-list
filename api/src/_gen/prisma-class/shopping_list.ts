@@ -15,4 +15,7 @@ export class ShoppingList {
 
 	@ApiPropertyOptional({ type: Date })
 	updatedAt?: Date
+
+	@ApiPropertyOptional({ type: String })
+	colorId?: string
 }

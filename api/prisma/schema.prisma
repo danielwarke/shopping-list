@@ -34,6 +34,8 @@ model ShoppingList {
   createdByUser   User       @relation("CreatedByUser", fields: [createdByUserId], references: [id])
   createdAt       DateTime   @default(now())
   updatedAt       DateTime?  @updatedAt
+  colorId         String?
+  color           ListColor? @relation(fields: [colorId], references: [id], onDelete: SetNull)
 }
 
 model ListItem {
@@ -45,4 +47,11 @@ model ListItem {
   shoppingListId String
   createdAt      DateTime     @default(now())
   updatedAt      DateTime?    @updatedAt
+}
+
+model ListColor {
+  id            String         @id @default(cuid())
+  name          String
+  hex           String
+  shoppingLists ShoppingList[]
 }
