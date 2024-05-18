@@ -10,6 +10,7 @@ import {
   ItemAppendedPayload,
   ItemCompletePayload,
   ItemRenamedPayload,
+  ItemsDeletedPayload,
   ItemUpdatedPayload,
   ListRenamedPayload,
   ListReorderedPayload,
@@ -53,8 +54,8 @@ export class GatewayService {
     this.server.to(shoppingListId).emit("itemAppended", payload);
   }
 
-  onItemDeleted(shoppingListId: string, payload: ItemUpdatedPayload) {
-    this.server.to(shoppingListId).emit("itemDeleted", payload);
+  onItemsDeleted(shoppingListId: string, payload: ItemsDeletedPayload) {
+    this.server.to(shoppingListId).emit("itemsDeleted", payload);
   }
 
   onItemRenamed(shoppingListId: string, payload: ItemRenamedPayload) {

@@ -252,7 +252,10 @@ export class ListItemsService {
       }),
     ]);
 
-    this.gatewayService.onItemDeleted(shoppingListId, { userId, itemId: id });
+    this.gatewayService.onItemsDeleted(shoppingListId, {
+      userId,
+      itemIds: [id],
+    });
 
     return deletedListItem;
   }

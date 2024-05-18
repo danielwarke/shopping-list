@@ -56,9 +56,9 @@ export function useSetItemData(shoppingListId: string) {
   );
 
   const setItemDeleteData = useCallback(
-    (itemId: string) => {
+    (deletedItemIds: string[]) => {
       setItemData((currentData) =>
-        currentData.filter((item) => item.id !== itemId),
+        currentData.filter((item) => !deletedItemIds.includes(item.id)),
       );
     },
     [setItemData],

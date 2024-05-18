@@ -82,9 +82,9 @@ export function useSocket(shoppingListId: string = "") {
       }
     });
 
-    socket.on("itemDeleted", ({ userId, itemId }) => {
+    socket.on("itemsDeleted", ({ userId, itemIds }) => {
       if (currentUserId !== userId) {
-        setItemDeleteData(itemId);
+        setItemDeleteData(itemIds);
       }
     });
 

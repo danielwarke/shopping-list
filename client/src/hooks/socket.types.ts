@@ -28,13 +28,18 @@ export interface ItemCompletePayload extends ItemUpdatedPayload {
   complete: boolean;
 }
 
+export interface ItemsDeletedPayload {
+  userId: string;
+  itemIds: string[];
+}
+
 export interface ServerToClientEvents {
   listRenamed: (payload: ListRenamedPayload) => void;
   listReordered: (payload: ListReorderedPayload) => void;
   itemAppended: (payload: ItemAppendedPayload) => void;
   itemRenamed: (payload: ItemRenamedPayload) => void;
   itemComplete: (payload: ItemCompletePayload) => void;
-  itemDeleted: (payload: ItemUpdatedPayload) => void;
+  itemsDeleted: (payload: ItemsDeletedPayload) => void;
 }
 
 export interface ClientToServerEvents {
