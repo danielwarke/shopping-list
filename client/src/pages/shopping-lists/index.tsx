@@ -63,19 +63,19 @@ export default function ShoppingLists() {
             <CircularProgress />
           </Box>
         )}
-        <Box sx={{ columns: "2 auto" }}>
+        {!shoppingLists.length && !isLoading && (
+          <Typography variant="h5">
+            No shopping lists found. Press the button in the bottom right corner
+            to create a new shopping list 🛒
+          </Typography>
+        )}
+        <Box marginBottom="25vh" sx={{ columns: "2 auto" }}>
           {shoppingLists.map((shoppingList) => (
             <ShoppingListCard
               key={shoppingList.id}
               shoppingList={shoppingList}
             />
           ))}
-          {!shoppingLists.length && !isLoading && (
-            <Typography variant="h5">
-              No shopping lists found. Press the button in the bottom right
-              corner to create a new shopping list 🛒
-            </Typography>
-          )}
         </Box>
         <Tooltip title="New Shopping List">
           <Fab
