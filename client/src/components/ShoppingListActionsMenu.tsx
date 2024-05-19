@@ -99,7 +99,7 @@ export const ShoppingListActionsMenu: FC<ShoppingListActionMenuProps> = ({
               handleClose();
             }}
           >
-            Remove checked items
+            Remove completed items
           </MenuItem>
         )}
         <MenuItem onClick={handleOpenDeleteDialog}>{deleteLabel}</MenuItem>

@@ -33,7 +33,8 @@ export const ListItem: FC<ListItemProps> = ({
 
   const queryClient = useQueryClient();
   const itemsQueryKey = getItemsQueryKey(shoppingListId);
-  const { setItemDeleteData } = useSetItemData(shoppingListId);
+  const { setItemDeleteData, setItemCompleteData } =
+    useSetItemData(shoppingListId);
 
   function invalidateCache() {
     return queryClient.invalidateQueries({
@@ -58,6 +59,7 @@ export const ListItem: FC<ListItemProps> = ({
         listItemId,
         data,
       ),
+    onSuccess: (item) => setItemCompleteData(item.id, item.complete),
     onError: invalidateCache,
   });
 
@@ -78,11 +80,6 @@ export const ListItem: FC<ListItemProps> = ({
       renameListItemMutation.mutate({ name: newName });
     }
   });
-
-  const [complete, setComplete] = useDebounceState(
-    listItem.complete,
-    (newComplete) => setCompleteMutation.mutate({ complete: newComplete }),
-  );
 
   async function handleKeyDown(e: KeyboardEvent) {
     if (e.code === "Enter") {
@@ -123,8 +120,10 @@ export const ListItem: FC<ListItemProps> = ({
                 />
               )}
               <Checkbox
-                checked={complete}
-                onChange={(e) => setComplete(e.target.checked)}
+                checked={listItem.complete}
+                onChange={(e) =>
+                  setCompleteMutation.mutate({ complete: e.target.checked })
+                }
                 color={colorId ? "default" : "primary"}
               />
             </InputAdornment>
@@ -136,7 +135,7 @@ export const ListItem: FC<ListItemProps> = ({
               </IconButton>
             </InputAdornment>
           ),
-          ...(complete && {
+          ...(listItem.complete && {
             sx: {
               textDecoration: "line-through",
               color: "gray",

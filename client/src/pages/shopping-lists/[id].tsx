@@ -68,25 +68,26 @@ export default function ShoppingListDetails() {
           />
         }
       />
-      <Container
-        maxWidth="sm"
-        sx={{ backgroundColor: shoppingList?.color?.hex }}
+      <Box
+        sx={{ backgroundColor: shoppingList?.color?.hex, minHeight: "100vh" }}
       >
-        <Box
-          display="flex"
-          justifyContent="center"
-          flexDirection="column"
-          paddingTop="4vh"
-        >
-          {shoppingListIsLoading && (
-            <CircularProgress sx={{ alignSelf: "center" }} />
-          )}
-          {shoppingListIsError && (
-            <Alert severity="error">Unable to load shopping list.</Alert>
-          )}
-          {shoppingList && <ListDetails />}
-        </Box>
-      </Container>
+        <Container maxWidth="sm">
+          <Box
+            display="flex"
+            justifyContent="center"
+            flexDirection="column"
+            paddingTop="4vh"
+          >
+            {shoppingListIsLoading && (
+              <CircularProgress sx={{ alignSelf: "center" }} />
+            )}
+            {shoppingListIsError && (
+              <Alert severity="error">Unable to load shopping list.</Alert>
+            )}
+            {shoppingList && <ListDetails />}
+          </Box>
+        </Container>
+      </Box>
     </ShoppingListContextProvider>
   );
 }
