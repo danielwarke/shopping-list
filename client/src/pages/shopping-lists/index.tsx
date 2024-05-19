@@ -69,7 +69,7 @@ export default function ShoppingLists() {
             to create a new shopping list 🛒
           </Typography>
         )}
-        <Box marginBottom="25vh" sx={{ columns: "2 auto" }}>
+        <Box marginBottom="25vh" sx={{ columns: "2 200px" }}>
           {shoppingLists.map((shoppingList) => (
             <ShoppingListCard
               key={shoppingList.id}
