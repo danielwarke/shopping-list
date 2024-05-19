@@ -7,7 +7,7 @@ services:
       - ./postgres:/var/lib/postgresql/data
     restart: always
     ports:
-      - 6543:5432
+      - 127.0.0.1:5432:5432
     env_file:
       - .env
   api:
@@ -19,7 +19,7 @@ services:
     depends_on:
       - db
     ports:
-      - 8000:8000
+      - 127.0.0.1:8000:8000
   client:
     build:
       context: ./client
@@ -27,4 +27,9 @@ services:
       - ./client/.env
     restart: always
     ports:
-      - 3000:3000
+      - 127.0.0.1:3000:3000
+
+networks:
+  default:
+    name: reverse-proxy
+    external: true
