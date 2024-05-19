@@ -115,7 +115,7 @@ export const ListItem: FC<ListItemProps> = ({
               {!disableDrag && (
                 <DragIndicator
                   className="drag-handle"
-                  sx={{ cursor: "grab" }}
+                  sx={{ cursor: "grab", padding: "6px" }}
                   onClick={(e) => e.preventDefault()}
                 />
               )}
