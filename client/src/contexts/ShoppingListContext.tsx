@@ -8,7 +8,6 @@ import {
 import { ShoppingListWithMetadata } from "@/api/client-sdk/Api";
 import { useSocket } from "@/hooks/use-socket";
 import { useAuth } from "@/hooks/use-auth";
-import { Box } from "@mui/material";
 
 type ListDetails = ShoppingListWithMetadata & { shared?: "self" | "other" };
 
@@ -44,14 +43,7 @@ const ShoppingListContextProvider: FC<
     <ShoppingListContext.Provider
       value={shoppingList ? { ...shoppingList, shared } : emptyList}
     >
-      <Box
-        sx={{
-          backgroundColor: shoppingList?.color?.hex,
-          height: "100vh",
-        }}
-      >
-        {children}
-      </Box>
+      {children}
     </ShoppingListContext.Provider>
   );
 };

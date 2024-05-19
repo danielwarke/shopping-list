@@ -48,7 +48,7 @@ export default function ShoppingListDetails() {
     <ShoppingListContextProvider shoppingList={shoppingList}>
       <NavBar
         title="List Details"
-        transparent={!!shoppingList?.colorId}
+        backgroundColor={shoppingList?.color?.hex}
         startComponent={
           <IconButton
             size="large"
@@ -68,12 +68,15 @@ export default function ShoppingListDetails() {
           />
         }
       />
-      <Container maxWidth="sm">
+      <Container
+        maxWidth="sm"
+        sx={{ backgroundColor: shoppingList?.color?.hex }}
+      >
         <Box
           display="flex"
           justifyContent="center"
           flexDirection="column"
-          marginTop="4vh"
+          paddingTop="4vh"
         >
           {shoppingListIsLoading && (
             <CircularProgress sx={{ alignSelf: "center" }} />

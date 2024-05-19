@@ -4,14 +4,14 @@ import { useRouter } from "next/router";
 
 interface NavBarProps {
   title?: string;
-  transparent?: boolean;
+  backgroundColor?: string;
   startComponent?: React.ReactNode;
   endComponent?: React.ReactNode;
 }
 
 export const NavBar: FC<NavBarProps> = ({
   title,
-  transparent,
+  backgroundColor,
   startComponent,
   endComponent,
 }) => {
@@ -24,9 +24,16 @@ export const NavBar: FC<NavBarProps> = ({
 
   return (
     <AppBar
-      color={transparent ? "transparent" : undefined}
       position="sticky"
-      sx={{ top: 0, zIndex: 99 }}
+      sx={{
+        top: 0,
+        zIndex: 99,
+        ...(backgroundColor && {
+          backgroundColor,
+          filter: "brightness(90%)",
+          color: "rgba(0, 0, 0, 0.87)",
+        }),
+      }}
     >
       <Toolbar>
         {startComponent}
