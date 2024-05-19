@@ -38,7 +38,6 @@ export const ShoppingListCard: FC<ShoppingListCardProps> = ({
 
   return (
     <Card
-      variant="outlined"
       sx={{ marginBottom: "1em", backgroundColor: shoppingList.color?.hex }}
     >
       <CardHeader

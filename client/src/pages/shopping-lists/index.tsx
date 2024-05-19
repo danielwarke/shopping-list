@@ -63,7 +63,7 @@ export default function ShoppingLists() {
             <CircularProgress />
           </Box>
         )}
-        <Box>
+        <Box sx={{ columns: "2 auto" }}>
           {shoppingLists.map((shoppingList) => (
             <ShoppingListCard
               key={shoppingList.id}
