@@ -56,9 +56,13 @@ export const DraggableItems: FC = () => {
     mutationFn: (data: InsertListItemDto) =>
       apiClient.shoppingLists.listItemsControllerInsert(shoppingListId, data),
     onSuccess: (reorderedList) => {
-      const newestItem = [...reorderedList].sort((a, b) =>
-        a.createdAt > b.createdAt ? -1 : 1,
-      )[0];
+      let newestItem = reorderedList[0];
+      for (const listItem of reorderedList) {
+        if (listItem.createdAt > newestItem.createdAt) {
+          newestItem = listItem;
+        }
+      }
+
       setAutoFocusListItemId(newestItem.id);
       setItemData(reorderedList);
     },
