@@ -11,7 +11,10 @@ import {
 import { ArrowBack } from "@mui/icons-material";
 import { NavBar } from "@/components/NavBar";
 import { useAuth } from "@/hooks/use-auth";
-import { getShoppingListQueryKey } from "@/api/query-keys";
+import {
+  getShoppingListQueryKey,
+  shoppingListsQueryKey,
+} from "@/api/query-keys";
 import { ListDetails } from "@/components/list-details/ListDetails";
 import { ShoppingListActionsMenu } from "@/components/ShoppingListActionsMenu";
 import ShoppingListContextProvider from "@/contexts/ShoppingListContext";
@@ -37,9 +40,9 @@ export default function ShoppingListDetails() {
 
   const isShared = !!userId && shoppingList?.createdByUserId !== userId;
 
-  function handleBackButtonClick() {
-    queryClient.invalidateQueries({
-      queryKey: shoppingListQueryKey,
+  async function handleBackButtonClick() {
+    await queryClient.invalidateQueries({
+      queryKey: shoppingListsQueryKey,
     });
     router.push("/shopping-lists");
   }
