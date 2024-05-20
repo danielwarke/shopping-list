@@ -66,12 +66,14 @@ export const DraggableItems: FC = () => {
   });
 
   const filteredListItems = useMemo(() => {
-    if (search.length === 0) {
+    let searchValue = search.trim().toLowerCase();
+
+    if (searchValue.length === 0) {
       return listItems;
     }
 
     return listItems.filter((listItem) => {
-      return listItem.name.toLowerCase().includes(search.toLowerCase());
+      return listItem.name.toLowerCase().includes(searchValue);
     });
   }, [listItems, search]);
 
