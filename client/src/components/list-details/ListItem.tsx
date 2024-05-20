@@ -59,7 +59,7 @@ export const ListItem: FC<ListItemProps> = ({
         listItemId,
         data,
       ),
-    onSuccess: (item) => setItemCompleteData(item.id, item.complete),
+    onMutate: (data) => setItemCompleteData(listItemId, data.complete),
     onError: invalidateCache,
   });
 
@@ -69,9 +69,7 @@ export const ListItem: FC<ListItemProps> = ({
         shoppingListId,
         listItemId,
       ),
-    onSuccess: (deletedListItem) => {
-      setItemDeleteData([deletedListItem.id]);
-    },
+    onMutate: () => setItemDeleteData([listItemId]),
     onError: invalidateCache,
   });
 
