@@ -1,17 +1,17 @@
 import { useCallback, useEffect } from "react";
 import { io, Socket } from "socket.io-client";
-import { useAuth } from "@/hooks/use-auth";
 import { useSetItemData } from "@/hooks/use-set-item-data";
 import { useQueryClient } from "@tanstack/react-query";
 import { getShoppingListQueryKey } from "@/api/query-keys";
 import { ShoppingListWithMetadata } from "@/api/client-sdk/Api";
 import { ClientToServerEvents, ServerToClientEvents } from "./socket.types";
+import { useAuthContext } from "@/contexts/AuthContext";
 
 export function useSocket(shoppingListId: string = "") {
   const queryClient = useQueryClient();
   const shoppingListQueryKey = getShoppingListQueryKey(shoppingListId);
 
-  const { isAuthenticated, userId: currentUserId } = useAuth();
+  const { userId: currentUserId } = useAuthContext();
   const {
     setItemData,
     setItemAppendedData,
@@ -41,7 +41,7 @@ export function useSocket(shoppingListId: string = "") {
 
   useEffect(() => {
     const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-    if (!apiUrl || !isAuthenticated || !shoppingListId) {
+    if (!apiUrl || !shoppingListId) {
       return;
     }
 
@@ -93,7 +93,6 @@ export function useSocket(shoppingListId: string = "") {
     };
   }, [
     currentUserId,
-    isAuthenticated,
     setItemAppendedData,
     setItemCompleteData,
     setItemData,

@@ -1,4 +1,3 @@
-import { useAuth } from "@/hooks/use-auth";
 import { Alert, Button } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -6,10 +5,11 @@ import { useMutation } from "@tanstack/react-query";
 import { apiClient } from "@/api/api-client";
 import { ErrorRenderer } from "@/components/ErrorRenderer";
 import { useSnackbarContext } from "@/contexts/SnackbarContext";
+import { useAuthContext } from "@/contexts/AuthContext";
 
 export const EmailVerification = () => {
   const { showMessage } = useSnackbarContext();
-  const { email, emailVerified } = useAuth(false);
+  const { email, emailVerified } = useAuthContext();
   const router = useRouter();
   const token = router.query.emailVerify as string;
 
@@ -45,7 +45,7 @@ export const EmailVerification = () => {
     );
   }
 
-  if (emailVerified) {
+  if (emailVerified || emailVerified === null) {
     return null;
   }
 

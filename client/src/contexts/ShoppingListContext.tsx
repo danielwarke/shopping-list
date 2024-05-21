@@ -7,7 +7,7 @@ import {
 } from "react";
 import { ShoppingListWithMetadata } from "@/api/client-sdk/Api";
 import { useSocket } from "@/hooks/use-socket";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuthContext } from "./AuthContext";
 
 type ListDetails = ShoppingListWithMetadata & { shared?: "self" | "other" };
 
@@ -28,7 +28,7 @@ interface ShoppingListContextProviderProps {
 const ShoppingListContextProvider: FC<
   PropsWithChildren & ShoppingListContextProviderProps
 > = ({ children, shoppingList }) => {
-  const { userId } = useAuth(false);
+  const { userId } = useAuthContext();
   useSocket(shoppingList?.isShared ? shoppingList.id : undefined);
 
   const shared = useMemo(() => {

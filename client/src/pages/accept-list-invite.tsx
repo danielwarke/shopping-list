@@ -4,10 +4,8 @@ import { useMutation } from "@tanstack/react-query";
 import { apiClient } from "@/api/api-client";
 import { Alert, Box, Button, CircularProgress, Container } from "@mui/material";
 import { ErrorRenderer } from "@/components/ErrorRenderer";
-import { useAuth } from "@/hooks/use-auth";
 
 export default function AcceptListInvite() {
-  const { isAuthenticated } = useAuth();
   const router = useRouter();
   const token = router.query.token as string;
 
@@ -19,13 +17,12 @@ export default function AcceptListInvite() {
   useEffect(() => {
     if (
       token &&
-      isAuthenticated &&
       !acceptInviteMutation.isError &&
       !acceptInviteMutation.isPending
     ) {
       acceptInviteMutation.mutate({ token });
     }
-  }, [token, acceptInviteMutation, isAuthenticated]);
+  }, [token, acceptInviteMutation]);
 
   return (
     <Container maxWidth="sm">
@@ -36,7 +33,7 @@ export default function AcceptListInvite() {
           Unable to accept shopping list invite: token must be provided
         </Alert>
       )}
-      {!isAuthenticated && !!token && (
+      {!!token && (
         <Alert severity="error">
           Please login before accepting shopping list invite
         </Alert>

@@ -10,19 +10,17 @@ import {
 } from "@mui/material";
 import { Add } from "@mui/icons-material";
 import { ShoppingListCard } from "@/components/shopping-lists/ShoppingListCard";
-import { useAuth } from "@/hooks/use-auth";
 import { NavBar } from "@/components/NavBar";
 import { shoppingListsQueryKey } from "@/api/query-keys";
 import { EmailVerification } from "@/components/EmailVerification";
+import AuthContextProvider from "@/contexts/AuthContext";
 
 export default function ShoppingLists() {
   const queryClient = useQueryClient();
-  const { isAuthenticated } = useAuth(true);
 
   const { data: shoppingLists = [], isLoading } = useQuery({
     queryKey: shoppingListsQueryKey,
     queryFn: apiClient.shoppingLists.shoppingListsControllerFindAll,
-    enabled: isAuthenticated,
   });
 
   const createShoppingListMutation = useMutation({
@@ -51,7 +49,7 @@ export default function ShoppingLists() {
   }
 
   return (
-    <>
+    <AuthContextProvider>
       <NavBar title="Shopping Lists" />
       <Container maxWidth="sm" sx={{ marginTop: "4vh" }}>
         <EmailVerification />
@@ -90,6 +88,6 @@ export default function ShoppingLists() {
           </Fab>
         </Tooltip>
       </Container>
-    </>
+    </AuthContextProvider>
   );
 }

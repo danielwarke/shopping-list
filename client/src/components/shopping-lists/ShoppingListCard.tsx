@@ -11,10 +11,10 @@ import {
 } from "@mui/material";
 import { ShoppingListWithPreview } from "@/api/client-sdk/Api";
 import { useRouter } from "next/router";
-import { useAuth } from "@/hooks/use-auth";
 import { AccountCircle } from "@mui/icons-material";
 import { ShoppingListSharedUser } from "@/components/shopping-lists/ShoppingListSharedUser";
 import { ShoppingListActionsMenu } from "@/components/ShoppingListActionsMenu";
+import { useAuthContext } from "@/contexts/AuthContext";
 
 interface ShoppingListCardProps {
   shoppingList: ShoppingListWithPreview;
@@ -24,7 +24,7 @@ export const ShoppingListCard: FC<ShoppingListCardProps> = ({
   shoppingList,
 }) => {
   const router = useRouter();
-  const { userId, email } = useAuth(false);
+  const { userId, email } = useAuthContext();
   const isShared = !!userId && shoppingList.createdByUser.email !== email;
 
   const remainingAfterPreview =

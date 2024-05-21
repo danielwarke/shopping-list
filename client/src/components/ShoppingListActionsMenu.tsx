@@ -8,8 +8,8 @@ import { useMutation } from "@tanstack/react-query";
 import { apiClient } from "@/api/api-client";
 import { useSetItemData } from "@/hooks/use-set-item-data";
 import { SetListColorDialog } from "@/components/shopping-lists/dialogs/SetListColorDialog";
-import { useAuth } from "@/hooks/use-auth";
 import { useSnackbarContext } from "@/contexts/SnackbarContext";
+import { useAuthContext } from "@/contexts/AuthContext";
 
 interface ShoppingListActionMenuProps {
   shoppingListId: string;
@@ -26,7 +26,7 @@ export const ShoppingListActionsMenu: FC<ShoppingListActionMenuProps> = ({
 }) => {
   const router = useRouter();
   const { showMessage } = useSnackbarContext();
-  const { emailVerified } = useAuth(false);
+  const { emailVerified } = useAuthContext();
 
   const { setItemDeleteData } = useSetItemData(shoppingListId);
 
