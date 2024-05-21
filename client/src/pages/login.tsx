@@ -74,7 +74,13 @@ export default function Login() {
           </LoadingButton>
           {loginMutation.isError && (
             <Button
-              onClick={() => router.push("/forgot-password")}
+              onClick={() => {
+                let route = "/forgot-password";
+                if (email) {
+                  route += "?email=" + email;
+                }
+                router.push(route);
+              }}
               type="button"
               color="error"
               sx={{ marginTop: "2vh" }}

@@ -8,8 +8,9 @@ import { ErrorRenderer } from "@/components/ErrorRenderer";
 
 export default function ForgotPassword() {
   const router = useRouter();
+  const initialEmail = router.query.email as string;
 
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(initialEmail ?? "");
   const [success, setSuccess] = useState(false);
 
   const forgotPasswordMutation = useMutation({
