@@ -29,10 +29,15 @@ export class AuthController {
     return this.authService.login(req.user);
   }
 
+  @Post("request-verification-email")
+  requestVerificationEmail(@Req() req: JwtRequest) {
+    const { userId, name, email } = req.user;
+    return this.authService.requestVerificationEmail(userId, email, name);
+  }
+
   @Post("verify-email")
-  @Public()
-  verifyEmail(@Body() verifyEmailDto: VerifyEmailDto) {
-    return this.authService.verifyEmail(verifyEmailDto);
+  verifyEmail(@Req() req: JwtRequest, @Body() verifyEmailDto: VerifyEmailDto) {
+    return this.authService.verifyEmail(req.user.userId, verifyEmailDto);
   }
 
   @Post("forgot-password")

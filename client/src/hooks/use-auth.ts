@@ -5,6 +5,7 @@ import { apiClient } from "@/api/api-client";
 export function useAuth(shouldRedirect?: boolean) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [email, setEmail] = useState("");
+  const [emailVerified, setEmailVerified] = useState(false);
   const [userId, setUserId] = useState("");
 
   const router = useRouter();
@@ -27,6 +28,7 @@ export function useAuth(shouldRedirect?: boolean) {
       .then((data: any) => {
         setIsAuthenticated(true);
         setEmail(data.email);
+        setEmailVerified(data.emailVerified);
         setUserId(data.userId);
       })
       .catch(() => {
@@ -35,5 +37,5 @@ export function useAuth(shouldRedirect?: boolean) {
       });
   }, [redirectToLogin, router, shouldRedirect]);
 
-  return { isAuthenticated, email, userId };
+  return { isAuthenticated, email, emailVerified, userId };
 }

@@ -23,6 +23,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       throw new NotFoundException("User does not exist");
     }
 
-    return { userId: payload.sub, email: payload.email, name: payload.name };
+    return {
+      userId: payload.sub,
+      email: payload.email,
+      name: payload.name,
+      emailVerified: !!user.emailVerified,
+    };
   }
 }

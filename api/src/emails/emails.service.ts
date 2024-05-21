@@ -9,13 +9,13 @@ export class EmailsService {
     private readonly configService: ConfigService,
   ) {}
 
-  private buildUrl(path: string, token: string) {
+  private buildUrl(path: string, token: string, tokenType?: string) {
     const clientDomain = this.configService.get<string>("CLIENT_DOMAIN");
-    return `${clientDomain}/${path}?token=${token}`;
+    return `${clientDomain}/${path}?${tokenType ?? "token"}=${token}`;
   }
 
-  verifyEmail(toEmail: string, name: string, token: string) {
-    const url = this.buildUrl("verify-email", token);
+  verifyEmailRequest(toEmail: string, name: string, token: string) {
+    const url = this.buildUrl("shopping-lists", token, "emailVerify");
 
     return this.mailerService.sendMail({
       to: toEmail,

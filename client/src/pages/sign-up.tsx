@@ -44,8 +44,7 @@ export default function SignUp() {
         {success && (
           <Alert severity="success">
             You have signed up successfully! <br />
-            Please check your email for a link to verify your account. You can
-            safely close this tab.
+            Please login to continue.
           </Alert>
         )}
         <Box
@@ -83,22 +82,20 @@ export default function SignUp() {
             disabled={success}
           />
           {!success && (
-            <>
-              <LoadingButton
-                variant="contained"
-                size="large"
-                onClick={handleSubmit}
-                type="submit"
-                loading={signUpMutation.isPending}
-                disabled={!name || !email || !password}
-              >
-                Sign Up
-              </LoadingButton>
-              <Button type="button" onClick={() => router.push("/login")}>
-                Already have an account?
-              </Button>
-            </>
+            <LoadingButton
+              variant="contained"
+              size="large"
+              onClick={handleSubmit}
+              type="submit"
+              loading={signUpMutation.isPending}
+              disabled={!name || !email || !password}
+            >
+              Sign Up
+            </LoadingButton>
           )}
+          <Button type="button" onClick={() => router.push("/login")}>
+            {success ? "Return to login" : "Already have an account?"}
+          </Button>
         </Box>
       </form>
     </Container>

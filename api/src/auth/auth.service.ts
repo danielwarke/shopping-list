@@ -3,7 +3,6 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
-  UnauthorizedException,
   UnprocessableEntityException,
 } from "@nestjs/common";
 import { UsersService } from "../users/users.service";
@@ -81,12 +80,7 @@ export class AuthService {
       await this.acceptAppInvite(email, inviteToken);
     }
 
-    const tokenPayload = { sub: user.id, type: "email" };
-    const verifyEmailToken = this.jwtService.sign(tokenPayload, {
-      expiresIn: "1 year",
-    });
-    await this.usersService.setToken(email, verifyEmailToken);
-    this.emailsService.verifyEmail(email, name, verifyEmailToken);
+    await this.requestVerificationEmail(user.id, user.email, user.name);
 
     const { password, ...rest } = user;
     return rest;
@@ -132,21 +126,27 @@ export class AuthService {
   }
 
   async login(user: User) {
-    if (!user.emailVerified) {
-      this.emailsService.verifyEmail(user.email, user.name, user.token);
-      throw new UnauthorizedException(
-        "Please verify your email address before logging in. A new verification email has been sent.",
-      );
-    }
-
     const payload = { sub: user.id, email: user.email, name: user.name };
     return {
       access_token: this.jwtService.sign(payload),
     };
   }
 
-  async verifyEmail(verifyEmailDto: VerifyEmailDto) {
+  async requestVerificationEmail(userId: string, email: string, name: string) {
+    const tokenPayload = { sub: userId, type: "email" };
+    const verifyEmailToken = this.jwtService.sign(tokenPayload, {
+      expiresIn: "1 week",
+    });
+    await this.usersService.setToken(email, verifyEmailToken);
+    this.emailsService.verifyEmailRequest(email, name, verifyEmailToken);
+  }
+
+  async verifyEmail(userId: string, verifyEmailDto: VerifyEmailDto) {
     const user = await this.validateUserToken(verifyEmailDto.token, "email");
+    if (user.id !== userId) {
+      throw new UnprocessableEntityException("Token is invalid");
+    }
+
     return this.usersService.verifyEmail(user.email);
   }
 
