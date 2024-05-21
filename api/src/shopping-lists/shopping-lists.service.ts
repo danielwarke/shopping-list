@@ -231,7 +231,11 @@ export class ShoppingListsService {
       },
       where: {
         id,
-        createdByUserId: userId,
+        users: {
+          some: {
+            id: userId,
+          },
+        },
       },
     });
   }

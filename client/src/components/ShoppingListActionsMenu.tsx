@@ -86,12 +86,8 @@ export const ShoppingListActionsMenu: FC<ShoppingListActionMenuProps> = ({
         open={!!anchorEl}
         onClose={handleClose}
       >
-        {!shared && (
-          <>
-            <MenuItem onClick={handleOpenShareDialog}>Share</MenuItem>
-            <MenuItem onClick={handleOpenSetColorDialog}>Set color</MenuItem>
-          </>
-        )}
+        {!shared && <MenuItem onClick={handleOpenShareDialog}>Share</MenuItem>}
+        <MenuItem onClick={handleOpenSetColorDialog}>Set color</MenuItem>
         {detail && (
           <MenuItem
             onClick={() => {
