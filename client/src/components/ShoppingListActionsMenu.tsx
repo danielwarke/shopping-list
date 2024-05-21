@@ -8,6 +8,8 @@ import { useMutation } from "@tanstack/react-query";
 import { apiClient } from "@/api/api-client";
 import { useSetItemData } from "@/hooks/use-set-item-data";
 import { SetListColorDialog } from "@/components/shopping-lists/dialogs/SetListColorDialog";
+import { useAuth } from "@/hooks/use-auth";
+import { useSnackbarContext } from "@/contexts/SnackbarContext";
 
 interface ShoppingListActionMenuProps {
   shoppingListId: string;
@@ -23,6 +25,8 @@ export const ShoppingListActionsMenu: FC<ShoppingListActionMenuProps> = ({
   detail,
 }) => {
   const router = useRouter();
+  const { showMessage } = useSnackbarContext();
+  const { emailVerified } = useAuth(false);
 
   const { setItemDeleteData } = useSetItemData(shoppingListId);
 
@@ -52,6 +56,11 @@ export const ShoppingListActionsMenu: FC<ShoppingListActionMenuProps> = ({
   }
 
   function handleOpenShareDialog() {
+    if (!emailVerified) {
+      showMessage("You must verify your email address before sharing lists");
+      return;
+    }
+
     setOpenDialog("share");
   }
 

@@ -1,4 +1,8 @@
-import { ConflictException, Injectable } from "@nestjs/common";
+import {
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from "@nestjs/common";
 import { PrismaService } from "../database/prisma.service";
 import { ShoppingList } from "../_gen/prisma-class/shopping_list";
 import { JwtService } from "@nestjs/jwt";
@@ -21,6 +25,21 @@ export class ListSharingService {
     id: string,
     shareShoppingListDto: ShareShoppingListDto,
   ) {
+    const { emailVerified } = await this.prisma.user.findUniqueOrThrow({
+      select: {
+        emailVerified: true,
+      },
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!emailVerified) {
+      throw new UnauthorizedException(
+        "You must verify your email address before sharing lists",
+      );
+    }
+
     // only allow the user who created the list to share it with other users
     const shoppingList = await this.prisma.shoppingList.findUniqueOrThrow({
       where: {
