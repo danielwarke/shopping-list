@@ -14,6 +14,7 @@ import { NavBar } from "@/components/NavBar";
 import { shoppingListsQueryKey } from "@/api/query-keys";
 import { EmailVerification } from "@/components/EmailVerification";
 import AuthContextProvider from "@/contexts/AuthContext";
+import { AcceptListInvite } from "@/components/AccpetListInvite";
 
 export default function ShoppingLists() {
   const queryClient = useQueryClient();
@@ -53,6 +54,7 @@ export default function ShoppingLists() {
       <NavBar title="Shopping Lists" />
       <Container maxWidth="sm" sx={{ marginTop: "4vh" }}>
         <EmailVerification />
+        <AcceptListInvite />
         <Box marginBottom="1vh">&nbsp;</Box>
         {isLoading && (
           <Box

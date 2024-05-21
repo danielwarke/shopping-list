@@ -69,7 +69,7 @@ export class EmailsService {
     shoppingList: string,
     token: string,
   ) {
-    const url = this.buildUrl("accept-list-invite", token);
+    const url = this.buildUrl("shopping-lists", token, "invite");
 
     return this.mailerService.sendMail({
       to: toEmail,
