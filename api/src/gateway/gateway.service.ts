@@ -8,9 +8,8 @@ import {
 import { Server, Socket } from "socket.io";
 import {
   ItemAppendedPayload,
-  ItemCompletePayload,
-  ItemRenamedPayload,
   ItemsDeletedPayload,
+  ItemUpdatedPayload,
   ListRenamedPayload,
   ListReorderedPayload,
   ServerToClientEvents,
@@ -53,15 +52,11 @@ export class GatewayService {
     this.server.to(shoppingListId).emit("itemAppended", payload);
   }
 
+  onItemUpdated(shoppingListId: string, payload: ItemUpdatedPayload) {
+    this.server.to(shoppingListId).emit("itemUpdated", payload);
+  }
+
   onItemsDeleted(shoppingListId: string, payload: ItemsDeletedPayload) {
     this.server.to(shoppingListId).emit("itemsDeleted", payload);
-  }
-
-  onItemRenamed(shoppingListId: string, payload: ItemRenamedPayload) {
-    this.server.to(shoppingListId).emit("itemRenamed", payload);
-  }
-
-  onItemComplete(shoppingListId: string, payload: ItemCompletePayload) {
-    this.server.to(shoppingListId).emit("itemComplete", payload);
   }
 }

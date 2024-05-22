@@ -5,12 +5,11 @@ import {
 } from "@nestjs/common";
 import { PrismaService } from "../database/prisma.service";
 import { ListItem } from "../_gen/prisma-class/list_item";
-import { RenameListItemDto } from "./dto/rename-list-item.dto";
 import { AppendListItemDto } from "./dto/append-list-item.dto";
 import { GatewayService } from "../gateway/gateway.service";
-import { SetListItemCompleteDto } from "./dto/set-list-item-complete.dto";
 import { InsertListItemDto } from "./dto/insert-list-item.dto";
 import { ReorderShoppingListDto } from "./dto/reorder-shopping-list.dto";
+import { UpdateListItemDto } from "./dto/update-list-item.dto";
 
 @Injectable()
 export class ListItemsService {
@@ -154,17 +153,15 @@ export class ListItemsService {
     return updatedListItems;
   }
 
-  async rename(
+  async update(
     userId: string,
     shoppingListId: string,
     id: string,
-    renameListItemDto: RenameListItemDto,
+    updateListItemDto: UpdateListItemDto,
   ): Promise<ListItem> {
-    const { name } = renameListItemDto;
-
     const updatedListItem = await this.prisma.listItem.update({
       data: {
-        name,
+        ...updateListItemDto,
         shoppingList: {
           update: {
             updatedAt: new Date(),
@@ -184,10 +181,10 @@ export class ListItemsService {
       },
     });
 
-    this.gatewayService.onItemRenamed(shoppingListId, {
+    this.gatewayService.onItemUpdated(shoppingListId, {
       userId,
       itemId: id,
-      name,
+      ...updateListItemDto,
     });
 
     return updatedListItem;
@@ -238,43 +235,6 @@ export class ListItemsService {
     });
 
     return updatedListItems;
-  }
-
-  async setComplete(
-    userId: string,
-    shoppingListId: string,
-    id: string,
-    setListItemCompleteDto: SetListItemCompleteDto,
-  ): Promise<ListItem> {
-    const { complete } = setListItemCompleteDto;
-
-    const updatedList = await this.prisma.listItem.update({
-      data: {
-        complete,
-        shoppingList: {
-          update: {
-            updatedAt: new Date(),
-          },
-        },
-      },
-      where: {
-        id: id,
-        shoppingList: {
-          id: shoppingListId,
-          users: {
-            some: { id: userId },
-          },
-        },
-      },
-    });
-
-    this.gatewayService.onItemComplete(shoppingListId, {
-      userId,
-      itemId: id,
-      complete,
-    });
-
-    return updatedList;
   }
 
   async remove(

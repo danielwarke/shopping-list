@@ -10,12 +10,11 @@ import {
 } from "@nestjs/common";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { ListItemsService } from "./list-items.service";
-import { RenameListItemDto } from "./dto/rename-list-item.dto";
 import { AppendListItemDto } from "./dto/append-list-item.dto";
 import { JwtRequest } from "../types";
-import { SetListItemCompleteDto } from "./dto/set-list-item-complete.dto";
 import { InsertListItemDto } from "./dto/insert-list-item.dto";
 import { ReorderShoppingListDto } from "./dto/reorder-shopping-list.dto";
+import { UpdateListItemDto } from "./dto/update-list-item.dto";
 
 @Controller()
 @ApiTags("items")
@@ -70,33 +69,18 @@ export class ListItemsController {
     );
   }
 
-  @Patch(":id/rename")
+  @Patch(":id")
   rename(
     @Req() req: JwtRequest,
     @Param("shoppingListId") shoppingListId: string,
     @Param("id") id: string,
-    @Body() renameListItemDto: RenameListItemDto,
+    @Body() updateListItemDto: UpdateListItemDto,
   ) {
-    return this.listItemsService.rename(
+    return this.listItemsService.update(
       req.user.userId,
       shoppingListId,
       id,
-      renameListItemDto,
-    );
-  }
-
-  @Patch(":id/set-complete")
-  setComplete(
-    @Req() req: JwtRequest,
-    @Param("shoppingListId") shoppingListId: string,
-    @Param("id") id: string,
-    @Body() setListItemCompleteDto: SetListItemCompleteDto,
-  ) {
-    return this.listItemsService.setComplete(
-      req.user.userId,
-      shoppingListId,
-      id,
-      setListItemCompleteDto,
+      updateListItemDto,
     );
   }
 
