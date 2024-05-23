@@ -34,7 +34,10 @@ export function useSetItemData(shoppingListId: string) {
   );
 
   const setItemUpdateData = useCallback(
-    (itemId: string, data: { name?: string; complete?: boolean }) => {
+    (
+      itemId: string,
+      data: { name?: string; complete?: boolean; header?: boolean },
+    ) => {
       setItemData((currentData) =>
         currentData.map((item) =>
           item.id === itemId ? { ...item, ...data } : item,

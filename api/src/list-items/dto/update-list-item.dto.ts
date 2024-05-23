@@ -8,4 +8,8 @@ export class UpdateListItemDto {
   @IsBoolean()
   @IsOptional()
   complete?: boolean;
+
+  @IsBoolean()
+  @IsOptional()
+  header?: boolean;
 }

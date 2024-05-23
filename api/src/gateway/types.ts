@@ -20,6 +20,7 @@ export interface ItemUpdatedPayload {
   itemId: string;
   name?: string;
   complete?: boolean;
+  header?: boolean;
 }
 
 export interface ItemsDeletedPayload {

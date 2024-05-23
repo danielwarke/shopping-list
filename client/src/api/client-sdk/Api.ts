@@ -130,6 +130,7 @@ export interface ReorderShoppingListDto {
 export interface UpdateListItemDto {
   name?: string;
   complete?: boolean;
+  header?: boolean;
 }
 
 export interface ShareShoppingListDto {

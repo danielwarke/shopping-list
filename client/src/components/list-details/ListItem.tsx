@@ -1,4 +1,4 @@
-import { FC, KeyboardEvent } from "react";
+import { FC, KeyboardEvent, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   ListItem as ListItemInterface,
@@ -7,7 +7,12 @@ import {
 import { apiClient } from "@/api/api-client";
 import { useDebounceState } from "@/hooks/use-debounce-state";
 import { Checkbox, IconButton, InputAdornment, TextField } from "@mui/material";
-import { Clear, DragIndicator } from "@mui/icons-material";
+import {
+  Clear,
+  DragIndicator,
+  TextDecrease,
+  TextIncrease,
+} from "@mui/icons-material";
 import { Draggable } from "react-smooth-dnd";
 import { getItemsQueryKey } from "@/api/query-keys";
 import { useSetItemData } from "@/hooks/use-set-item-data";
@@ -35,6 +40,8 @@ export const ListItem: FC<ListItemProps> = ({
   const { setItemDeleteData, setItemUpdateData } =
     useSetItemData(shoppingListId);
 
+  const [isFocused, setIsFocused] = useState(false);
+
   function invalidateCache() {
     return queryClient.invalidateQueries({
       queryKey: itemsQueryKey,
@@ -49,7 +56,7 @@ export const ListItem: FC<ListItemProps> = ({
         data,
       ),
     onMutate: (data) => {
-      if (typeof data.complete !== "undefined") {
+      if (typeof data.name === "undefined") {
         setItemUpdateData(listItemId, data);
       }
     },
@@ -93,12 +100,14 @@ export const ListItem: FC<ListItemProps> = ({
         value={name}
         onChange={(e) => setName(e.target.value)}
         onKeyDown={handleKeyDown}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => {
+          setTimeout(() => setIsFocused(false), 100);
+        }}
         autoFocus={autoFocus}
         placeholder="List item"
         fullWidth
-        sx={{
-          marginTop: "1em",
-        }}
+        margin="dense"
         variant="standard"
         InputProps={{
           startAdornment: (
@@ -106,32 +115,55 @@ export const ListItem: FC<ListItemProps> = ({
               {!disableDrag && (
                 <DragIndicator
                   className="drag-handle"
-                  sx={{ cursor: "grab", padding: "6px" }}
+                  sx={{
+                    cursor: "grab",
+                    padding: "6px",
+                  }}
                   onClick={(e) => e.preventDefault()}
                 />
               )}
-              <Checkbox
-                checked={listItem.complete}
-                onChange={(e) =>
-                  updateListItemMutation.mutate({ complete: e.target.checked })
-                }
-                color={colorId ? "default" : "primary"}
-              />
+              {!listItem.header && (
+                <Checkbox
+                  checked={listItem.complete}
+                  onChange={(e) =>
+                    updateListItemMutation.mutate({
+                      complete: e.target.checked,
+                    })
+                  }
+                  color={colorId ? "default" : "primary"}
+                />
+              )}
             </InputAdornment>
           ),
           endAdornment: (
             <InputAdornment position="end">
+              {isFocused && (
+                <IconButton
+                  size="small"
+                  onClick={() => {
+                    updateListItemMutation.mutate({ header: !listItem.header });
+                  }}
+                >
+                  {listItem.header ? <TextDecrease /> : <TextIncrease />}
+                </IconButton>
+              )}
               <IconButton onClick={() => deleteListItemMutation.mutate()}>
                 <Clear />
               </IconButton>
             </InputAdornment>
           ),
-          ...(listItem.complete && {
-            sx: {
+          sx: {
+            ...(listItem.header && {
+              fontSize: "1.75em",
+              paddingX: 0,
+              backgroundColor: "rgba(0, 0, 0, 0.15)",
+              borderRadius: "4px",
+            }),
+            ...(listItem.complete && {
               textDecoration: "line-through",
               color: "gray",
-            },
-          }),
+            }),
+          },
           disableUnderline: !!colorId,
         }}
       />
