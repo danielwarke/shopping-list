@@ -17,7 +17,7 @@ export const ListDetails: FC = () => {
   const { id: shoppingListId, colorId } = useShoppingListContext();
   const queryClient = useQueryClient();
 
-  const { setItemAppendedData } = useSetItemData(shoppingListId);
+  const { setItemData, setItemAppendedData } = useSetItemData(shoppingListId);
   const itemsQueryKey = getItemsQueryKey(shoppingListId);
 
   const appendListItemMutation = useMutation({
@@ -25,7 +25,7 @@ export const ListDetails: FC = () => {
       apiClient.shoppingLists.listItemsControllerAppend(shoppingListId, data),
     onMutate: () => {
       const listItems = queryClient.getQueryData<ListItemDto[]>(itemsQueryKey);
-      const tempId = `optimistic-${listItems ? listItems.length : 0}`;
+      const tempId = `optimistic-append-${listItems ? listItems.length : 0}`;
 
       setItemAppendedData({
         id: tempId,
@@ -40,15 +40,11 @@ export const ListDetails: FC = () => {
       return tempId;
     },
     onSuccess: (createdListItem, _, tempId) => {
-      queryClient.setQueryData<ListItemDto[]>(itemsQueryKey, (currentData) => {
-        if (!currentData) {
-          return [createdListItem];
-        }
-
-        return currentData.map((item) =>
+      setItemData((currentData) =>
+        currentData.map((item) =>
           item.id === tempId ? createdListItem : item,
-        );
-      });
+        ),
+      );
     },
     onError: () => {
       queryClient.invalidateQueries({
