@@ -45,9 +45,41 @@ export const DraggableItems: FC<DraggableItemsProps> = ({ appendListItem }) => {
   });
 
   const insertListItemMutation = useMutation({
-    mutationFn: (data: InsertListItemDto) =>
+    mutationFn: (data: InsertListItemDto & { index: number }) =>
       apiClient.shoppingLists.listItemsControllerInsert(shoppingListId, data),
-    onSuccess: setItemData,
+    onMutate: (data) => {
+      const prefix = "optimistic";
+      const tempExists = listItems.some((item) => item.id.startsWith(prefix));
+      if (tempExists) {
+        return;
+      }
+
+      const tempId = prefix + listItems.length;
+      const newListItem: ListItemDto = {
+        id: tempId,
+        name: "",
+        complete: false,
+        header: false,
+        sortOrder: -1,
+        shoppingListId,
+        createdAt: new Date().toISOString(),
+      };
+
+      setItemData((currentData) => {
+        const newData = [...currentData];
+        newData.splice(data.index + 1, 0, newListItem);
+        return newData;
+      });
+
+      return tempId;
+    },
+    onSuccess: (createdListItem, _, tempId) => {
+      setItemData((currentData) =>
+        currentData.map((item) =>
+          item.id === tempId ? createdListItem : item,
+        ),
+      );
+    },
     onError: invalidateCache,
   });
 
@@ -102,7 +134,10 @@ export const DraggableItems: FC<DraggableItemsProps> = ({ appendListItem }) => {
     if (listIndex === listItems.length - 1) {
       appendListItem();
     } else {
-      insertListItemMutation.mutate({ sortOrder: listItem.sortOrder });
+      insertListItemMutation.mutate({
+        sortOrder: listItem.sortOrder,
+        index: listIndex,
+      });
     }
   }
 

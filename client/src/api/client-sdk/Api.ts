@@ -642,7 +642,7 @@ export class Api<
       data: InsertListItemDto,
       params: RequestParams = {},
     ) =>
-      this.request<ListItem[], any>({
+      this.request<ListItem, any>({
         path: `/shopping-lists/${shoppingListId}/items/insert`,
         method: "POST",
         body: data,

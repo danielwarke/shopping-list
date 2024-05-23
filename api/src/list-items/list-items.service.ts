@@ -97,8 +97,8 @@ export class ListItemsService {
     userId: string,
     shoppingListId: string,
     insertListItemDto: InsertListItemDto,
-  ): Promise<ListItem[]> {
-    const [_, shoppingList] = await this.prisma.$transaction([
+  ): Promise<ListItem> {
+    const [createdListItem, shoppingList] = await this.prisma.$transaction([
       this.prisma.listItem.create({
         data: {
           shoppingListId,
@@ -132,11 +132,19 @@ export class ListItemsService {
       }),
     ]);
 
+    let createdSortOrder = createdListItem.sortOrder;
+
     const updatedListItems = await this.prisma.$transaction(
       shoppingList.listItems.map((listItem, index) => {
+        const newSortOrder = index + 1;
+
+        if (listItem.id === createdListItem.id) {
+          createdSortOrder = newSortOrder;
+        }
+
         return this.prisma.listItem.update({
           data: {
-            sortOrder: index + 1,
+            sortOrder: newSortOrder,
           },
           where: {
             id: listItem.id,
@@ -150,7 +158,10 @@ export class ListItemsService {
       reorderedList: updatedListItems.sort((a, b) => a.sortOrder - b.sortOrder),
     });
 
-    return updatedListItems;
+    return {
+      ...createdListItem,
+      sortOrder: createdSortOrder,
+    };
   }
 
   async update(
