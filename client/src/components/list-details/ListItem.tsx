@@ -17,6 +17,7 @@ import { Draggable } from "react-smooth-dnd";
 import { getItemsQueryKey } from "@/api/query-keys";
 import { useSetItemData } from "@/hooks/use-set-item-data";
 import { useShoppingListContext } from "@/contexts/ShoppingListContext";
+import { useAuthContext } from "@/contexts/AuthContext";
 
 interface ListItemProps {
   listItem: ListItemInterface;
@@ -31,6 +32,7 @@ export const ListItem: FC<ListItemProps> = ({
 }) => {
   const listItemId = listItem.id;
   const shoppingListId = listItem.shoppingListId;
+  const { userId } = useAuthContext();
   const { colorId } = useShoppingListContext();
 
   const queryClient = useQueryClient();
@@ -96,7 +98,7 @@ export const ListItem: FC<ListItemProps> = ({
         onBlur={() => {
           setTimeout(() => setIsFocused(false), 100);
         }}
-        autoFocus
+        autoFocus={userId === listItem.createdByUserId}
         placeholder="List item"
         fullWidth
         margin="dense"

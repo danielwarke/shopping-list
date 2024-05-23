@@ -12,8 +12,10 @@ import { FC } from "react";
 import { useSetItemData } from "@/hooks/use-set-item-data";
 import { getItemsQueryKey } from "@/api/query-keys";
 import { useShoppingListContext } from "@/contexts/ShoppingListContext";
+import { useAuthContext } from "@/contexts/AuthContext";
 
 export const ListDetails: FC = () => {
+  const { userId } = useAuthContext();
   const { id: shoppingListId, colorId } = useShoppingListContext();
   const queryClient = useQueryClient();
 
@@ -44,6 +46,7 @@ export const ListDetails: FC = () => {
         sortOrder: -1,
         shoppingListId,
         createdAt: new Date().toISOString(),
+        createdByUserId: userId,
       });
 
       return tempId;

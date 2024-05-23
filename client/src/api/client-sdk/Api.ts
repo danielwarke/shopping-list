@@ -66,6 +66,7 @@ export interface ListItem {
   complete: boolean;
   header: boolean;
   sortOrder: number;
+  createdByUserId: string;
   shoppingListId: string;
   /** @format date-time */
   createdAt: string;

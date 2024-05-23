@@ -13,12 +13,14 @@ import { useSetItemData } from "@/hooks/use-set-item-data";
 import { ListItem } from "@/components/list-details/ListItem";
 import { ListSearchBar } from "@/components/list-details/ListSearchBar";
 import { useShoppingListContext } from "@/contexts/ShoppingListContext";
+import { useAuthContext } from "@/contexts/AuthContext";
 
 interface DraggableItemsProps {
   appendListItem: () => void;
 }
 
 export const DraggableItems: FC<DraggableItemsProps> = ({ appendListItem }) => {
+  const { userId } = useAuthContext();
   const { id: shoppingListId } = useShoppingListContext();
   const queryClient = useQueryClient();
   const itemsQueryKey = getItemsQueryKey(shoppingListId);
@@ -63,6 +65,7 @@ export const DraggableItems: FC<DraggableItemsProps> = ({ appendListItem }) => {
         sortOrder: -1,
         shoppingListId,
         createdAt: new Date().toISOString(),
+        createdByUserId: userId,
       };
 
       setItemData((currentData) => {

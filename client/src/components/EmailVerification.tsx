@@ -1,4 +1,4 @@
-import { Alert, Button } from "@mui/material";
+import { Alert, Box, Button } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
@@ -59,7 +59,7 @@ export const EmailVerification = () => {
   }
 
   return (
-    <>
+    <Box marginTop="4vh">
       <ErrorRenderer
         isError={requestEmailVerificationMutation.isError}
         error={requestEmailVerificationMutation.error}
@@ -78,6 +78,6 @@ export const EmailVerification = () => {
       >
         Your email address has not been verified yet.
       </Alert>
-    </>
+    </Box>
   );
 };

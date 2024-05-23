@@ -52,7 +52,7 @@ export default function ShoppingLists() {
   return (
     <AuthContextProvider>
       <NavBar title="Shopping Lists" />
-      <Container maxWidth="sm" sx={{ marginTop: "4vh" }}>
+      <Container maxWidth="sm">
         <EmailVerification />
         <AcceptListInvite />
         <Box marginBottom="1vh">&nbsp;</Box>

@@ -17,6 +17,9 @@ export class ListItem {
   sortOrder: number;
 
   @ApiProperty({ type: String })
+  createdByUserId: string;
+
+  @ApiProperty({ type: String })
   shoppingListId: string;
 
   @ApiProperty({ type: Date })

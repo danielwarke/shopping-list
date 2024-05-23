@@ -26,6 +26,7 @@ export class ShoppingListsService {
         listItems: {
           create: {
             sortOrder: 1,
+            createdByUserId: userId,
           },
         },
         users: {
