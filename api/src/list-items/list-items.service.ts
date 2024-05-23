@@ -71,9 +71,9 @@ export class ListItemsService {
       this.prisma.listItem.create({
         data: {
           shoppingListId,
-          name: appendListItemDto.name,
           sortOrder,
           createdByUserId: userId,
+          ...appendListItemDto,
         },
       }),
       this.prisma.shoppingList.update({
@@ -103,9 +103,8 @@ export class ListItemsService {
       this.prisma.listItem.create({
         data: {
           shoppingListId,
-          name: insertListItemDto.name,
-          sortOrder: insertListItemDto.sortOrder,
           createdByUserId: userId,
+          ...insertListItemDto,
         },
       }),
       this.prisma.shoppingList.update({

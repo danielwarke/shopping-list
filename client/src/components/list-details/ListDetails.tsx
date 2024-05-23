@@ -4,25 +4,38 @@ import { DraggableItems } from "@/components/list-details/DraggableItems";
 import { Add } from "@mui/icons-material";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/api/api-client";
-import {
-  AppendListItemDto,
-  InsertListItemDto,
-  ListItem as ListItemDto,
-} from "@/api/client-sdk/Api";
-import { FC, useCallback } from "react";
+import { ListItem as ListItemDto } from "@/api/client-sdk/Api";
+import { FC } from "react";
 import { useSetItemData } from "@/hooks/use-set-item-data";
 import { getItemsQueryKey } from "@/api/query-keys";
 import { useShoppingListContext } from "@/contexts/ShoppingListContext";
 import { useAuthContext } from "@/contexts/AuthContext";
+import { createId } from "@paralleldrive/cuid2";
 
-const tempPrefix = "optimistic";
+const generateListItem = (
+  id: string,
+  userId: string,
+  shoppingListId: string,
+): ListItemDto => {
+  return {
+    id,
+    name: "",
+    complete: false,
+    header: false,
+    sortOrder: -1,
+    shoppingListId,
+    createdAt: new Date().toISOString(),
+    createdByUserId: userId,
+  };
+};
 
 export const ListDetails: FC = () => {
   const { userId } = useAuthContext();
   const { id: shoppingListId, colorId } = useShoppingListContext();
   const queryClient = useQueryClient();
 
-  const { setItemData, setItemAppendedData } = useSetItemData(shoppingListId);
+  const { setItemData, setItemAppendedData, setItemUpdateData } =
+    useSetItemData(shoppingListId);
   const itemsQueryKey = getItemsQueryKey(shoppingListId);
 
   function invalidateCache() {
@@ -31,100 +44,51 @@ export const ListDetails: FC = () => {
     });
   }
 
-  const getTempListItem = useCallback<() => ListItemDto | undefined>(() => {
-    const listItems = queryClient.getQueryData<ListItemDto[]>(itemsQueryKey);
-    if (!listItems) {
-      return;
-    }
-
-    const tempId = tempPrefix + listItems.length;
-
-    return {
-      id: tempId,
-      name: "",
-      complete: false,
-      header: false,
-      sortOrder: -1,
-      shoppingListId,
-      createdAt: new Date().toISOString(),
-      createdByUserId: userId,
-    };
-  }, [itemsQueryKey, queryClient, shoppingListId, userId]);
-
   const appendListItemMutation = useMutation({
-    mutationFn: (data: AppendListItemDto) =>
+    mutationFn: (data: { id: string }) =>
       apiClient.shoppingLists.listItemsControllerAppend(shoppingListId, data),
-    onMutate: () => {
-      const tempListItem = getTempListItem();
-      if (!tempListItem) {
-        return;
-      }
-
-      setItemAppendedData(tempListItem);
-
-      return tempListItem.id;
+    onMutate: (data) => {
+      const listItem = generateListItem(data.id, userId, shoppingListId);
+      setItemAppendedData(listItem);
     },
-    onSuccess: (createdListItem, _, tempId) => {
-      setItemData((currentData) =>
-        currentData.map((item) =>
-          item.id === tempId ? createdListItem : item,
-        ),
-      );
+    onSuccess: (createdListItem) => {
+      setItemUpdateData(createdListItem.id, {
+        sortOrder: createdListItem.sortOrder,
+        createdAt: createdListItem.createdAt,
+      });
     },
     onError: invalidateCache,
   });
 
   const insertListItemMutation = useMutation({
-    mutationFn: (data: InsertListItemDto & { index: number }) =>
+    mutationFn: (data: { id: string; sortOrder: number; index: number }) =>
       apiClient.shoppingLists.listItemsControllerInsert(shoppingListId, data),
     onMutate: (data) => {
-      const tempListItem = getTempListItem();
-      if (!tempListItem) {
-        return;
-      }
+      const listItem = generateListItem(data.id, userId, shoppingListId);
 
       setItemData((currentData) => {
         const newData = [...currentData];
-        newData.splice(data.index + 1, 0, tempListItem);
+        newData.splice(data.index + 1, 0, listItem);
         return newData;
       });
-
-      return tempListItem.id;
     },
-    onSuccess: (createdListItem, _, tempId) => {
-      setItemData((currentData) =>
-        currentData.map((item) =>
-          item.id === tempId ? createdListItem : item,
-        ),
-      );
+    onSuccess: (createdListItem) => {
+      setItemUpdateData(createdListItem.id, {
+        sortOrder: createdListItem.sortOrder,
+        createdAt: createdListItem.createdAt,
+      });
     },
     onError: invalidateCache,
   });
 
-  function validateAdd() {
-    const listItems = queryClient.getQueryData<ListItemDto[]>(itemsQueryKey);
-    if (listItems) {
-      const tempExists = listItems.some(
-        (item) => item.id === tempPrefix + listItems.length,
-      );
-      if (tempExists) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
   function handleAppend() {
-    if (validateAdd()) {
-      appendListItemMutation.mutate({});
-    }
+    appendListItemMutation.mutate({
+      id: createId(),
+    });
   }
 
   function handleInsert(data: { sortOrder: number; index: number }) {
-    if (validateAdd()) {
-      insertListItemMutation.mutate(data);
-    }
+    insertListItemMutation.mutate({ ...data, id: createId() });
   }
 
   return (

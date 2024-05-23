@@ -111,10 +111,12 @@ export interface SetListColorDto {
 }
 
 export interface AppendListItemDto {
+  id?: string;
   name?: string;
 }
 
 export interface InsertListItemDto {
+  id?: string;
   name?: string;
   sortOrder: number;
 }
