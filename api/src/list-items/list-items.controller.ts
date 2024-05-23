@@ -70,7 +70,7 @@ export class ListItemsController {
   }
 
   @Patch(":id")
-  rename(
+  update(
     @Req() req: JwtRequest,
     @Param("shoppingListId") shoppingListId: string,
     @Param("id") id: string,

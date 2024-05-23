@@ -2,8 +2,7 @@ import { FC, KeyboardEvent } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   ListItem as ListItemInterface,
-  RenameListItemDto,
-  SetListItemCompleteDto,
+  UpdateListItemDto,
 } from "@/api/client-sdk/Api";
 import { apiClient } from "@/api/api-client";
 import { useDebounceState } from "@/hooks/use-debounce-state";
@@ -33,7 +32,7 @@ export const ListItem: FC<ListItemProps> = ({
 
   const queryClient = useQueryClient();
   const itemsQueryKey = getItemsQueryKey(shoppingListId);
-  const { setItemDeleteData, setItemCompleteData } =
+  const { setItemDeleteData, setItemUpdateData } =
     useSetItemData(shoppingListId);
 
   function invalidateCache() {
@@ -42,24 +41,18 @@ export const ListItem: FC<ListItemProps> = ({
     });
   }
 
-  const renameListItemMutation = useMutation({
-    mutationFn: (data: RenameListItemDto) =>
-      apiClient.shoppingLists.listItemsControllerRename(
+  const updateListItemMutation = useMutation({
+    mutationFn: (data: UpdateListItemDto) =>
+      apiClient.shoppingLists.listItemsControllerUpdate(
         shoppingListId,
         listItemId,
         data,
       ),
-    onError: invalidateCache,
-  });
-
-  const setCompleteMutation = useMutation({
-    mutationFn: (data: SetListItemCompleteDto) =>
-      apiClient.shoppingLists.listItemsControllerSetComplete(
-        shoppingListId,
-        listItemId,
-        data,
-      ),
-    onMutate: (data) => setItemCompleteData(listItemId, data.complete),
+    onMutate: (data) => {
+      if (typeof data.complete !== "undefined") {
+        setItemUpdateData(listItemId, data);
+      }
+    },
     onError: invalidateCache,
   });
 
@@ -75,14 +68,14 @@ export const ListItem: FC<ListItemProps> = ({
 
   const [name, setName] = useDebounceState(listItem.name, (newName) => {
     if (newName !== listItem.name) {
-      renameListItemMutation.mutate({ name: newName });
+      updateListItemMutation.mutate({ name: newName });
     }
   });
 
   async function handleKeyDown(e: KeyboardEvent) {
     if (e.code === "Enter") {
       if (name !== listItem.name) {
-        await renameListItemMutation.mutateAsync({ name });
+        await updateListItemMutation.mutateAsync({ name });
       }
 
       onEnterKey();
@@ -120,7 +113,7 @@ export const ListItem: FC<ListItemProps> = ({
               <Checkbox
                 checked={listItem.complete}
                 onChange={(e) =>
-                  setCompleteMutation.mutate({ complete: e.target.checked })
+                  updateListItemMutation.mutate({ complete: e.target.checked })
                 }
                 color={colorId ? "default" : "primary"}
               />

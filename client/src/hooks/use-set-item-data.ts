@@ -33,22 +33,11 @@ export function useSetItemData(shoppingListId: string) {
     [setItemData],
   );
 
-  const setItemRenameData = useCallback(
-    (itemId: string, name: string) => {
+  const setItemUpdateData = useCallback(
+    (itemId: string, data: { name?: string; complete?: boolean }) => {
       setItemData((currentData) =>
         currentData.map((item) =>
-          item.id === itemId ? { ...item, name } : item,
-        ),
-      );
-    },
-    [setItemData],
-  );
-
-  const setItemCompleteData = useCallback(
-    (itemId: string, complete: boolean) => {
-      setItemData((currentData) =>
-        currentData.map((item) =>
-          item.id === itemId ? { ...item, complete } : item,
+          item.id === itemId ? { ...item, ...data } : item,
         ),
       );
     },
@@ -67,8 +56,7 @@ export function useSetItemData(shoppingListId: string) {
   return {
     setItemData,
     setItemAppendedData,
-    setItemRenameData,
-    setItemCompleteData,
+    setItemUpdateData,
     setItemDeleteData,
   };
 }
