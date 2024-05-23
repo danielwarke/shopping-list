@@ -16,13 +16,11 @@ import { useShoppingListContext } from "@/contexts/ShoppingListContext";
 interface DraggableItemsProps {
   appendListItem: () => void;
   insertListItem: (data: { sortOrder: number; index: number }) => void;
-  autoFocusId: string;
 }
 
 export const DraggableItems: FC<DraggableItemsProps> = ({
   appendListItem,
   insertListItem,
-  autoFocusId,
 }) => {
   const { id: shoppingListId } = useShoppingListContext();
   const queryClient = useQueryClient();
@@ -128,7 +126,6 @@ export const DraggableItems: FC<DraggableItemsProps> = ({
             key={listItem.id}
             listItem={listItem}
             onEnterKey={() => onEnterKeyHandler(listItem)}
-            autoFocusId={autoFocusId}
             disableDrag={search.length > 0}
           />
         ))}

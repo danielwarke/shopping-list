@@ -9,7 +9,7 @@ import {
   InsertListItemDto,
   ListItem as ListItemDto,
 } from "@/api/client-sdk/Api";
-import { FC, useCallback, useState } from "react";
+import { FC, useCallback } from "react";
 import { useSetItemData } from "@/hooks/use-set-item-data";
 import { getItemsQueryKey } from "@/api/query-keys";
 import { useShoppingListContext } from "@/contexts/ShoppingListContext";
@@ -25,8 +25,6 @@ export const ListDetails: FC = () => {
   const { setItemData, setItemAppendedData } = useSetItemData(shoppingListId);
   const itemsQueryKey = getItemsQueryKey(shoppingListId);
 
-  const [autoFocusId, setAutoFocusId] = useState("");
-
   function invalidateCache() {
     queryClient.invalidateQueries({
       queryKey: itemsQueryKey,
@@ -40,7 +38,6 @@ export const ListDetails: FC = () => {
     }
 
     const tempId = tempPrefix + listItems.length;
-    setAutoFocusId(tempId);
 
     return {
       id: tempId,
@@ -68,8 +65,6 @@ export const ListDetails: FC = () => {
       return tempListItem.id;
     },
     onSuccess: (createdListItem, _, tempId) => {
-      setAutoFocusId((id) => (id === tempId ? createdListItem.id : id));
-
       setItemData((currentData) =>
         currentData.map((item) =>
           item.id === tempId ? createdListItem : item,
@@ -97,8 +92,6 @@ export const ListDetails: FC = () => {
       return tempListItem.id;
     },
     onSuccess: (createdListItem, _, tempId) => {
-      setAutoFocusId((id) => (tempId === id ? createdListItem.id : id));
-
       setItemData((currentData) =>
         currentData.map((item) =>
           item.id === tempId ? createdListItem : item,
@@ -141,7 +134,6 @@ export const ListDetails: FC = () => {
         <DraggableItems
           appendListItem={handleAppend}
           insertListItem={handleInsert}
-          autoFocusId={autoFocusId}
         />
       </Box>
       <Tooltip title="New List Item">
