@@ -25,8 +25,17 @@ export const ListDetails: FC = () => {
       apiClient.shoppingLists.listItemsControllerAppend(shoppingListId, data),
     onMutate: () => {
       const listItems = queryClient.getQueryData<ListItemDto[]>(itemsQueryKey);
-      const tempId = `optimistic-append-${listItems ? listItems.length : 0}`;
+      if (!listItems) {
+        return;
+      }
 
+      const prefix = "optimistic";
+      const tempExists = listItems.some((item) => item.id.startsWith(prefix));
+      if (tempExists) {
+        return;
+      }
+
+      const tempId = `${prefix}${listItems ? listItems.length : 0}`;
       setItemAppendedData({
         id: tempId,
         name: "",
