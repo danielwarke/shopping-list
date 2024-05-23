@@ -35,7 +35,7 @@ export const ListDetails: FC = () => {
         return;
       }
 
-      const tempId = `${prefix}${listItems ? listItems.length : 0}`;
+      const tempId = prefix + listItems.length;
       setItemAppendedData({
         id: tempId,
         name: "",
