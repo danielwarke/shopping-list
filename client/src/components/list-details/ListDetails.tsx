@@ -6,13 +6,16 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/api/api-client";
 import {
   AppendListItemDto,
+  InsertListItemDto,
   ListItem as ListItemDto,
 } from "@/api/client-sdk/Api";
-import { FC } from "react";
+import { FC, useCallback, useState } from "react";
 import { useSetItemData } from "@/hooks/use-set-item-data";
 import { getItemsQueryKey } from "@/api/query-keys";
 import { useShoppingListContext } from "@/contexts/ShoppingListContext";
 import { useAuthContext } from "@/contexts/AuthContext";
+
+const tempPrefix = "optimistic";
 
 export const ListDetails: FC = () => {
   const { userId } = useAuthContext();
@@ -22,61 +25,130 @@ export const ListDetails: FC = () => {
   const { setItemData, setItemAppendedData } = useSetItemData(shoppingListId);
   const itemsQueryKey = getItemsQueryKey(shoppingListId);
 
+  const [autoFocusId, setAutoFocusId] = useState("");
+
+  function invalidateCache() {
+    queryClient.invalidateQueries({
+      queryKey: itemsQueryKey,
+    });
+  }
+
+  const getTempListItem = useCallback<() => ListItemDto | undefined>(() => {
+    const listItems = queryClient.getQueryData<ListItemDto[]>(itemsQueryKey);
+    if (!listItems) {
+      return;
+    }
+
+    const tempId = tempPrefix + listItems.length;
+    setAutoFocusId(tempId);
+
+    return {
+      id: tempId,
+      name: "",
+      complete: false,
+      header: false,
+      sortOrder: -1,
+      shoppingListId,
+      createdAt: new Date().toISOString(),
+      createdByUserId: userId,
+    };
+  }, [itemsQueryKey, queryClient, shoppingListId, userId]);
+
   const appendListItemMutation = useMutation({
     mutationFn: (data: AppendListItemDto) =>
       apiClient.shoppingLists.listItemsControllerAppend(shoppingListId, data),
     onMutate: () => {
-      const listItems = queryClient.getQueryData<ListItemDto[]>(itemsQueryKey);
-      if (!listItems) {
+      const tempListItem = getTempListItem();
+      if (!tempListItem) {
         return;
       }
 
-      const tempId = "optimistic" + listItems.length;
-      const tempExists = listItems.some((item) => item.id === tempId);
-      if (tempExists) {
-        return;
-      }
+      setItemAppendedData(tempListItem);
 
-      setItemAppendedData({
-        id: tempId,
-        name: "",
-        complete: false,
-        header: false,
-        sortOrder: -1,
-        shoppingListId,
-        createdAt: new Date().toISOString(),
-        createdByUserId: userId,
-      });
-
-      return tempId;
+      return tempListItem.id;
     },
     onSuccess: (createdListItem, _, tempId) => {
+      setAutoFocusId((id) => (id === tempId ? createdListItem.id : id));
+
       setItemData((currentData) =>
         currentData.map((item) =>
           item.id === tempId ? createdListItem : item,
         ),
       );
     },
-    onError: () => {
-      queryClient.invalidateQueries({
-        queryKey: itemsQueryKey,
-      });
-    },
+    onError: invalidateCache,
   });
+
+  const insertListItemMutation = useMutation({
+    mutationFn: (data: InsertListItemDto & { index: number }) =>
+      apiClient.shoppingLists.listItemsControllerInsert(shoppingListId, data),
+    onMutate: (data) => {
+      const tempListItem = getTempListItem();
+      if (!tempListItem) {
+        return;
+      }
+
+      setItemData((currentData) => {
+        const newData = [...currentData];
+        newData.splice(data.index + 1, 0, tempListItem);
+        return newData;
+      });
+
+      return tempListItem.id;
+    },
+    onSuccess: (createdListItem, _, tempId) => {
+      setAutoFocusId((id) => (tempId === id ? createdListItem.id : id));
+
+      setItemData((currentData) =>
+        currentData.map((item) =>
+          item.id === tempId ? createdListItem : item,
+        ),
+      );
+    },
+    onError: invalidateCache,
+  });
+
+  function validateAdd() {
+    const listItems = queryClient.getQueryData<ListItemDto[]>(itemsQueryKey);
+    if (listItems) {
+      const tempExists = listItems.some(
+        (item) => item.id === tempPrefix + listItems.length,
+      );
+      if (tempExists) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  function handleAppend() {
+    if (validateAdd()) {
+      appendListItemMutation.mutate({});
+    }
+  }
+
+  function handleInsert(data: { sortOrder: number; index: number }) {
+    if (validateAdd()) {
+      insertListItemMutation.mutate(data);
+    }
+  }
 
   return (
     <>
       <ListName />
       <Box marginTop="2vh" paddingBottom="16vh">
         <DraggableItems
-          appendListItem={() => appendListItemMutation.mutate({})}
+          appendListItem={handleAppend}
+          insertListItem={handleInsert}
+          autoFocusId={autoFocusId}
         />
       </Box>
       <Tooltip title="New List Item">
         <Fab
           color={colorId ? "default" : "primary"}
           sx={{ position: "fixed", bottom: "2em", right: "2em" }}
-          onClick={() => appendListItemMutation.mutate({})}
+          onClick={handleAppend}
         >
           <Add />
         </Fab>

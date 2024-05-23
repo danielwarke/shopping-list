@@ -3,7 +3,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/api/api-client";
 import { Container as DraggableContainer } from "react-smooth-dnd";
 import {
-  InsertListItemDto,
   ListItem as ListItemDto,
   ReorderShoppingListDto,
 } from "@/api/client-sdk/Api";
@@ -13,14 +12,18 @@ import { useSetItemData } from "@/hooks/use-set-item-data";
 import { ListItem } from "@/components/list-details/ListItem";
 import { ListSearchBar } from "@/components/list-details/ListSearchBar";
 import { useShoppingListContext } from "@/contexts/ShoppingListContext";
-import { useAuthContext } from "@/contexts/AuthContext";
 
 interface DraggableItemsProps {
   appendListItem: () => void;
+  insertListItem: (data: { sortOrder: number; index: number }) => void;
+  autoFocusId: string;
 }
 
-export const DraggableItems: FC<DraggableItemsProps> = ({ appendListItem }) => {
-  const { userId } = useAuthContext();
+export const DraggableItems: FC<DraggableItemsProps> = ({
+  appendListItem,
+  insertListItem,
+  autoFocusId,
+}) => {
   const { id: shoppingListId } = useShoppingListContext();
   const queryClient = useQueryClient();
   const itemsQueryKey = getItemsQueryKey(shoppingListId);
@@ -43,45 +46,6 @@ export const DraggableItems: FC<DraggableItemsProps> = ({ appendListItem }) => {
   const reorderListItemsMutation = useMutation({
     mutationFn: (data: ReorderShoppingListDto) =>
       apiClient.shoppingLists.listItemsControllerReorder(shoppingListId, data),
-    onError: invalidateCache,
-  });
-
-  const insertListItemMutation = useMutation({
-    mutationFn: (data: InsertListItemDto & { index: number }) =>
-      apiClient.shoppingLists.listItemsControllerInsert(shoppingListId, data),
-    onMutate: (data) => {
-      const tempId = "optimistic" + listItems.length;
-      const tempExists = listItems.some((item) => item.id === tempId);
-      if (tempExists) {
-        return;
-      }
-
-      const newListItem: ListItemDto = {
-        id: tempId,
-        name: "",
-        complete: false,
-        header: false,
-        sortOrder: -1,
-        shoppingListId,
-        createdAt: new Date().toISOString(),
-        createdByUserId: userId,
-      };
-
-      setItemData((currentData) => {
-        const newData = [...currentData];
-        newData.splice(data.index + 1, 0, newListItem);
-        return newData;
-      });
-
-      return tempId;
-    },
-    onSuccess: (createdListItem, _, tempId) => {
-      setItemData((currentData) =>
-        currentData.map((item) =>
-          item.id === tempId ? createdListItem : item,
-        ),
-      );
-    },
     onError: invalidateCache,
   });
 
@@ -136,7 +100,7 @@ export const DraggableItems: FC<DraggableItemsProps> = ({ appendListItem }) => {
     if (listIndex === listItems.length - 1) {
       appendListItem();
     } else {
-      insertListItemMutation.mutate({
+      insertListItem({
         sortOrder: listItem.sortOrder,
         index: listIndex,
       });
@@ -164,6 +128,7 @@ export const DraggableItems: FC<DraggableItemsProps> = ({ appendListItem }) => {
             key={listItem.id}
             listItem={listItem}
             onEnterKey={() => onEnterKeyHandler(listItem)}
+            autoFocusId={autoFocusId}
             disableDrag={search.length > 0}
           />
         ))}
