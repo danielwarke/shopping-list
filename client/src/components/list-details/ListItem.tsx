@@ -72,17 +72,11 @@ export const ListItem: FC<ListItemProps> = ({
   });
 
   const [name, setName] = useDebounceState(listItem.name, (newName) => {
-    if (newName !== listItem.name) {
-      updateListItemMutation.mutate({ name: newName });
-    }
+    updateListItemMutation.mutate({ name: newName });
   });
 
   async function handleKeyDown(e: KeyboardEvent) {
     if (e.code === "Enter") {
-      if (name !== listItem.name) {
-        await updateListItemMutation.mutateAsync({ name });
-      }
-
       onEnterKey();
     }
 
