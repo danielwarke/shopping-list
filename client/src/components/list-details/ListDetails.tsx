@@ -4,7 +4,10 @@ import { DraggableItems } from "@/components/list-details/DraggableItems";
 import { Add } from "@mui/icons-material";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/api/api-client";
-import { AppendListItemDto } from "@/api/client-sdk/Api";
+import {
+  AppendListItemDto,
+  ListItem as ListItemDto,
+} from "@/api/client-sdk/Api";
 import { FC } from "react";
 import { useSetItemData } from "@/hooks/use-set-item-data";
 import { getItemsQueryKey } from "@/api/query-keys";
@@ -20,7 +23,33 @@ export const ListDetails: FC = () => {
   const appendListItemMutation = useMutation({
     mutationFn: (data: AppendListItemDto) =>
       apiClient.shoppingLists.listItemsControllerAppend(shoppingListId, data),
-    onSuccess: setItemAppendedData,
+    onMutate: () => {
+      const listItems = queryClient.getQueryData<ListItemDto[]>(itemsQueryKey);
+      const tempId = `optimistic-${listItems ? listItems.length : 0}`;
+
+      setItemAppendedData({
+        id: tempId,
+        name: "",
+        complete: false,
+        header: false,
+        sortOrder: -1,
+        shoppingListId,
+        createdAt: new Date().toISOString(),
+      });
+
+      return tempId;
+    },
+    onSuccess: (createdListItem, _, tempId) => {
+      queryClient.setQueryData<ListItemDto[]>(itemsQueryKey, (currentData) => {
+        if (!currentData) {
+          return [createdListItem];
+        }
+
+        return currentData.map((item) =>
+          item.id === tempId ? createdListItem : item,
+        );
+      });
+    },
     onError: () => {
       queryClient.invalidateQueries({
         queryKey: itemsQueryKey,
@@ -32,7 +61,9 @@ export const ListDetails: FC = () => {
     <>
       <ListName />
       <Box marginTop="2vh" paddingBottom="16vh">
-        <DraggableItems />
+        <DraggableItems
+          appendListItem={() => appendListItemMutation.mutate({})}
+        />
       </Box>
       <Tooltip title="New List Item">
         <Fab

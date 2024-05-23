@@ -3,7 +3,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/api/api-client";
 import { Container as DraggableContainer } from "react-smooth-dnd";
 import {
-  AppendListItemDto,
   InsertListItemDto,
   ListItem as ListItemDto,
   ReorderShoppingListDto,
@@ -15,13 +14,16 @@ import { ListItem } from "@/components/list-details/ListItem";
 import { ListSearchBar } from "@/components/list-details/ListSearchBar";
 import { useShoppingListContext } from "@/contexts/ShoppingListContext";
 
-export const DraggableItems: FC = () => {
+interface DraggableItemsProps {
+  appendListItem: () => void;
+}
+
+export const DraggableItems: FC<DraggableItemsProps> = ({ appendListItem }) => {
   const { id: shoppingListId } = useShoppingListContext();
   const queryClient = useQueryClient();
   const itemsQueryKey = getItemsQueryKey(shoppingListId);
-  const { setItemData, setItemAppendedData } = useSetItemData(shoppingListId);
+  const { setItemData } = useSetItemData(shoppingListId);
 
-  const [autoFocusListItemId, setAutoFocusListItemId] = useState("");
   const [search, setSearch] = useState("");
 
   function invalidateCache() {
@@ -42,30 +44,10 @@ export const DraggableItems: FC = () => {
     onError: invalidateCache,
   });
 
-  const appendListItemMutation = useMutation({
-    mutationFn: (data: AppendListItemDto) =>
-      apiClient.shoppingLists.listItemsControllerAppend(shoppingListId, data),
-    onSuccess: (createdListItem) => {
-      setAutoFocusListItemId(createdListItem.id);
-      setItemAppendedData(createdListItem);
-    },
-    onError: invalidateCache,
-  });
-
   const insertListItemMutation = useMutation({
     mutationFn: (data: InsertListItemDto) =>
       apiClient.shoppingLists.listItemsControllerInsert(shoppingListId, data),
-    onSuccess: (reorderedList) => {
-      let newestItem = reorderedList[0];
-      for (const listItem of reorderedList) {
-        if (listItem.createdAt > newestItem.createdAt) {
-          newestItem = listItem;
-        }
-      }
-
-      setAutoFocusListItemId(newestItem.id);
-      setItemData(reorderedList);
-    },
+    onSuccess: setItemData,
     onError: invalidateCache,
   });
 
@@ -118,7 +100,7 @@ export const DraggableItems: FC = () => {
   function onEnterKeyHandler(listItem: ListItemDto) {
     const listIndex = listItems.findIndex((item) => item.id === listItem.id);
     if (listIndex === listItems.length - 1) {
-      appendListItemMutation.mutate({});
+      appendListItem();
     } else {
       insertListItemMutation.mutate({ sortOrder: listItem.sortOrder });
     }
@@ -126,13 +108,7 @@ export const DraggableItems: FC = () => {
 
   return (
     <>
-      <ListSearchBar
-        search={search}
-        setSearch={(value) => {
-          setSearch(value);
-          setAutoFocusListItemId("");
-        }}
-      />
+      <ListSearchBar search={search} setSearch={setSearch} />
       {search.length > 0 &&
         listItems.length > 0 &&
         filteredListItems.length === 0 && (
@@ -151,7 +127,6 @@ export const DraggableItems: FC = () => {
             key={listItem.id}
             listItem={listItem}
             onEnterKey={() => onEnterKeyHandler(listItem)}
-            autoFocus={listItem.id === autoFocusListItemId}
             disableDrag={search.length > 0}
           />
         ))}

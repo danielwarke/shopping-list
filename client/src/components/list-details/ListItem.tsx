@@ -21,14 +21,12 @@ import { useShoppingListContext } from "@/contexts/ShoppingListContext";
 interface ListItemProps {
   listItem: ListItemInterface;
   onEnterKey: () => void;
-  autoFocus: boolean;
   disableDrag?: boolean;
 }
 
 export const ListItem: FC<ListItemProps> = ({
   listItem,
   onEnterKey,
-  autoFocus,
   disableDrag,
 }) => {
   const listItemId = listItem.id;
@@ -104,7 +102,7 @@ export const ListItem: FC<ListItemProps> = ({
         onBlur={() => {
           setTimeout(() => setIsFocused(false), 100);
         }}
-        autoFocus={autoFocus}
+        autoFocus
         placeholder="List item"
         fullWidth
         margin="dense"
