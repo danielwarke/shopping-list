@@ -1,24 +1,27 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 
 export class ListItem {
-	@ApiProperty({ type: String })
-	id: string
+  @ApiProperty({ type: String })
+  id: string;
 
-	@ApiProperty({ type: String })
-	name: string
+  @ApiProperty({ type: String })
+  name: string;
 
-	@ApiProperty({ type: Boolean })
-	complete: boolean
+  @ApiProperty({ type: Boolean })
+  complete: boolean;
 
-	@ApiProperty({ type: Number })
-	sortOrder: number
+  @ApiProperty({ type: Boolean })
+  header: boolean;
 
-	@ApiProperty({ type: String })
-	shoppingListId: string
+  @ApiProperty({ type: Number })
+  sortOrder: number;
 
-	@ApiProperty({ type: Date })
-	createdAt: Date
+  @ApiProperty({ type: String })
+  shoppingListId: string;
 
-	@ApiPropertyOptional({ type: Date })
-	updatedAt?: Date
+  @ApiProperty({ type: Date })
+  createdAt: Date;
+
+  @ApiPropertyOptional({ type: Date })
+  updatedAt?: Date;
 }

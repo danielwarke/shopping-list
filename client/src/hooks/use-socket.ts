@@ -15,8 +15,7 @@ export function useSocket(shoppingListId: string = "") {
   const {
     setItemData,
     setItemAppendedData,
-    setItemRenameData,
-    setItemCompleteData,
+    setItemUpdateData,
     setItemDeleteData,
   } = useSetItemData(shoppingListId);
 
@@ -70,15 +69,9 @@ export function useSocket(shoppingListId: string = "") {
       }
     });
 
-    socket.on("itemRenamed", ({ userId, itemId, name }) => {
+    socket.on("itemUpdated", ({ userId, itemId, ...rest }) => {
       if (currentUserId !== userId) {
-        setItemRenameData(itemId, name);
-      }
-    });
-
-    socket.on("itemComplete", ({ userId, itemId, complete }) => {
-      if (currentUserId !== userId) {
-        setItemCompleteData(itemId, complete);
+        setItemUpdateData(itemId, rest);
       }
     });
 
@@ -94,10 +87,9 @@ export function useSocket(shoppingListId: string = "") {
   }, [
     currentUserId,
     setItemAppendedData,
-    setItemCompleteData,
     setItemData,
     setItemDeleteData,
-    setItemRenameData,
+    setItemUpdateData,
     setListRenameData,
     shoppingListId,
   ]);

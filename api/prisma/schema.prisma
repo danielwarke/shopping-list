@@ -42,6 +42,7 @@ model ListItem {
   id             String       @id @default(cuid())
   name           String       @default("")
   complete       Boolean      @default(false)
+  header         Boolean      @default(false)
   sortOrder      Int
   shoppingList   ShoppingList @relation(fields: [shoppingListId], references: [id], onDelete: Cascade)
   shoppingListId String

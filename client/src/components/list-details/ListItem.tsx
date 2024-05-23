@@ -1,14 +1,18 @@
-import { FC, KeyboardEvent } from "react";
+import { FC, KeyboardEvent, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   ListItem as ListItemInterface,
-  RenameListItemDto,
-  SetListItemCompleteDto,
+  UpdateListItemDto,
 } from "@/api/client-sdk/Api";
 import { apiClient } from "@/api/api-client";
 import { useDebounceState } from "@/hooks/use-debounce-state";
 import { Checkbox, IconButton, InputAdornment, TextField } from "@mui/material";
-import { Clear, DragIndicator } from "@mui/icons-material";
+import {
+  Clear,
+  DragIndicator,
+  TextDecrease,
+  TextIncrease,
+} from "@mui/icons-material";
 import { Draggable } from "react-smooth-dnd";
 import { getItemsQueryKey } from "@/api/query-keys";
 import { useSetItemData } from "@/hooks/use-set-item-data";
@@ -33,8 +37,10 @@ export const ListItem: FC<ListItemProps> = ({
 
   const queryClient = useQueryClient();
   const itemsQueryKey = getItemsQueryKey(shoppingListId);
-  const { setItemDeleteData, setItemCompleteData } =
+  const { setItemDeleteData, setItemUpdateData } =
     useSetItemData(shoppingListId);
+
+  const [isFocused, setIsFocused] = useState(false);
 
   function invalidateCache() {
     return queryClient.invalidateQueries({
@@ -42,24 +48,18 @@ export const ListItem: FC<ListItemProps> = ({
     });
   }
 
-  const renameListItemMutation = useMutation({
-    mutationFn: (data: RenameListItemDto) =>
-      apiClient.shoppingLists.listItemsControllerRename(
+  const updateListItemMutation = useMutation({
+    mutationFn: (data: UpdateListItemDto) =>
+      apiClient.shoppingLists.listItemsControllerUpdate(
         shoppingListId,
         listItemId,
         data,
       ),
-    onError: invalidateCache,
-  });
-
-  const setCompleteMutation = useMutation({
-    mutationFn: (data: SetListItemCompleteDto) =>
-      apiClient.shoppingLists.listItemsControllerSetComplete(
-        shoppingListId,
-        listItemId,
-        data,
-      ),
-    onMutate: (data) => setItemCompleteData(listItemId, data.complete),
+    onMutate: (data) => {
+      if (typeof data.name === "undefined") {
+        setItemUpdateData(listItemId, data);
+      }
+    },
     onError: invalidateCache,
   });
 
@@ -75,14 +75,14 @@ export const ListItem: FC<ListItemProps> = ({
 
   const [name, setName] = useDebounceState(listItem.name, (newName) => {
     if (newName !== listItem.name) {
-      renameListItemMutation.mutate({ name: newName });
+      updateListItemMutation.mutate({ name: newName });
     }
   });
 
   async function handleKeyDown(e: KeyboardEvent) {
     if (e.code === "Enter") {
       if (name !== listItem.name) {
-        await renameListItemMutation.mutateAsync({ name });
+        await updateListItemMutation.mutateAsync({ name });
       }
 
       onEnterKey();
@@ -100,12 +100,14 @@ export const ListItem: FC<ListItemProps> = ({
         value={name}
         onChange={(e) => setName(e.target.value)}
         onKeyDown={handleKeyDown}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => {
+          setTimeout(() => setIsFocused(false), 100);
+        }}
         autoFocus={autoFocus}
         placeholder="List item"
         fullWidth
-        sx={{
-          marginTop: "1em",
-        }}
+        margin="dense"
         variant="standard"
         InputProps={{
           startAdornment: (
@@ -113,32 +115,55 @@ export const ListItem: FC<ListItemProps> = ({
               {!disableDrag && (
                 <DragIndicator
                   className="drag-handle"
-                  sx={{ cursor: "grab", padding: "6px" }}
+                  sx={{
+                    cursor: "grab",
+                    padding: "6px",
+                  }}
                   onClick={(e) => e.preventDefault()}
                 />
               )}
-              <Checkbox
-                checked={listItem.complete}
-                onChange={(e) =>
-                  setCompleteMutation.mutate({ complete: e.target.checked })
-                }
-                color={colorId ? "default" : "primary"}
-              />
+              {!listItem.header && (
+                <Checkbox
+                  checked={listItem.complete}
+                  onChange={(e) =>
+                    updateListItemMutation.mutate({
+                      complete: e.target.checked,
+                    })
+                  }
+                  color={colorId ? "default" : "primary"}
+                />
+              )}
             </InputAdornment>
           ),
           endAdornment: (
             <InputAdornment position="end">
+              {isFocused && (
+                <IconButton
+                  size="small"
+                  onClick={() => {
+                    updateListItemMutation.mutate({ header: !listItem.header });
+                  }}
+                >
+                  {listItem.header ? <TextDecrease /> : <TextIncrease />}
+                </IconButton>
+              )}
               <IconButton onClick={() => deleteListItemMutation.mutate()}>
                 <Clear />
               </IconButton>
             </InputAdornment>
           ),
-          ...(listItem.complete && {
-            sx: {
+          sx: {
+            ...(listItem.header && {
+              fontSize: "1.75em",
+              paddingX: 0,
+              backgroundColor: "rgba(0, 0, 0, 0.15)",
+              borderRadius: "4px",
+            }),
+            ...(listItem.complete && {
               textDecoration: "line-through",
               color: "gray",
-            },
-          }),
+            }),
+          },
           disableUnderline: !!colorId,
         }}
       />

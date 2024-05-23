@@ -64,6 +64,7 @@ export interface ListItem {
   id: string;
   name: string;
   complete: boolean;
+  header: boolean;
   sortOrder: number;
   shoppingListId: string;
   /** @format date-time */
@@ -126,12 +127,10 @@ export interface ReorderShoppingListDto {
   order: ReorderItem[];
 }
 
-export interface RenameListItemDto {
-  name: string;
-}
-
-export interface SetListItemCompleteDto {
-  complete: boolean;
+export interface UpdateListItemDto {
+  name?: string;
+  complete?: boolean;
+  header?: boolean;
 }
 
 export interface ShareShoppingListDto {
@@ -371,10 +370,9 @@ export class Api<
      * @request POST:/auth/request-verification-email
      */
     authControllerRequestVerificationEmail: (params: RequestParams = {}) =>
-      this.request<object, any>({
+      this.request<void, any>({
         path: `/auth/request-verification-email`,
         method: "POST",
-        format: "json",
         ...params,
       }),
 
@@ -681,66 +679,22 @@ export class Api<
      * No description
      *
      * @tags items
-     * @name ListItemsControllerRename
-     * @request PATCH:/shopping-lists/{shoppingListId}/items/{id}/rename
+     * @name ListItemsControllerUpdate
+     * @request PATCH:/shopping-lists/{shoppingListId}/items/{id}
      * @secure
      */
-    listItemsControllerRename: (
+    listItemsControllerUpdate: (
       shoppingListId: string,
       id: string,
-      data: RenameListItemDto,
+      data: UpdateListItemDto,
       params: RequestParams = {},
     ) =>
       this.request<ListItem, any>({
-        path: `/shopping-lists/${shoppingListId}/items/${id}/rename`,
+        path: `/shopping-lists/${shoppingListId}/items/${id}`,
         method: "PATCH",
         body: data,
         secure: true,
         type: ContentType.Json,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags items
-     * @name ListItemsControllerSetComplete
-     * @request PATCH:/shopping-lists/{shoppingListId}/items/{id}/set-complete
-     * @secure
-     */
-    listItemsControllerSetComplete: (
-      shoppingListId: string,
-      id: string,
-      data: SetListItemCompleteDto,
-      params: RequestParams = {},
-    ) =>
-      this.request<ListItem, any>({
-        path: `/shopping-lists/${shoppingListId}/items/${id}/set-complete`,
-        method: "PATCH",
-        body: data,
-        secure: true,
-        type: ContentType.Json,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags items
-     * @name ListItemsControllerRemoveCompleteItems
-     * @request DELETE:/shopping-lists/{shoppingListId}/items/complete
-     * @secure
-     */
-    listItemsControllerRemoveCompleteItems: (
-      shoppingListId: string,
-      params: RequestParams = {},
-    ) =>
-      this.request<ListItem[], any>({
-        path: `/shopping-lists/${shoppingListId}/items/complete`,
-        method: "DELETE",
-        secure: true,
         format: "json",
         ...params,
       }),
@@ -760,6 +714,26 @@ export class Api<
     ) =>
       this.request<ListItem, any>({
         path: `/shopping-lists/${shoppingListId}/items/${id}`,
+        method: "DELETE",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags items
+     * @name ListItemsControllerRemoveCompleteItems
+     * @request DELETE:/shopping-lists/{shoppingListId}/items/complete
+     * @secure
+     */
+    listItemsControllerRemoveCompleteItems: (
+      shoppingListId: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<ListItem[], any>({
+        path: `/shopping-lists/${shoppingListId}/items/complete`,
         method: "DELETE",
         secure: true,
         format: "json",
