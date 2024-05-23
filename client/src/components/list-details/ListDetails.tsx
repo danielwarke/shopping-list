@@ -31,13 +31,12 @@ export const ListDetails: FC = () => {
         return;
       }
 
-      const prefix = "optimistic";
-      const tempExists = listItems.some((item) => item.id.startsWith(prefix));
+      const tempId = "optimistic" + listItems.length;
+      const tempExists = listItems.some((item) => item.id === tempId);
       if (tempExists) {
         return;
       }
 
-      const tempId = prefix + listItems.length;
       setItemAppendedData({
         id: tempId,
         name: "",

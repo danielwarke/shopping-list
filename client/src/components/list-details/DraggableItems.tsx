@@ -50,13 +50,12 @@ export const DraggableItems: FC<DraggableItemsProps> = ({ appendListItem }) => {
     mutationFn: (data: InsertListItemDto & { index: number }) =>
       apiClient.shoppingLists.listItemsControllerInsert(shoppingListId, data),
     onMutate: (data) => {
-      const prefix = "optimistic";
-      const tempExists = listItems.some((item) => item.id.startsWith(prefix));
+      const tempId = "optimistic" + listItems.length;
+      const tempExists = listItems.some((item) => item.id === tempId);
       if (tempExists) {
         return;
       }
 
-      const tempId = prefix + listItems.length;
       const newListItem: ListItemDto = {
         id: tempId,
         name: "",
