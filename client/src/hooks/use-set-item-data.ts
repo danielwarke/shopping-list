@@ -27,6 +27,13 @@ export function useSetItemData(shoppingListId: string) {
   const setItemAppendedData = useCallback(
     (createdItem: ListItem) => {
       setItemData((currentData) => {
+        const itemExists = currentData.some(
+          (item) => item.id === createdItem.id,
+        );
+        if (itemExists) {
+          return currentData;
+        }
+
         return [...currentData, createdItem];
       });
     },
