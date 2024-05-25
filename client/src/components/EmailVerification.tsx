@@ -41,7 +41,9 @@ export const EmailVerification = () => {
 
   if (success) {
     return (
-      <Alert severity="success">Email address verified successfully.</Alert>
+      <Box marginTop="4vh">
+        <Alert severity="success">Email address verified successfully.</Alert>
+      </Box>
     );
   }
 
@@ -51,10 +53,12 @@ export const EmailVerification = () => {
 
   if (token) {
     return (
-      <ErrorRenderer
-        isError={verifyEmailMutation.isError}
-        error={verifyEmailMutation.error}
-      />
+      <Box marginTop="4vh">
+        <ErrorRenderer
+          isError={verifyEmailMutation.isError}
+          error={verifyEmailMutation.error}
+        />
+      </Box>
     );
   }
 
