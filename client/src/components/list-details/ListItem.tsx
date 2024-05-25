@@ -1,4 +1,4 @@
-import { FC, KeyboardEvent, useState } from "react";
+import { FC, KeyboardEvent } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   ListItem as ListItemInterface,
@@ -21,6 +21,8 @@ import { useAuthContext } from "@/contexts/AuthContext";
 
 interface ListItemProps {
   listItem: ListItemInterface;
+  isFocused: boolean;
+  onFocus: () => void;
   onEnterKey: () => void;
   previousId?: string;
   searchApplied?: boolean;
@@ -28,6 +30,8 @@ interface ListItemProps {
 
 export const ListItem: FC<ListItemProps> = ({
   listItem,
+  isFocused,
+  onFocus,
   onEnterKey,
   searchApplied,
   previousId,
@@ -41,8 +45,6 @@ export const ListItem: FC<ListItemProps> = ({
   const itemsQueryKey = getItemsQueryKey(shoppingListId);
   const { setItemDeleteData, setItemUpdateData } =
     useSetItemData(shoppingListId);
-
-  const [isFocused, setIsFocused] = useState(false);
 
   function invalidateCache() {
     return queryClient.invalidateQueries({
@@ -60,6 +62,11 @@ export const ListItem: FC<ListItemProps> = ({
     onMutate: (data) => {
       if (typeof data.name === "undefined") {
         setItemUpdateData(listItemId, data);
+      }
+    },
+    onSuccess: (_, data) => {
+      if (typeof data.header !== "undefined") {
+        document.getElementById(listItemId)?.focus();
       }
     },
     onError: invalidateCache,
@@ -85,7 +92,7 @@ export const ListItem: FC<ListItemProps> = ({
     updateListItemMutation.mutate({ name: newName });
   });
 
-  async function handleKeyDown(e: KeyboardEvent) {
+  function handleKeyDown(e: KeyboardEvent) {
     if (e.code === "Enter") {
       onEnterKey();
     }
@@ -104,11 +111,8 @@ export const ListItem: FC<ListItemProps> = ({
         value={name}
         onChange={(e) => setName(e.target.value)}
         onKeyDown={handleKeyDown}
-        onFocus={() => setIsFocused(true)}
-        onBlur={() => {
-          setTimeout(() => setIsFocused(false), 100);
-        }}
-        autoFocus={listItem.createdByUserId === userId}
+        onFocus={onFocus}
+        autoFocus={listItem.createdByUserId === userId && !searchApplied}
         placeholder="List item"
         fullWidth
         margin="dense"

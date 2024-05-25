@@ -28,6 +28,7 @@ export const DraggableItems: FC<DraggableItemsProps> = ({
   const { setItemData } = useSetItemData(shoppingListId);
 
   const [search, setSearch] = useState("");
+  const [focusedItemId, setFocusedItemId] = useState("");
 
   function invalidateCache() {
     queryClient.invalidateQueries({
@@ -125,6 +126,8 @@ export const DraggableItems: FC<DraggableItemsProps> = ({
           <ListItem
             key={listItem.id}
             listItem={listItem}
+            isFocused={listItem.id === focusedItemId}
+            onFocus={() => setFocusedItemId(listItem.id)}
             onEnterKey={() => onEnterKeyHandler(listItem)}
             previousId={filteredListItems[index - 1]?.id}
             searchApplied={search.length > 0}

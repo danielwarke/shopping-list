@@ -22,11 +22,11 @@ export const ListSearchBar: FC<ListSearchBarProps> = ({
     <TextField
       value={search}
       onChange={(e) => setSearch(e.target.value)}
-      onFocus={() =>
+      onFocus={() => {
         queryClient.invalidateQueries({
           queryKey: itemsQueryKey,
-        })
-      }
+        });
+      }}
       fullWidth
       size="small"
       placeholder="Search your shopping list"
