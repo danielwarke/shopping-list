@@ -27,7 +27,10 @@ export default function App({ Component, pageProps }: AppProps) {
     <>
       <Head>
         <title>Shopping List</title>
-        <meta name="description" content="A smart shopping list application" />
+        <meta
+          name="description"
+          content="A smart and simple shopping list application"
+        />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
