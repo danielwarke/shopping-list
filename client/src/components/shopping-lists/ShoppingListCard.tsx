@@ -101,6 +101,7 @@ export const ShoppingListCard: FC<ShoppingListCardProps> = ({
                 <ShoppingListSharedUser
                   key={user.email}
                   shoppingListId={shoppingList.id}
+                  shoppingListName={shoppingList.name}
                   email={user.email}
                   userName={user.name}
                 />

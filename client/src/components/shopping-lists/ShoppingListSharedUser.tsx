@@ -5,12 +5,14 @@ import { RevokeListAccessDialog } from "@/components/shopping-lists/dialogs/Revo
 
 interface ShoppingListSharedUserProps {
   shoppingListId: string;
+  shoppingListName: string;
   email: string;
   userName: string;
 }
 
 export const ShoppingListSharedUser: FC<ShoppingListSharedUserProps> = ({
   shoppingListId,
+  shoppingListName,
   email,
   userName,
 }) => {
@@ -49,6 +51,7 @@ export const ShoppingListSharedUser: FC<ShoppingListSharedUserProps> = ({
         open={openRevokeDialog}
         handleClose={handleClose}
         shoppingListId={shoppingListId}
+        shoppingListName={shoppingListName}
         email={email}
         userName={userName}
       />

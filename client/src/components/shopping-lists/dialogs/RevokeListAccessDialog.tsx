@@ -19,6 +19,7 @@ interface RevokeListAccessDialogProps {
   open: boolean;
   handleClose: () => void;
   shoppingListId: string;
+  shoppingListName: string;
   email: string;
   userName: string;
 }
@@ -27,6 +28,7 @@ export const RevokeListAccessDialog: FC<RevokeListAccessDialogProps> = ({
   open,
   handleClose,
   shoppingListId,
+  shoppingListName,
   email,
   userName,
 }) => {
@@ -75,7 +77,7 @@ export const RevokeListAccessDialog: FC<RevokeListAccessDialogProps> = ({
           error={revokeListAccessMutation.error}
         />
         <DialogContentText sx={{ marginY: "2vh" }}>
-          {`Are you sure you want to revoke ${userName}'s access from the selected shopping list?`}
+          {`Are you sure you want to revoke ${userName}'s access from "${shoppingListName}"?`}
         </DialogContentText>
       </DialogContent>
       <DialogActions>
