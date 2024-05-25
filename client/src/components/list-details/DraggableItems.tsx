@@ -60,15 +60,6 @@ export const DraggableItems: FC<DraggableItemsProps> = ({
     });
   }, [listItems, search]);
 
-  if (listItems.length === 0 && !isLoading) {
-    return (
-      <Typography variant="h5" sx={{ marginTop: "2vh" }}>
-        No list items found. Press the button in the bottom right corner to add
-        a new item to the list 🧀
-      </Typography>
-    );
-  }
-
   function onDropHandler({
     removedIndex,
     addedIndex,
@@ -108,30 +99,39 @@ export const DraggableItems: FC<DraggableItemsProps> = ({
 
   return (
     <>
-      <ListSearchBar search={search} setSearch={setSearch} />
-      {search.length > 0 &&
-        listItems.length > 0 &&
-        filteredListItems.length === 0 && (
-          <Typography variant="subtitle1" sx={{ marginTop: "1vh" }}>
-            No list items found
-          </Typography>
-        )}
-      {/* @ts-ignore */}
-      <DraggableContainer
-        dragHandleSelector=".drag-handle"
-        lockAxis="y"
-        onDrop={onDropHandler}
-      >
-        {filteredListItems.map((listItem, index) => (
-          <ListItem
-            key={listItem.id}
-            listItem={listItem}
-            onEnterKey={() => onEnterKeyHandler(listItem)}
-            previousId={filteredListItems[index - 1]?.id}
-            searchApplied={search.length > 0}
-          />
-        ))}
-      </DraggableContainer>
+      {listItems.length === 0 && !isLoading ? (
+        <Typography variant="h5" sx={{ marginTop: "2vh" }}>
+          No list items found. Press the button in the bottom right corner to
+          add a new item to the list 🧀
+        </Typography>
+      ) : (
+        <>
+          <ListSearchBar search={search} setSearch={setSearch} />
+          {search.length > 0 &&
+            listItems.length > 0 &&
+            filteredListItems.length === 0 && (
+              <Typography variant="subtitle1" sx={{ marginTop: "1vh" }}>
+                No list items found
+              </Typography>
+            )}
+          {/* @ts-ignore */}
+          <DraggableContainer
+            dragHandleSelector=".drag-handle"
+            lockAxis="y"
+            onDrop={onDropHandler}
+          >
+            {filteredListItems.map((listItem, index) => (
+              <ListItem
+                key={listItem.id}
+                listItem={listItem}
+                onEnterKey={() => onEnterKeyHandler(listItem)}
+                previousId={filteredListItems[index - 1]?.id}
+                searchApplied={search.length > 0}
+              />
+            ))}
+          </DraggableContainer>
+        </>
+      )}
       <Tooltip title="New List Item">
         <Fab
           color={colorId ? "default" : "primary"}
