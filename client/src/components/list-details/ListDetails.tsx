@@ -30,7 +30,7 @@ const generateListItem = (
 
 export const ListDetails: FC = () => {
   const { userId } = useAuthContext();
-  const { id: shoppingListId, colorId } = useShoppingListContext();
+  const { id: shoppingListId } = useShoppingListContext();
   const queryClient = useQueryClient();
 
   const { setItemData, setItemAppendedData, setItemUpdateData } =
@@ -49,13 +49,13 @@ export const ListDetails: FC = () => {
     onMutate: (data) => {
       const listItem = generateListItem(data.id, userId, shoppingListId);
       setItemAppendedData(listItem);
+      setTimeout(() => document.getElementById(data.id)?.focus());
     },
     onSuccess: (createdListItem) => {
       setItemUpdateData(createdListItem.id, {
         sortOrder: createdListItem.sortOrder,
         createdAt: createdListItem.createdAt,
       });
-      document.getElementById(createdListItem.id)?.focus();
     },
     onError: invalidateCache,
   });
@@ -71,13 +71,13 @@ export const ListDetails: FC = () => {
         newData.splice(data.index + 1, 0, listItem);
         return newData;
       });
+      setTimeout(() => document.getElementById(data.id)?.focus());
     },
     onSuccess: (createdListItem) => {
       setItemUpdateData(createdListItem.id, {
         sortOrder: createdListItem.sortOrder,
         createdAt: createdListItem.createdAt,
       });
-      document.getElementById(createdListItem.id)?.focus();
     },
     onError: invalidateCache,
   });
