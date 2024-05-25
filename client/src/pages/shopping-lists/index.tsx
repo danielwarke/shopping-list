@@ -8,7 +8,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { Add } from "@mui/icons-material";
+import { NoteAdd } from "@mui/icons-material";
 import { ShoppingListCard } from "@/components/shopping-lists/ShoppingListCard";
 import { NavBar } from "@/components/NavBar";
 import { shoppingListsQueryKey } from "@/api/query-keys";
@@ -86,7 +86,7 @@ export default function ShoppingLists() {
             sx={{ position: "fixed", bottom: "2em", right: "2em" }}
             onClick={handleCreateButtonClicked}
           >
-            <Add />
+            <NoteAdd />
           </Fab>
         </Tooltip>
       </Container>
