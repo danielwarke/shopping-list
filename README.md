@@ -21,6 +21,6 @@
 
 ### Roadmap:
 
-📝&nbsp; Share list with via link\
+📝&nbsp; Share list via link\
 📝&nbsp; Configure completed list items to either stay in place or drop to the bottom of list\
 📝&nbsp; Drag and drop shopping lists overview page
