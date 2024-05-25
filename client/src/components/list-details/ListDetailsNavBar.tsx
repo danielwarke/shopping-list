@@ -13,7 +13,8 @@ export const ListDetailsNavBar = () => {
   const router = useRouter();
 
   const { userId } = useAuthContext();
-  const { id, colorId, color, createdByUserId } = useShoppingListContext();
+  const { id, name, colorId, color, createdByUserId } =
+    useShoppingListContext();
 
   async function handleBackButtonClick() {
     await queryClient.invalidateQueries({
@@ -42,6 +43,7 @@ export const ListDetailsNavBar = () => {
       endComponent={
         <ShoppingListActionsMenu
           shoppingListId={id}
+          shoppingListName={name}
           shared={isShared}
           colorId={colorId}
           detail

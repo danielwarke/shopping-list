@@ -19,6 +19,7 @@ interface DeleteShoppingListDialogProps {
   open: boolean;
   handleClose: (deleted?: boolean) => void;
   shoppingListId: string;
+  shoppingListName: string;
   shared?: boolean;
 }
 
@@ -26,6 +27,7 @@ export const DeleteShoppingListDialog: FC<DeleteShoppingListDialogProps> = ({
   open,
   handleClose,
   shoppingListId,
+  shoppingListName,
   shared,
 }) => {
   const { showMessage } = useSnackbarContext();
@@ -66,7 +68,7 @@ export const DeleteShoppingListDialog: FC<DeleteShoppingListDialogProps> = ({
           error={deleteShoppingListMutation.error}
         />
         <DialogContentText>
-          {`Are you sure you want to ${shared ? "remove yourself from" : "delete"} the selected shopping list?`}
+          {`Are you sure you want to ${shared ? "remove yourself from" : "delete"} "${shoppingListName}"?`}
         </DialogContentText>
       </DialogContent>
       <DialogActions>

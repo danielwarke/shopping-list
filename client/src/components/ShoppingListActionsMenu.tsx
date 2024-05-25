@@ -13,6 +13,7 @@ import { useAuthContext } from "@/contexts/AuthContext";
 
 interface ShoppingListActionMenuProps {
   shoppingListId: string;
+  shoppingListName: string;
   colorId?: string;
   shared?: boolean;
   detail?: boolean;
@@ -20,6 +21,7 @@ interface ShoppingListActionMenuProps {
 
 export const ShoppingListActionsMenu: FC<ShoppingListActionMenuProps> = ({
   shoppingListId,
+  shoppingListName,
   colorId,
   shared,
   detail,
@@ -129,6 +131,7 @@ export const ShoppingListActionsMenu: FC<ShoppingListActionMenuProps> = ({
           }
         }}
         shoppingListId={shoppingListId}
+        shoppingListName={shoppingListName}
         shared={shared}
       />
     </div>

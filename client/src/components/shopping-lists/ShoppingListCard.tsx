@@ -49,6 +49,7 @@ export const ShoppingListCard: FC<ShoppingListCardProps> = ({
         action={
           <ShoppingListActionsMenu
             shoppingListId={shoppingList.id}
+            shoppingListName={shoppingList.name}
             shared={isShared}
             colorId={shoppingList.colorId}
           />
