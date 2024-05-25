@@ -121,12 +121,13 @@ export const DraggableItems: FC<DraggableItemsProps> = ({
         lockAxis="y"
         onDrop={onDropHandler}
       >
-        {filteredListItems.map((listItem) => (
+        {filteredListItems.map((listItem, index) => (
           <ListItem
             key={listItem.id}
             listItem={listItem}
             onEnterKey={() => onEnterKeyHandler(listItem)}
-            disableDrag={search.length > 0}
+            previousId={filteredListItems[index - 1]?.id}
+            searchApplied={search.length > 0}
           />
         ))}
       </DraggableContainer>

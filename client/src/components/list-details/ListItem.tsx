@@ -22,13 +22,15 @@ import { useAuthContext } from "@/contexts/AuthContext";
 interface ListItemProps {
   listItem: ListItemInterface;
   onEnterKey: () => void;
-  disableDrag?: boolean;
+  previousId?: string;
+  searchApplied?: boolean;
 }
 
 export const ListItem: FC<ListItemProps> = ({
   listItem,
   onEnterKey,
-  disableDrag,
+  searchApplied,
+  previousId,
 }) => {
   const listItemId = listItem.id;
   const shoppingListId = listItem.shoppingListId;
@@ -64,12 +66,18 @@ export const ListItem: FC<ListItemProps> = ({
   });
 
   const deleteListItemMutation = useMutation({
-    mutationFn: () =>
+    mutationFn: (_: { fromKeyboard: boolean }) =>
       apiClient.shoppingLists.listItemsControllerRemove(
         shoppingListId,
         listItemId,
       ),
-    onMutate: () => setItemDeleteData([listItemId]),
+    onMutate: (data) => {
+      if (data.fromKeyboard && previousId && !searchApplied) {
+        document.getElementById(previousId)?.focus();
+      }
+
+      setItemDeleteData([listItemId]);
+    },
     onError: invalidateCache,
   });
 
@@ -83,7 +91,8 @@ export const ListItem: FC<ListItemProps> = ({
     }
 
     if (e.code === "Backspace" && name === "") {
-      deleteListItemMutation.mutate();
+      e.preventDefault();
+      deleteListItemMutation.mutate({ fromKeyboard: true });
     }
   }
 
@@ -91,6 +100,7 @@ export const ListItem: FC<ListItemProps> = ({
     // @ts-ignore
     <Draggable key={listItemId}>
       <TextField
+        id={listItemId}
         value={name}
         onChange={(e) => setName(e.target.value)}
         onKeyDown={handleKeyDown}
@@ -106,7 +116,7 @@ export const ListItem: FC<ListItemProps> = ({
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
-              {!disableDrag && (
+              {!searchApplied && (
                 <DragIndicator
                   className="drag-handle"
                   sx={{
@@ -141,7 +151,11 @@ export const ListItem: FC<ListItemProps> = ({
                   {listItem.header ? <TextDecrease /> : <TextIncrease />}
                 </IconButton>
               )}
-              <IconButton onClick={() => deleteListItemMutation.mutate()}>
+              <IconButton
+                onClick={() =>
+                  deleteListItemMutation.mutate({ fromKeyboard: false })
+                }
+              >
                 <Clear />
               </IconButton>
             </InputAdornment>
