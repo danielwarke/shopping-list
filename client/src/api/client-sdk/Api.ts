@@ -53,6 +53,7 @@ export interface ListColor {
   id: string;
   name: string;
   hex: string;
+  darkHex: string;
 }
 
 export interface SharedUser {

@@ -1,4 +1,4 @@
-import { IconButton } from "@mui/material";
+import { IconButton, useTheme } from "@mui/material";
 import { ArrowBack } from "@mui/icons-material";
 import { ShoppingListActionsMenu } from "@/components/ShoppingListActionsMenu";
 import { NavBar } from "@/components/NavBar";
@@ -23,11 +23,12 @@ export const ListDetailsNavBar = () => {
   }
 
   const isShared = !!userId && createdByUserId !== userId;
+  const isDarkMode = useTheme().palette.mode === "dark";
 
   return (
     <NavBar
       title="List Details"
-      backgroundColor={color?.hex}
+      backgroundColor={isDarkMode ? color?.darkHex : color?.hex}
       startComponent={
         <IconButton
           size="large"

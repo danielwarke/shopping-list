@@ -8,6 +8,7 @@ import {
   InputLabel,
   MenuItem,
   Select,
+  useTheme,
 } from "@mui/material";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/api/api-client";
@@ -32,6 +33,7 @@ export const SetListColorDialog: FC<SetListColorDialogProps> = ({
   initialColorId,
 }) => {
   const queryClient = useQueryClient();
+  const isDarkMode = useTheme().palette.mode === "dark";
 
   const [colorId, setColorId] = useState(initialColorId ?? defaultColor);
 
@@ -60,9 +62,12 @@ export const SetListColorDialog: FC<SetListColorDialogProps> = ({
 
   const currentColorHex = useMemo(() => {
     if (colorId) {
-      return colors.find((c) => c.id === colorId)?.hex;
+      const color = colors.find((c) => c.id === colorId);
+      if (color) {
+        return isDarkMode ? color.darkHex : color.hex;
+      }
     }
-  }, [colorId, colors]);
+  }, [colorId, colors, isDarkMode]);
 
   return (
     <Dialog onClose={handleClose} open={open} fullWidth>
@@ -84,7 +89,7 @@ export const SetListColorDialog: FC<SetListColorDialogProps> = ({
             <MenuItem
               key={color.id}
               value={color.id}
-              sx={{ backgroundColor: color.hex }}
+              sx={{ backgroundColor: isDarkMode ? color.darkHex : color.hex }}
             >
               {color.name}
             </MenuItem>

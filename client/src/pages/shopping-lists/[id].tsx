@@ -1,7 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/router";
 import { apiClient } from "@/api/api-client";
-import { Alert, Box, CircularProgress, Container } from "@mui/material";
+import {
+  Alert,
+  Box,
+  CircularProgress,
+  Container,
+  useTheme,
+} from "@mui/material";
 import { getShoppingListQueryKey } from "@/api/query-keys";
 import { ListDetails } from "@/components/list-details/ListDetails";
 import ShoppingListContextProvider from "@/contexts/ShoppingListContext";
@@ -25,12 +31,19 @@ export default function ShoppingListDetails() {
     enabled: !!shoppingListId,
   });
 
+  const isDarkMode = useTheme().palette.mode === "dark";
+
   return (
     <AuthContextProvider>
       <ShoppingListContextProvider shoppingList={shoppingList}>
         <ListDetailsNavBar />
         <Box
-          sx={{ backgroundColor: shoppingList?.color?.hex, minHeight: "100vh" }}
+          sx={{
+            backgroundColor: isDarkMode
+              ? shoppingList?.color?.darkHex
+              : shoppingList?.color?.hex,
+            minHeight: "100vh",
+          }}
         >
           <Container maxWidth="sm">
             <Box

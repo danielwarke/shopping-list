@@ -6,10 +6,23 @@ import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 import SnackbarContextProvider from "@/contexts/SnackbarContext";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { CssBaseline, useMediaQuery } from "@mui/material";
+import { useMemo } from "react";
 
 const queryClient = new QueryClient();
 
 export default function App({ Component, pageProps }: AppProps) {
+  const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
+
+  const theme = useMemo(() => {
+    return createTheme({
+      palette: {
+        mode: prefersDarkMode ? "dark" : "light",
+      },
+    });
+  }, [prefersDarkMode]);
+
   return (
     <>
       <Head>
@@ -25,9 +38,12 @@ export default function App({ Component, pageProps }: AppProps) {
           }
         `}</style>
         <QueryClientProvider client={queryClient}>
-          <SnackbarContextProvider>
-            <Component {...pageProps} />
-          </SnackbarContextProvider>
+          <ThemeProvider theme={theme}>
+            <SnackbarContextProvider>
+              <Component {...pageProps} />
+              <CssBaseline enableColorScheme />
+            </SnackbarContextProvider>
+          </ThemeProvider>
         </QueryClientProvider>
       </main>
     </>

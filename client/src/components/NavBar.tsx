@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { AppBar, Button, Toolbar, Typography } from "@mui/material";
+import { AppBar, Button, Toolbar, Typography, useTheme } from "@mui/material";
 import { useRouter } from "next/router";
 
 interface NavBarProps {
@@ -16,6 +16,7 @@ export const NavBar: FC<NavBarProps> = ({
   endComponent,
 }) => {
   const router = useRouter();
+  const isDarkMode = useTheme().palette.mode === "dark";
 
   function handleLogout() {
     localStorage.removeItem("auth_token");
@@ -31,7 +32,9 @@ export const NavBar: FC<NavBarProps> = ({
         ...(backgroundColor && {
           backgroundColor,
           filter: "brightness(90%)",
-          color: "rgba(0, 0, 0, 0.87)",
+          ...(!isDarkMode && {
+            color: "rgba(0, 0, 0, 0.87)",
+          }),
         }),
       }}
     >

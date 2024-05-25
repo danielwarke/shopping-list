@@ -57,5 +57,6 @@ model ListColor {
   id            String         @id @default(cuid())
   name          String
   hex           String
+  darkHex       String
   shoppingLists ShoppingList[]
 }

@@ -8,6 +8,7 @@ import {
   CardHeader,
   Tooltip,
   Typography,
+  useTheme,
 } from "@mui/material";
 import { ShoppingListWithPreview } from "@/api/client-sdk/Api";
 import { useRouter } from "next/router";
@@ -32,14 +33,17 @@ export const ShoppingListCard: FC<ShoppingListCardProps> = ({
 
   const hasPreview = shoppingList.listItemsPreview.length > 0;
 
+  const isDarkMode = useTheme().palette.mode === "dark";
+  const colorHex = isDarkMode
+    ? shoppingList.color?.darkHex
+    : shoppingList.color?.hex;
+
   function handleViewShoppingListClick() {
     router.push(`/shopping-lists/${shoppingList.id}`);
   }
 
   return (
-    <Card
-      sx={{ marginBottom: "1em", backgroundColor: shoppingList.color?.hex }}
-    >
+    <Card sx={{ marginBottom: "1em", backgroundColor: colorHex }}>
       <CardHeader
         title={shoppingList.name}
         action={
