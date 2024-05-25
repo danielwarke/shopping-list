@@ -6,21 +6,21 @@
 
 ### Features:
 
-✅&nbsp; Share lists with friends and family via email invites\
-✅&nbsp; Collaborate on shared lists in real time via websockets\
-✅&nbsp; Optimistic updates for a snappy user experience\
-✅&nbsp; Customize list appearance by choosing from one of 11 available pastel colors\
-✅&nbsp; Works well on desktop or mobile\
-✅&nbsp; Installable via PWA (Progressive Web App)\
-✅&nbsp; Dark mode\
-✅&nbsp; List section headers to organize items\
-✅&nbsp; Searchable lists\
-✅&nbsp; Drag and drop to reorder list items\
-✅&nbsp; Keyboard controls
+✅ Share lists with friends and family via email invites\
+✅ Collaborate on shared lists in real time via websockets\
+✅ Optimistic updates for a snappy user experience\
+✅ Customize list appearance by choosing from one of 11 available pastel colors\
+✅ Works well on desktop or mobile\
+✅ Installable via PWA (Progressive Web App)\
+✅ Dark mode\
+✅ List section headers to organize items\
+✅ Searchable lists\
+✅ Drag and drop to reorder list items\
+✅ Keyboard controls
 
 
 ### Roadmap:
 
-📝&nbsp; Share list via link\
-📝&nbsp; Configure completed list items to either stay in place or drop to the bottom of list\
-📝&nbsp; Drag and drop shopping lists overview page
+📝 Share list via link\
+📝 Configure completed list items to either stay in place or drop to the bottom of list\
+📝 Drag and drop shopping lists overview page
