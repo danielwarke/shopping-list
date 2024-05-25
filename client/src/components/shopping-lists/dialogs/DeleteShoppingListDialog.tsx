@@ -38,8 +38,8 @@ export const DeleteShoppingListDialog: FC<DeleteShoppingListDialogProps> = ({
     onSuccess: (deletedShoppingList) => {
       showMessage(
         shared
-          ? "You have been successfully removed from the shopping list"
-          : "Successfully deleted shopping list",
+          ? `You have been successfully removed from "${shoppingListName}"`
+          : `Successfully deleted "${shoppingListName}"`,
       );
 
       queryClient.setQueryData<ShoppingListWithPreview[]>(

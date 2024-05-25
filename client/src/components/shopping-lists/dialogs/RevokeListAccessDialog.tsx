@@ -42,7 +42,7 @@ export const RevokeListAccessDialog: FC<RevokeListAccessDialogProps> = ({
         data,
       ),
     onSuccess: (updatedShoppingList) => {
-      showMessage(`${userName} has been removed from the shopping list`);
+      showMessage(`${userName} has been removed from "${shoppingListName}"`);
       queryClient.setQueryData<ShoppingListWithPreview[]>(
         shoppingListsQueryKey,
         (currentData) => {
