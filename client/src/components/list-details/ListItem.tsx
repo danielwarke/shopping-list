@@ -1,4 +1,4 @@
-import { FC, KeyboardEvent } from "react";
+import { FC, KeyboardEvent, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   ListItem as ListItemInterface,
@@ -17,12 +17,9 @@ import { Draggable } from "react-smooth-dnd";
 import { getItemsQueryKey } from "@/api/query-keys";
 import { useSetItemData } from "@/hooks/use-set-item-data";
 import { useShoppingListContext } from "@/contexts/ShoppingListContext";
-import { useAuthContext } from "@/contexts/AuthContext";
 
 interface ListItemProps {
   listItem: ListItemInterface;
-  isFocused: boolean;
-  onFocus: () => void;
   onEnterKey: () => void;
   previousId?: string;
   searchApplied?: boolean;
@@ -30,8 +27,6 @@ interface ListItemProps {
 
 export const ListItem: FC<ListItemProps> = ({
   listItem,
-  isFocused,
-  onFocus,
   onEnterKey,
   searchApplied,
   previousId,
@@ -39,7 +34,6 @@ export const ListItem: FC<ListItemProps> = ({
   const listItemId = listItem.id;
   const shoppingListId = listItem.shoppingListId;
   const { colorId } = useShoppingListContext();
-  const { userId } = useAuthContext();
 
   const queryClient = useQueryClient();
   const itemsQueryKey = getItemsQueryKey(shoppingListId);
@@ -92,8 +86,10 @@ export const ListItem: FC<ListItemProps> = ({
     updateListItemMutation.mutate({ name: newName });
   });
 
+  const [isFocused, setIsFocused] = useState(false);
+
   function handleKeyDown(e: KeyboardEvent) {
-    if (e.code === "Enter") {
+    if (e.code === "Enter" && !searchApplied) {
       onEnterKey();
     }
 
@@ -111,8 +107,8 @@ export const ListItem: FC<ListItemProps> = ({
         value={name}
         onChange={(e) => setName(e.target.value)}
         onKeyDown={handleKeyDown}
-        onFocus={onFocus}
-        autoFocus={listItem.createdByUserId === userId && !searchApplied}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
         placeholder="List item"
         fullWidth
         margin="dense"
@@ -148,7 +144,7 @@ export const ListItem: FC<ListItemProps> = ({
               {isFocused && (
                 <IconButton
                   size="small"
-                  onClick={() => {
+                  onMouseDown={() => {
                     updateListItemMutation.mutate({ header: !listItem.header });
                   }}
                 >

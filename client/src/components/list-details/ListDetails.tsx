@@ -1,7 +1,6 @@
-import { Box, Fab, Tooltip } from "@mui/material";
+import { Box } from "@mui/material";
 import { ListName } from "@/components/list-details/ListName";
 import { DraggableItems } from "@/components/list-details/DraggableItems";
-import { Add } from "@mui/icons-material";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/api/api-client";
 import { ListItem as ListItemDto } from "@/api/client-sdk/Api";
@@ -56,6 +55,7 @@ export const ListDetails: FC = () => {
         sortOrder: createdListItem.sortOrder,
         createdAt: createdListItem.createdAt,
       });
+      document.getElementById(createdListItem.id)?.focus();
     },
     onError: invalidateCache,
   });
@@ -77,6 +77,7 @@ export const ListDetails: FC = () => {
         sortOrder: createdListItem.sortOrder,
         createdAt: createdListItem.createdAt,
       });
+      document.getElementById(createdListItem.id)?.focus();
     },
     onError: invalidateCache,
   });
@@ -100,15 +101,6 @@ export const ListDetails: FC = () => {
           insertListItem={handleInsert}
         />
       </Box>
-      <Tooltip title="New List Item">
-        <Fab
-          color={colorId ? "default" : "primary"}
-          sx={{ position: "fixed", bottom: "2em", right: "2em" }}
-          onClick={handleAppend}
-        >
-          <Add />
-        </Fab>
-      </Tooltip>
     </>
   );
 };

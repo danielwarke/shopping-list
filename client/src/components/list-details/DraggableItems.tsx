@@ -6,12 +6,13 @@ import {
   ListItem as ListItemDto,
   ReorderShoppingListDto,
 } from "@/api/client-sdk/Api";
-import { Typography } from "@mui/material";
+import { Fab, Tooltip, Typography } from "@mui/material";
 import { getItemsQueryKey } from "@/api/query-keys";
 import { useSetItemData } from "@/hooks/use-set-item-data";
 import { ListItem } from "@/components/list-details/ListItem";
 import { ListSearchBar } from "@/components/list-details/ListSearchBar";
 import { useShoppingListContext } from "@/contexts/ShoppingListContext";
+import { Add } from "@mui/icons-material";
 
 interface DraggableItemsProps {
   appendListItem: () => void;
@@ -22,13 +23,12 @@ export const DraggableItems: FC<DraggableItemsProps> = ({
   appendListItem,
   insertListItem,
 }) => {
-  const { id: shoppingListId } = useShoppingListContext();
+  const { id: shoppingListId, colorId } = useShoppingListContext();
   const queryClient = useQueryClient();
   const itemsQueryKey = getItemsQueryKey(shoppingListId);
   const { setItemData } = useSetItemData(shoppingListId);
 
   const [search, setSearch] = useState("");
-  const [focusedItemId, setFocusedItemId] = useState("");
 
   function invalidateCache() {
     queryClient.invalidateQueries({
@@ -126,14 +126,22 @@ export const DraggableItems: FC<DraggableItemsProps> = ({
           <ListItem
             key={listItem.id}
             listItem={listItem}
-            isFocused={listItem.id === focusedItemId}
-            onFocus={() => setFocusedItemId(listItem.id)}
             onEnterKey={() => onEnterKeyHandler(listItem)}
             previousId={filteredListItems[index - 1]?.id}
             searchApplied={search.length > 0}
           />
         ))}
       </DraggableContainer>
+      <Tooltip title="New List Item">
+        <Fab
+          color={colorId ? "default" : "primary"}
+          sx={{ position: "fixed", bottom: "2em", right: "2em" }}
+          onClick={appendListItem}
+          disabled={search.length > 0}
+        >
+          <Add />
+        </Fab>
+      </Tooltip>
     </>
   );
 };
