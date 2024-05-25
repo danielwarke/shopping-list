@@ -10,7 +10,9 @@ import {
 } from "@mui/material";
 import { getShoppingListQueryKey } from "@/api/query-keys";
 import { ListDetails } from "@/components/list-details/ListDetails";
-import ShoppingListContextProvider from "@/contexts/ShoppingListContext";
+import ShoppingListContextProvider, {
+  emptyList,
+} from "@/contexts/ShoppingListContext";
 import AuthContextProvider from "@/contexts/AuthContext";
 import { ListDetailsNavBar } from "@/components/list-details/ListDetailsNavBar";
 
@@ -21,7 +23,7 @@ export default function ShoppingListDetails() {
   const shoppingListQueryKey = getShoppingListQueryKey(shoppingListId);
 
   const {
-    data: shoppingList,
+    data: shoppingList = emptyList,
     isError: shoppingListIsError,
     isLoading: shoppingListIsLoading,
   } = useQuery({
@@ -35,13 +37,13 @@ export default function ShoppingListDetails() {
 
   return (
     <AuthContextProvider>
-      <ShoppingListContextProvider shoppingList={shoppingList}>
+      <ShoppingListContextProvider {...shoppingList}>
         <ListDetailsNavBar />
         <Box
           sx={{
             backgroundColor: isDarkMode
-              ? shoppingList?.color?.darkHex
-              : shoppingList?.color?.hex,
+              ? shoppingList.color?.darkHex
+              : shoppingList.color?.hex,
             minHeight: "100vh",
           }}
         >
@@ -58,7 +60,7 @@ export default function ShoppingListDetails() {
               {shoppingListIsError && (
                 <Alert severity="error">Unable to load shopping list.</Alert>
               )}
-              {shoppingList && <ListDetails />}
+              {!!shoppingList.id && <ListDetails />}
             </Box>
           </Container>
         </Box>

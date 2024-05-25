@@ -11,7 +11,7 @@ import { useAuthContext } from "./AuthContext";
 
 type ListDetails = ShoppingListWithMetadata & { shared?: "self" | "other" };
 
-const emptyList: ListDetails = {
+export const emptyList: ListDetails = {
   id: "",
   name: "",
   createdByUserId: "",
@@ -21,13 +21,10 @@ const emptyList: ListDetails = {
 
 export const ShoppingListContext = createContext<ListDetails>(emptyList);
 
-interface ShoppingListContextProviderProps {
-  shoppingList: ListDetails | undefined;
-}
-
-const ShoppingListContextProvider: FC<
-  PropsWithChildren & ShoppingListContextProviderProps
-> = ({ children, shoppingList }) => {
+const ShoppingListContextProvider: FC<PropsWithChildren & ListDetails> = ({
+  children,
+  ...shoppingList
+}) => {
   const { userId } = useAuthContext();
   useSocket(shoppingList?.isShared ? shoppingList.id : undefined);
 

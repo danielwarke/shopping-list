@@ -12,12 +12,14 @@ export const ListName: FC = () => {
   const queryClient = useQueryClient();
   const shoppingListQueryKey = getShoppingListQueryKey(id);
 
+  function invalidateCache() {
+    queryClient.invalidateQueries({ queryKey: shoppingListQueryKey });
+  }
+
   const renameShoppingListMutation = useMutation({
     mutationFn: (data: UpdateShoppingListDto) =>
       apiClient.shoppingLists.shoppingListsControllerRename(id, data),
-    onError: () => {
-      queryClient.invalidateQueries({ queryKey: shoppingListQueryKey });
-    },
+    onError: invalidateCache,
   });
 
   const [name, setName] = useDebounceState(currentName, (newName) => {
@@ -28,6 +30,7 @@ export const ListName: FC = () => {
     <TextField
       value={name}
       onChange={(e) => setName(e.target.value)}
+      onBlur={invalidateCache}
       variant="standard"
       placeholder="Shopping List Name"
       fullWidth
