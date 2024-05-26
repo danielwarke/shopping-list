@@ -63,12 +63,14 @@ export class ShoppingListsService {
         listItems: {
           take: 3,
           where: {
-            complete: false,
             name: {
               not: "",
             },
           },
           orderBy: [
+            {
+              complete: "asc",
+            },
             {
               sortOrder: "asc",
             },
@@ -80,6 +82,9 @@ export class ShoppingListsService {
             listItems: {
               where: {
                 complete: false,
+                name: {
+                  not: "",
+                },
               },
             },
           },

@@ -28,10 +28,12 @@ export const ShoppingListCard: FC<ShoppingListCardProps> = ({
   const { userId, email } = useAuthContext();
   const isShared = !!userId && shoppingList.createdByUser.email !== email;
 
-  const remainingAfterPreview =
-    shoppingList.incompleteItemCount - shoppingList.listItemsPreview.length;
+  const incompleteItemsPreview = shoppingList.listItemsPreview.filter(
+    (item) => !item.complete,
+  );
 
-  const hasPreview = shoppingList.listItemsPreview.length > 0;
+  const remainingAfterPreview =
+    shoppingList.incompleteItemCount - incompleteItemsPreview.length;
 
   const isDarkMode = useTheme().palette.mode === "dark";
   const colorHex = isDarkMode
@@ -56,23 +58,24 @@ export const ShoppingListCard: FC<ShoppingListCardProps> = ({
         }
       ></CardHeader>
       <CardContent>
-        {hasPreview && (
+        {incompleteItemsPreview.length > 0 && (
           <Box marginBottom="1em">
-            {shoppingList.listItemsPreview.map((listItem) => (
+            {incompleteItemsPreview.map((listItem) => (
               <Typography key={listItem.id} variant="subtitle1">
                 {listItem.name}
               </Typography>
             ))}
           </Box>
         )}
-        {shoppingList.incompleteItemCount === 0 && (
-          <Typography variant="subtitle2" color="text.secondary">
-            All items completed
-          </Typography>
-        )}
+        {shoppingList.incompleteItemCount === 0 &&
+          shoppingList.listItemsPreview.length > 0 && (
+            <Typography variant="subtitle2" color="text.secondary">
+              All items completed
+            </Typography>
+          )}
         {remainingAfterPreview > 0 && (
           <Typography variant="subtitle2" color="text.secondary">
-            {`${remainingAfterPreview} ${hasPreview ? "more" : ""} incomplete item${remainingAfterPreview > 1 ? "s" : ""}`}
+            {`${remainingAfterPreview} more incomplete item${remainingAfterPreview > 1 ? "s" : ""}`}
           </Typography>
         )}
       </CardContent>
