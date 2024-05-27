@@ -56,6 +56,7 @@ export const ShoppingListCard: FC<ShoppingListCardProps> = ({
       >
         <CardHeader
           title={shoppingList.name}
+          className="drag-handle"
           action={
             <ShoppingListActionsMenu
               shoppingListId={shoppingList.id}

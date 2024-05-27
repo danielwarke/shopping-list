@@ -8,7 +8,7 @@ import "@fontsource/roboto/700.css";
 import SnackbarContextProvider from "@/contexts/SnackbarContext";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { CssBaseline, useMediaQuery } from "@mui/material";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 
 const queryClient = new QueryClient();
 
@@ -22,6 +22,16 @@ export default function App({ Component, pageProps }: AppProps) {
       },
     });
   }, [prefersDarkMode]);
+
+  useEffect(() => {
+    const cleanClasses = () => {
+      document.body.className = "";
+    };
+    document.addEventListener("touchend", cleanClasses, false);
+    return () => {
+      document.removeEventListener("touchend", cleanClasses, false);
+    };
+  }, []);
 
   return (
     <>
