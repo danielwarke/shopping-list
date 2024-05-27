@@ -52,11 +52,12 @@ export const ShoppingListCard: FC<ShoppingListCardProps> = ({
         sx={{
           marginBottom: "1em",
           backgroundColor: colorHex,
-          cursor: "grab",
         }}
       >
         <CardHeader
           title={shoppingList.name}
+          className="drag-handle"
+          sx={{ cursor: "grab" }}
           action={
             <ShoppingListActionsMenu
               shoppingListId={shoppingList.id}

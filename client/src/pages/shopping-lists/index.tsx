@@ -111,7 +111,11 @@ export default function ShoppingLists() {
         )}
         <Box marginBottom="25vh">
           {/* @ts-ignore */}
-          <DraggableContainer lockAxis="y" onDrop={onDropHandler}>
+          <DraggableContainer
+            lockAxis="y"
+            onDrop={onDropHandler}
+            dragHandleSelector=".drag-handle"
+          >
             {shoppingLists.map((shoppingList) => (
               <ShoppingListCard
                 key={shoppingList.id}
