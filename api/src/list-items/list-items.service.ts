@@ -67,24 +67,14 @@ export class ListItemsService {
         ? shoppingList.listItems[0].sortOrder + 1
         : 1;
 
-    const [createdListItem] = await this.prisma.$transaction([
-      this.prisma.listItem.create({
-        data: {
-          shoppingListId,
-          sortOrder,
-          createdByUserId: userId,
-          ...appendListItemDto,
-        },
-      }),
-      this.prisma.shoppingList.update({
-        data: {
-          updatedAt: new Date(),
-        },
-        where: {
-          id: shoppingListId,
-        },
-      }),
-    ]);
+    const createdListItem = await this.prisma.listItem.create({
+      data: {
+        shoppingListId,
+        sortOrder,
+        createdByUserId: userId,
+        ...appendListItemDto,
+      },
+    });
 
     this.gatewayService.onItemAppended(shoppingListId, {
       userId,
@@ -107,7 +97,7 @@ export class ListItemsService {
           ...insertListItemDto,
         },
       }),
-      this.prisma.shoppingList.update({
+      this.prisma.shoppingList.findUniqueOrThrow({
         include: {
           listItems: {
             select: {
@@ -120,9 +110,6 @@ export class ListItemsService {
               { createdAt: "asc" },
             ],
           },
-        },
-        data: {
-          updatedAt: new Date(),
         },
         where: {
           id: shoppingListId,
@@ -172,14 +159,7 @@ export class ListItemsService {
     updateListItemDto: UpdateListItemDto,
   ): Promise<ListItem> {
     const updatedListItem = await this.prisma.listItem.update({
-      data: {
-        ...updateListItemDto,
-        shoppingList: {
-          update: {
-            updatedAt: new Date(),
-          },
-        },
-      },
+      data: updateListItemDto,
       where: {
         id: id,
         shoppingList: {
@@ -236,11 +216,6 @@ export class ListItemsService {
         }),
     );
 
-    await this.prisma.shoppingList.update({
-      data: { updatedAt: new Date() },
-      where: { id: shoppingListId },
-    });
-
     this.gatewayService.onListReordered(shoppingListId, {
       userId,
       reorderedList: updatedListItems,
@@ -254,27 +229,17 @@ export class ListItemsService {
     shoppingListId: string,
     id: string,
   ): Promise<ListItem> {
-    const [deletedListItem] = await this.prisma.$transaction([
-      this.prisma.listItem.delete({
-        where: {
-          id: id,
-          shoppingList: {
-            id: shoppingListId,
-            users: {
-              some: { id: userId },
-            },
+    const deletedListItem = await this.prisma.listItem.delete({
+      where: {
+        id: id,
+        shoppingList: {
+          id: shoppingListId,
+          users: {
+            some: { id: userId },
           },
         },
-      }),
-      this.prisma.shoppingList.update({
-        data: {
-          updatedAt: new Date(),
-        },
-        where: {
-          id: shoppingListId,
-        },
-      }),
-    ]);
+      },
+    });
 
     this.gatewayService.onItemsDeleted(shoppingListId, {
       userId,
@@ -312,22 +277,12 @@ export class ListItemsService {
       throw new UnprocessableEntityException("No items found to delete");
     }
 
-    await this.prisma.$transaction([
-      this.prisma.listItem.deleteMany({
-        where: {
-          shoppingListId,
-          complete: true,
-        },
-      }),
-      this.prisma.shoppingList.update({
-        data: {
-          updatedAt: new Date(),
-        },
-        where: {
-          id: shoppingListId,
-        },
-      }),
-    ]);
+    this.prisma.listItem.deleteMany({
+      where: {
+        shoppingListId,
+        complete: true,
+      },
+    });
 
     const deletedItemIds = shoppingList.listItems.map((item) => item.id);
 

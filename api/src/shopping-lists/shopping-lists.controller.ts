@@ -14,6 +14,7 @@ import { UpdateShoppingListDto } from "./dto/update-shopping-list.dto";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { JwtRequest } from "../types";
 import { SetListColorDto } from "./dto/set-list-color.dto";
+import { ReorderListsDto } from "./dto/reorder-lists.dto";
 
 @Controller()
 @ApiTags("shopping-lists")
@@ -58,6 +59,11 @@ export class ShoppingListsController {
       id,
       updateShoppingListDto,
     );
+  }
+
+  @Post("reorder")
+  reorder(@Req() req: JwtRequest, @Body() reorderListsDto: ReorderListsDto) {
+    return this.shoppingListsService.reorder(req.user.userId, reorderListsDto);
   }
 
   @Patch(":id/color")

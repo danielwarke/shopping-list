@@ -8,6 +8,7 @@ import { ShoppingListWithMetadata } from "./dto/shopping-list-with-metadata.dto"
 import { GatewayService } from "../gateway/gateway.service";
 import { SetListColorDto } from "./dto/set-list-color.dto";
 import { ListColor } from "../_gen/prisma-class/list_color";
+import { ReorderListsDto } from "./dto/reorder-lists.dto";
 
 @Injectable()
 export class ShoppingListsService {
@@ -16,26 +17,52 @@ export class ShoppingListsService {
     private readonly gatewayService: GatewayService,
   ) {}
 
-  create(
+  async create(
     userId: string,
     createShoppingListDto: CreateShoppingListDto,
   ): Promise<ShoppingList> {
-    return this.prisma.shoppingList.create({
-      data: {
-        name: createShoppingListDto.name,
-        listItems: {
-          create: {
-            sortOrder: 1,
-            createdByUserId: userId,
-          },
-        },
-        users: {
-          connect: {
-            id: userId,
-          },
-        },
-        createdByUserId: userId,
+    const maxSortOrder = await this.prisma.userListOrder.findFirst({
+      select: {
+        sortOrder: true,
       },
+      where: {
+        userId,
+      },
+      orderBy: {
+        sortOrder: "desc",
+      },
+    });
+
+    const sortOrder = maxSortOrder ? maxSortOrder.sortOrder + 1 : 1;
+
+    return this.prisma.$transaction(async (tx) => {
+      const createdList = await tx.shoppingList.create({
+        data: {
+          name: createShoppingListDto.name,
+          listItems: {
+            create: {
+              sortOrder: 1,
+              createdByUserId: userId,
+            },
+          },
+          users: {
+            connect: {
+              id: userId,
+            },
+          },
+          createdByUserId: userId,
+        },
+      });
+
+      await tx.userListOrder.create({
+        data: {
+          userId,
+          shoppingListId: createdList.id,
+          sortOrder,
+        },
+      });
+
+      return createdList;
     });
   }
 
@@ -98,11 +125,11 @@ export class ShoppingListsService {
         },
       },
       orderBy: {
-        updatedAt: "desc",
+        createdAt: "desc",
       },
     });
 
-    return shoppingLists.map((shoppingList) => {
+    const mappedLists = shoppingLists.map((shoppingList) => {
       const {
         listItems: listItemsPreview,
         users,
@@ -121,6 +148,27 @@ export class ShoppingListsService {
         incompleteItemCount,
       };
     });
+
+    const shoppingListIds = mappedLists.map((list) => list.id);
+    const listSortOrder = await this.prisma.userListOrder.findMany({
+      where: {
+        userId,
+        shoppingListId: {
+          in: shoppingListIds,
+        },
+      },
+    });
+
+    if (listSortOrder.length === 0) {
+      return mappedLists;
+    }
+
+    const sortOrder: Record<string, number> = {};
+    for (const order of listSortOrder) {
+      sortOrder[order.shoppingListId] = order.sortOrder;
+    }
+
+    return mappedLists.sort((a, b) => sortOrder[a.id] - sortOrder[b.id]);
   }
 
   async findOne(userId: string, id: string): Promise<ShoppingListWithMetadata> {
@@ -182,6 +230,34 @@ export class ShoppingListsService {
     this.gatewayService.onListRenamed(id, { userId, name });
 
     return updatedShoppingList;
+  }
+
+  async reorder(
+    userId: string,
+    reorderListsDto: ReorderListsDto,
+  ): Promise<ShoppingListWithPreview[]> {
+    await this.prisma.$transaction(
+      reorderListsDto.order.map(({ shoppingListId, sortOrder }) => {
+        return this.prisma.userListOrder.upsert({
+          create: {
+            userId,
+            shoppingListId,
+            sortOrder,
+          },
+          update: {
+            sortOrder,
+          },
+          where: {
+            shoppingListId_userId: {
+              userId,
+              shoppingListId,
+            },
+          },
+        });
+      }),
+    );
+
+    return this.findAll(userId);
   }
 
   async remove(userId: string, id: string): Promise<ShoppingList> {

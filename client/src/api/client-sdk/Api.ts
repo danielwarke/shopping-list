@@ -107,6 +107,15 @@ export interface UpdateShoppingListDto {
   name?: string;
 }
 
+export interface ReorderList {
+  shoppingListId: string;
+  sortOrder: number;
+}
+
+export interface ReorderListsDto {
+  order: ReorderList[];
+}
+
 export interface SetListColorDto {
   colorId?: string;
 }
@@ -560,6 +569,28 @@ export class Api<
       this.request<ShoppingList, any>({
         path: `/shopping-lists/${id}/rename`,
         method: "PATCH",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags shopping-lists
+     * @name ShoppingListsControllerReorder
+     * @request POST:/shopping-lists/reorder
+     * @secure
+     */
+    shoppingListsControllerReorder: (
+      data: ReorderListsDto,
+      params: RequestParams = {},
+    ) =>
+      this.request<ShoppingListWithPreview[], any>({
+        path: `/shopping-lists/reorder`,
+        method: "POST",
         body: data,
         secure: true,
         type: ContentType.Json,
