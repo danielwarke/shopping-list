@@ -229,19 +229,17 @@ export class ListItemsService {
     shoppingListId: string,
     id: string,
   ): Promise<ListItem> {
-    const [deletedListItem] = await this.prisma.$transaction([
-      this.prisma.listItem.delete({
-        where: {
-          id: id,
-          shoppingList: {
-            id: shoppingListId,
-            users: {
-              some: { id: userId },
-            },
+    const deletedListItem = await this.prisma.listItem.delete({
+      where: {
+        id: id,
+        shoppingList: {
+          id: shoppingListId,
+          users: {
+            some: { id: userId },
           },
         },
-      }),
-    ]);
+      },
+    });
 
     this.gatewayService.onItemsDeleted(shoppingListId, {
       userId,
