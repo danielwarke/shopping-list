@@ -15,9 +15,15 @@ import { shoppingListsQueryKey } from "@/api/query-keys";
 import { EmailVerification } from "@/components/EmailVerification";
 import AuthContextProvider from "@/contexts/AuthContext";
 import { AcceptListInvite } from "@/components/AccpetListInvite";
+import { Container as DraggableContainer } from "react-smooth-dnd";
+import { ShoppingListWithPreview } from "@/api/client-sdk/Api";
 
 export default function ShoppingLists() {
   const queryClient = useQueryClient();
+
+  function invalidateCache() {
+    queryClient.invalidateQueries({ queryKey: shoppingListsQueryKey });
+  }
 
   const { data: shoppingLists = [], isLoading } = useQuery({
     queryKey: shoppingListsQueryKey,
@@ -26,9 +32,12 @@ export default function ShoppingLists() {
 
   const createShoppingListMutation = useMutation({
     mutationFn: apiClient.shoppingLists.shoppingListsControllerCreate,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: shoppingListsQueryKey });
-    },
+    onSuccess: invalidateCache,
+  });
+
+  const reorderListsMutation = useMutation({
+    mutationFn: apiClient.shoppingLists.shoppingListsControllerReorder,
+    onError: invalidateCache,
   });
 
   function handleCreateButtonClicked() {
@@ -49,10 +58,38 @@ export default function ShoppingLists() {
     });
   }
 
+  function onDropHandler({
+    removedIndex,
+    addedIndex,
+  }: {
+    removedIndex: number | null;
+    addedIndex: number | null;
+  }) {
+    if (removedIndex === null || addedIndex === null) {
+      return;
+    }
+
+    const reorderedLists = [...shoppingLists];
+    const listsToMove = reorderedLists[removedIndex];
+    reorderedLists.splice(removedIndex, 1);
+    reorderedLists.splice(addedIndex, 0, listsToMove);
+    queryClient.setQueryData<ShoppingListWithPreview[]>(
+      shoppingListsQueryKey,
+      reorderedLists,
+    );
+
+    const updatedOrder = reorderedLists.map(({ id }, index) => ({
+      shoppingListId: id,
+      sortOrder: index + 1,
+    }));
+
+    reorderListsMutation.mutate({ order: updatedOrder });
+  }
+
   return (
     <AuthContextProvider>
       <NavBar title="Shopping Lists" />
-      <Container maxWidth="sm">
+      <Container maxWidth="xs">
         <EmailVerification />
         <AcceptListInvite />
         <Box marginBottom="1vh">&nbsp;</Box>
@@ -72,13 +109,16 @@ export default function ShoppingLists() {
             to create a new shopping list 🛒
           </Typography>
         )}
-        <Box marginBottom="25vh" sx={{ columns: "2 200px" }}>
-          {shoppingLists.map((shoppingList) => (
-            <ShoppingListCard
-              key={shoppingList.id}
-              shoppingList={shoppingList}
-            />
-          ))}
+        <Box marginBottom="25vh">
+          {/* @ts-ignore */}
+          <DraggableContainer lockAxis="y" onDrop={onDropHandler}>
+            {shoppingLists.map((shoppingList) => (
+              <ShoppingListCard
+                key={shoppingList.id}
+                shoppingList={shoppingList}
+              />
+            ))}
+          </DraggableContainer>
         </Box>
         <Tooltip title="New Shopping List">
           <Fab

@@ -14,29 +14,42 @@ datasource db {
 }
 
 model User {
-  id                   String         @id @default(cuid())
+  id                   String          @id @default(cuid())
   name                 String
-  email                String         @unique
+  email                String          @unique
   emailVerified        DateTime?
-  shoppingLists        ShoppingList[] @relation("UsersWithShoppingListAccess")
+  shoppingLists        ShoppingList[]  @relation("UsersWithShoppingListAccess")
   listItems            ListItem[]
   password             String
   token                String?
-  createdShoppingLists ShoppingList[] @relation("CreatedByUser")
-  createdAt            DateTime       @default(now())
+  createdShoppingLists ShoppingList[]  @relation("CreatedByUser")
+  createdAt            DateTime        @default(now())
+  listOrders           UserListOrder[]
 }
 
 model ShoppingList {
-  id              String     @id @default(cuid())
-  name            String     @default("")
+  id              String          @id @default(cuid())
+  name            String          @default("")
   listItems       ListItem[]
-  users           User[]     @relation("UsersWithShoppingListAccess")
+  users           User[]          @relation("UsersWithShoppingListAccess")
   createdByUserId String
-  createdByUser   User       @relation("CreatedByUser", fields: [createdByUserId], references: [id], onDelete: Cascade)
-  createdAt       DateTime   @default(now())
-  updatedAt       DateTime?  @updatedAt
+  createdByUser   User            @relation("CreatedByUser", fields: [createdByUserId], references: [id], onDelete: Cascade)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime?       @updatedAt
   colorId         String?
-  color           ListColor? @relation(fields: [colorId], references: [id], onDelete: SetNull)
+  color           ListColor?      @relation(fields: [colorId], references: [id], onDelete: SetNull)
+  userListOrders  UserListOrder[]
+}
+
+model UserListOrder {
+  id             String       @id @default(cuid())
+  shoppingListId String
+  shoppingList   ShoppingList @relation(fields: [shoppingListId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sortOrder      Int
+
+  @@unique([shoppingListId, userId])
 }
 
 model ListItem {
