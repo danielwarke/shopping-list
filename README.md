@@ -16,11 +16,11 @@
 ✅ List section headers to organize items\
 ✅ Searchable lists\
 ✅ Drag and drop to reorder list items\
+✅ Drag and drop shopping lists overview page\
 ✅ Keyboard controls
 
 
 ### Roadmap:
 
 📝 Share list via link\
-📝 Configure completed list items to either stay in place or drop to the bottom of list\
-📝 Drag and drop shopping lists overview page
+📝 Configure completed list items to either stay in place or drop to the bottom of list
