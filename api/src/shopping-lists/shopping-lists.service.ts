@@ -54,7 +54,7 @@ export class ShoppingListsService {
         },
       });
 
-      tx.userListOrder.create({
+      await tx.userListOrder.create({
         data: {
           userId,
           shoppingListId: createdList.id,
