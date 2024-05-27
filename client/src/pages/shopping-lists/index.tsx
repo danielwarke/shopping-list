@@ -115,6 +115,7 @@ export default function ShoppingLists() {
             lockAxis="y"
             onDrop={onDropHandler}
             dragHandleSelector=".drag-handle"
+            dragBeginDelay={1000}
           >
             {shoppingLists.map((shoppingList) => (
               <ShoppingListCard
