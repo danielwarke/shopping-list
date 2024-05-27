@@ -37,9 +37,9 @@ export const ShoppingListCard: FC<ShoppingListCardProps> = ({
     shoppingList.incompleteItemCount - incompleteItemsPreview.length;
 
   const isDarkMode = useTheme().palette.mode === "dark";
-  const colorHex = isDarkMode
-    ? shoppingList.color?.darkHex
-    : shoppingList.color?.hex;
+  const colorHex =
+    (isDarkMode ? shoppingList.color?.darkHex : shoppingList.color?.hex) ??
+    "background.paper";
 
   function handleViewShoppingListClick() {
     router.push(`/shopping-lists/${shoppingList.id}`);
@@ -57,6 +57,14 @@ export const ShoppingListCard: FC<ShoppingListCardProps> = ({
         <CardHeader
           title={shoppingList.name}
           className="drag-handle"
+          sx={{
+            cursor: "grab",
+            backgroundColor: colorHex,
+            filter: "brightness(95%)",
+            "&:hover": {
+              filter: "brightness(80%)",
+            },
+          }}
           action={
             <ShoppingListActionsMenu
               shoppingListId={shoppingList.id}
