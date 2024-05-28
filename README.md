@@ -13,7 +13,7 @@
 ✅ Works well on desktop or mobile\
 ✅ Installable via PWA (Progressive Web App)\
 ✅ Dark mode\
-✅ List section headers to organize items\
+✅ Section headers to organize items\
 ✅ Searchable lists\
 ✅ Drag and drop to reorder list items\
 ✅ Drag and drop shopping lists overview page\
