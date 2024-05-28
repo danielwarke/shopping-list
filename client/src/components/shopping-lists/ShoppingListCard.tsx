@@ -78,7 +78,10 @@ export const ShoppingListCard: FC<ShoppingListCardProps> = ({
           {incompleteItemsPreview.length > 0 && (
             <Box marginBottom="1em">
               {incompleteItemsPreview.map((listItem) => (
-                <Typography key={listItem.id} variant="subtitle1">
+                <Typography
+                  key={listItem.id}
+                  variant={listItem.header ? "h6" : "subtitle1"}
+                >
                   {listItem.name}
                 </Typography>
               ))}
