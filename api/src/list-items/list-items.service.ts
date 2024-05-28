@@ -277,7 +277,7 @@ export class ListItemsService {
       throw new UnprocessableEntityException("No items found to delete");
     }
 
-    this.prisma.listItem.deleteMany({
+    await this.prisma.listItem.deleteMany({
       where: {
         shoppingListId,
         complete: true,
