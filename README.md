@@ -23,4 +23,4 @@
 ### Roadmap:
 
 📝 Drop completed items to the bottom of list\
-📝 View deleted lists and option to recover
+📝 View deleted lists which will be deleted after 7 days and ability to recover
