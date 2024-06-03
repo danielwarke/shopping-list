@@ -22,5 +22,5 @@
 
 ### Roadmap:
 
-📝 Share list via link\
-📝 Configure completed list items to either stay in place or drop to the bottom of list
+📝 Drop completed items to the bottom of list\
+📝 View deleted lists and option to recover
