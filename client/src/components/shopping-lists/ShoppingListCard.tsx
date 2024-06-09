@@ -40,8 +40,11 @@ export const ShoppingListCard: FC<ShoppingListCardProps> = ({
     (isDarkMode ? shoppingList.color?.darkHex : shoppingList.color?.hex) ??
     "background.paper";
 
-  function handleViewShoppingListClick() {
-    router.push(`/shopping-lists/${shoppingList.id}`);
+  function handleViewShoppingListClick(e: React.MouseEvent) {
+    const target = e.target as HTMLDivElement;
+    if (target.classList.contains("details-nav-target")) {
+      router.push(`/shopping-lists/${shoppingList.id}`);
+    }
   }
 
   return (
@@ -76,63 +79,72 @@ export const ShoppingListCard: FC<ShoppingListCardProps> = ({
             />
           }
         ></CardHeader>
-        <CardContent
-          sx={{ cursor: "pointer" }}
-          onClick={handleViewShoppingListClick}
-        >
-          {incompleteItemsPreview.length > 0 && (
-            <Box marginBottom="1em">
-              {incompleteItemsPreview.map((listItem) => (
-                <Typography
-                  key={listItem.id}
-                  variant={listItem.header ? "h6" : "subtitle1"}
-                >
-                  {listItem.name}
-                </Typography>
-              ))}
-            </Box>
-          )}
-          {shoppingList.incompleteItemCount === 0 && (
-            <Typography variant="subtitle2" color="text.secondary">
-              {shoppingList.listItemsPreview.length > 0
-                ? "All items completed"
-                : "No items"}
-            </Typography>
-          )}
-          {remainingAfterPreview > 0 && (
-            <Typography variant="subtitle2" color="text.secondary">
-              {`${remainingAfterPreview} more incomplete item${remainingAfterPreview > 1 ? "s" : ""}`}
-            </Typography>
-          )}
-        </CardContent>
-        <CardActions>
-          <Box
-            display="flex"
-            alignItems="center"
-            justifyContent="space-between"
-            width="100%"
-          >
-            <div />
-            {isShared && (
-              <Tooltip title={`Shared by ${shoppingList.createdByUser.name}`}>
-                <AccountCircle color="action" sx={{ margin: "1vh" }} />
-              </Tooltip>
-            )}
-            {shoppingList.sharedWithUsers.length > 0 && (
-              <Box>
-                {shoppingList.sharedWithUsers.map((user) => (
-                  <ShoppingListSharedUser
-                    key={user.email}
-                    shoppingListId={shoppingList.id}
-                    shoppingListName={shoppingList.name}
-                    email={user.email}
-                    userName={user.name}
-                  />
+        <Box sx={{ cursor: "pointer" }} onClick={handleViewShoppingListClick}>
+          <CardContent className="details-nav-target">
+            {incompleteItemsPreview.length > 0 && (
+              <Box marginBottom="1em" className="details-nav-target">
+                {incompleteItemsPreview.map((listItem) => (
+                  <Typography
+                    key={listItem.id}
+                    variant={listItem.header ? "h6" : "subtitle1"}
+                    className="details-nav-target"
+                  >
+                    {listItem.name}
+                  </Typography>
                 ))}
               </Box>
             )}
-          </Box>
-        </CardActions>
+            {shoppingList.incompleteItemCount === 0 && (
+              <Typography
+                variant="subtitle2"
+                color="text.secondary"
+                className="details-nav-target"
+              >
+                {shoppingList.listItemsPreview.length > 0
+                  ? "All items completed"
+                  : "No items"}
+              </Typography>
+            )}
+            {remainingAfterPreview > 0 && (
+              <Typography
+                variant="subtitle2"
+                color="text.secondary"
+                className="details-nav-target"
+              >
+                {`${remainingAfterPreview} more incomplete item${remainingAfterPreview > 1 ? "s" : ""}`}
+              </Typography>
+            )}
+          </CardContent>
+          <CardActions>
+            <Box
+              display="flex"
+              alignItems="center"
+              justifyContent="space-between"
+              width="100%"
+              className="details-nav-target"
+            >
+              <div />
+              {isShared && (
+                <Tooltip title={`Shared by ${shoppingList.createdByUser.name}`}>
+                  <AccountCircle color="action" sx={{ margin: "1vh" }} />
+                </Tooltip>
+              )}
+              {shoppingList.sharedWithUsers.length > 0 && (
+                <Box>
+                  {shoppingList.sharedWithUsers.map((user) => (
+                    <ShoppingListSharedUser
+                      key={user.email}
+                      shoppingListId={shoppingList.id}
+                      shoppingListName={shoppingList.name}
+                      email={user.email}
+                      userName={user.name}
+                    />
+                  ))}
+                </Box>
+              )}
+            </Box>
+          </CardActions>
+        </Box>
       </Card>
     </Draggable>
   );
