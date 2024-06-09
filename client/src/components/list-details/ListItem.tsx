@@ -90,6 +90,8 @@ export const ListItem: FC<ListItemProps> = ({
 
   function handleKeyDown(e: KeyboardEvent) {
     if (e.code === "Enter" && !searchApplied) {
+      e.preventDefault();
+      e.stopPropagation();
       onEnterKey();
     }
 

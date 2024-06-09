@@ -1,7 +1,6 @@
 import { FC } from "react";
 import {
   Box,
-  Button,
   Card,
   CardActions,
   CardContent,
@@ -52,6 +51,9 @@ export const ShoppingListCard: FC<ShoppingListCardProps> = ({
         sx={{
           marginBottom: "1em",
           backgroundColor: colorHex,
+          "&:hover": {
+            filter: "brightness(95%)",
+          },
         }}
       >
         <CardHeader
@@ -74,7 +76,10 @@ export const ShoppingListCard: FC<ShoppingListCardProps> = ({
             />
           }
         ></CardHeader>
-        <CardContent>
+        <CardContent
+          sx={{ cursor: "pointer" }}
+          onClick={handleViewShoppingListClick}
+        >
           {incompleteItemsPreview.length > 0 && (
             <Box marginBottom="1em">
               {incompleteItemsPreview.map((listItem) => (
@@ -87,12 +92,13 @@ export const ShoppingListCard: FC<ShoppingListCardProps> = ({
               ))}
             </Box>
           )}
-          {shoppingList.incompleteItemCount === 0 &&
-            shoppingList.listItemsPreview.length > 0 && (
-              <Typography variant="subtitle2" color="text.secondary">
-                All items completed
-              </Typography>
-            )}
+          {shoppingList.incompleteItemCount === 0 && (
+            <Typography variant="subtitle2" color="text.secondary">
+              {shoppingList.listItemsPreview.length > 0
+                ? "All items completed"
+                : "No items"}
+            </Typography>
+          )}
           {remainingAfterPreview > 0 && (
             <Typography variant="subtitle2" color="text.secondary">
               {`${remainingAfterPreview} more incomplete item${remainingAfterPreview > 1 ? "s" : ""}`}
@@ -106,13 +112,7 @@ export const ShoppingListCard: FC<ShoppingListCardProps> = ({
             justifyContent="space-between"
             width="100%"
           >
-            <Button
-              onClick={handleViewShoppingListClick}
-              size="small"
-              color={shoppingList.colorId ? "inherit" : "primary"}
-            >
-              View
-            </Button>
+            <div />
             {isShared && (
               <Tooltip title={`Shared by ${shoppingList.createdByUser.name}`}>
                 <AccountCircle color="action" sx={{ margin: "1vh" }} />
