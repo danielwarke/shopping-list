@@ -89,56 +89,54 @@ export class ListItemsService {
     shoppingListId: string,
     insertListItemDto: InsertListItemDto,
   ): Promise<ListItem> {
-    const [createdListItem, shoppingList] = await this.prisma.$transaction([
-      this.prisma.listItem.create({
-        data: {
-          shoppingListId,
-          createdByUserId: userId,
-          ...insertListItemDto,
-        },
-      }),
-      this.prisma.shoppingList.findUniqueOrThrow({
-        include: {
-          listItems: {
-            select: {
-              id: true,
-            },
-            orderBy: [
-              {
-                sortOrder: "asc",
-              },
-              { createdAt: "asc" },
-            ],
-          },
-        },
-        where: {
-          id: shoppingListId,
-          users: {
-            some: { id: userId },
-          },
-        },
-      }),
-    ]);
+    const createdListItem = await this.prisma.listItem.create({
+      data: {
+        shoppingListId,
+        createdByUserId: userId,
+        ...insertListItemDto,
+      },
+    });
 
-    let createdSortOrder = createdListItem.sortOrder;
+    const listItems = await this.setListOrder(userId, shoppingListId);
+    const listItem = listItems.find((item) => item.id === createdListItem.id);
+
+    return listItem ?? createdListItem;
+  }
+
+  private async setListOrder(userId: string, shoppingListId: string) {
+    const shoppingList = await this.prisma.shoppingList.findUniqueOrThrow({
+      include: {
+        listItems: {
+          select: {
+            id: true,
+          },
+          orderBy: [
+            {
+              sortOrder: "asc",
+            },
+            { createdAt: "asc" },
+          ],
+        },
+      },
+      where: {
+        id: shoppingListId,
+        users: {
+          some: { id: userId },
+        },
+      },
+    });
 
     const updatedListItems = await this.prisma.$transaction(
-      shoppingList.listItems.map((listItem, index) => {
-        const newSortOrder = index + 1;
-
-        if (listItem.id === createdListItem.id) {
-          createdSortOrder = newSortOrder;
-        }
-
-        return this.prisma.listItem.update({
+      shoppingList.listItems.map((listItem, index) =>
+        this.prisma.listItem.update({
           data: {
-            sortOrder: newSortOrder,
+            sortOrder: index + 1,
           },
           where: {
             id: listItem.id,
           },
-        });
-      }),
+        }),
+      ),
     );
 
     this.gatewayService.onListReordered(shoppingListId, {
@@ -146,10 +144,7 @@ export class ListItemsService {
       reorderedList: updatedListItems.sort((a, b) => a.sortOrder - b.sortOrder),
     });
 
-    return {
-      ...createdListItem,
-      sortOrder: createdSortOrder,
-    };
+    return updatedListItems;
   }
 
   async update(
