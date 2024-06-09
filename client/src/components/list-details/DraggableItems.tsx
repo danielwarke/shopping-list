@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/api/api-client";
 import { Container as DraggableContainer } from "react-smooth-dnd";
 import {
+  InsertBatchListItemsDto,
   ListItem as ListItemDto,
   ReorderShoppingListDto,
 } from "@/api/client-sdk/Api";
@@ -40,6 +41,16 @@ export const DraggableItems: FC<DraggableItemsProps> = ({
     queryKey: itemsQueryKey,
     queryFn: () =>
       apiClient.shoppingLists.listItemsControllerFindAll(shoppingListId),
+  });
+
+  const insertBatchListItemsMutation = useMutation({
+    mutationFn: (data: InsertBatchListItemsDto) =>
+      apiClient.shoppingLists.listItemsControllerInsertBatch(
+        shoppingListId,
+        data,
+      ),
+    onSuccess: setItemData,
+    onError: invalidateCache,
   });
 
   const reorderListItemsMutation = useMutation({
@@ -97,6 +108,13 @@ export const DraggableItems: FC<DraggableItemsProps> = ({
     }
   }
 
+  function onBulkCreateHandler(listItem: ListItemDto, itemsToCreate: string[]) {
+    insertBatchListItemsMutation.mutate({
+      items: itemsToCreate,
+      sortOrder: listItem.sortOrder,
+    });
+  }
+
   return (
     <>
       {listItems.length === 0 && !isLoading ? (
@@ -125,6 +143,7 @@ export const DraggableItems: FC<DraggableItemsProps> = ({
                 key={listItem.id}
                 listItem={listItem}
                 onEnterKey={() => onEnterKeyHandler(listItem)}
+                onBulkCreate={(items) => onBulkCreateHandler(listItem, items)}
                 previousId={filteredListItems[index - 1]?.id}
                 searchApplied={search.length > 0}
               />
