@@ -111,6 +111,7 @@ export const ListItem: FC<ListItemProps> = ({
         onBlur={() => setIsFocused(false)}
         placeholder="List item"
         fullWidth
+        multiline
         margin="dense"
         variant="standard"
         InputProps={{
