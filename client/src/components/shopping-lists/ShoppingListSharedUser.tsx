@@ -40,7 +40,7 @@ export const ShoppingListSharedUser: FC<ShoppingListSharedUserProps> = ({
         open={!!anchorEl}
         onClose={handleClose}
       >
-        <MenuItem onClick={handleOpenRevokeDialog}>Revoke Access</MenuItem>
+        <MenuItem onClick={handleOpenRevokeDialog}>Remove</MenuItem>
       </Menu>
       <Tooltip title={`Shared with ${userName}`}>
         <IconButton onClick={handleMenuClick} size="small">

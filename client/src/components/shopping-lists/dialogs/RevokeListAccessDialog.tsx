@@ -77,7 +77,7 @@ export const RevokeListAccessDialog: FC<RevokeListAccessDialogProps> = ({
           error={revokeListAccessMutation.error}
         />
         <DialogContentText sx={{ marginY: "2vh" }}>
-          {`Are you sure you want to revoke ${userName}'s access from "${shoppingListName}"?`}
+          {`Are you sure you want to remove ${userName}'s access from "${shoppingListName}"?`}
         </DialogContentText>
       </DialogContent>
       <DialogActions>
@@ -87,7 +87,7 @@ export const RevokeListAccessDialog: FC<RevokeListAccessDialogProps> = ({
           onClick={() => revokeListAccessMutation.mutate({ email })}
           loading={revokeListAccessMutation.isPending}
         >
-          Revoke
+          Remove
         </LoadingButton>
       </DialogActions>
     </Dialog>
