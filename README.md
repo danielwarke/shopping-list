@@ -17,7 +17,8 @@
 ✅ Searchable lists\
 ✅ Drag and drop to reorder list items\
 ✅ Drag and drop shopping lists overview page\
-✅ Keyboard controls
+✅ Keyboard controls\
+✅ Paste multi-line text to create multiple list items
 
 
 ### Roadmap:
