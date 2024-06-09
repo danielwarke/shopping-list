@@ -15,6 +15,7 @@ import { JwtRequest } from "../types";
 import { InsertListItemDto } from "./dto/insert-list-item.dto";
 import { ReorderShoppingListDto } from "./dto/reorder-shopping-list.dto";
 import { UpdateListItemDto } from "./dto/update-list-item.dto";
+import { InsertBatchListItemsDto } from "./dto/insert-batch-list-items.dto";
 
 @Controller()
 @ApiTags("items")
@@ -53,6 +54,19 @@ export class ListItemsController {
       req.user.userId,
       shoppingListId,
       insertListItemDto,
+    );
+  }
+
+  @Post("insert/batch")
+  insertBatch(
+    @Req() req: JwtRequest,
+    @Param("shoppingListId") shoppingListId: string,
+    @Body() insertBatchListItemsDto: InsertBatchListItemsDto,
+  ) {
+    return this.listItemsService.insertBatch(
+      req.user.userId,
+      shoppingListId,
+      insertBatchListItemsDto,
     );
   }
 

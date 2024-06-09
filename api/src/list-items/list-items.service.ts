@@ -10,6 +10,7 @@ import { GatewayService } from "../gateway/gateway.service";
 import { InsertListItemDto } from "./dto/insert-list-item.dto";
 import { ReorderShoppingListDto } from "./dto/reorder-shopping-list.dto";
 import { UpdateListItemDto } from "./dto/update-list-item.dto";
+import { InsertBatchListItemsDto } from "./dto/insert-batch-list-items.dto";
 
 @Injectable()
 export class ListItemsService {
@@ -97,10 +98,31 @@ export class ListItemsService {
       },
     });
 
-    const listItems = await this.setListOrder(userId, shoppingListId);
-    const listItem = listItems.find((item) => item.id === createdListItem.id);
+    const reorderedItems = await this.setListOrder(userId, shoppingListId);
+    return reorderedItems.find((item) => item.id === createdListItem.id);
+  }
 
-    return listItem ?? createdListItem;
+  async insertBatch(
+    userId: string,
+    shoppingListId: string,
+    insertBatchListItemsDto: InsertBatchListItemsDto,
+  ): Promise<ListItem[]> {
+    const { items, sortOrder } = insertBatchListItemsDto;
+
+    await this.prisma.$transaction(
+      items.map((item) =>
+        this.prisma.listItem.create({
+          data: {
+            name: item,
+            sortOrder,
+            shoppingListId,
+            createdByUserId: userId,
+          },
+        }),
+      ),
+    );
+
+    return this.setListOrder(userId, shoppingListId);
   }
 
   private async setListOrder(userId: string, shoppingListId: string) {
