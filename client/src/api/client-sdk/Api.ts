@@ -131,6 +131,11 @@ export interface InsertListItemDto {
   sortOrder: number;
 }
 
+export interface InsertBatchListItemsDto {
+  items: string[];
+  sortOrder: number;
+}
+
 export interface ReorderItem {
   listItemId: string;
   sortOrder: number;
@@ -679,6 +684,29 @@ export class Api<
     ) =>
       this.request<ListItem, any>({
         path: `/shopping-lists/${shoppingListId}/items/insert`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags items
+     * @name ListItemsControllerInsertBatch
+     * @request POST:/shopping-lists/{shoppingListId}/items/insert/batch
+     * @secure
+     */
+    listItemsControllerInsertBatch: (
+      shoppingListId: string,
+      data: InsertBatchListItemsDto,
+      params: RequestParams = {},
+    ) =>
+      this.request<ListItem[], any>({
+        path: `/shopping-lists/${shoppingListId}/items/insert/batch`,
         method: "POST",
         body: data,
         secure: true,

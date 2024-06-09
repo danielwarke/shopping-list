@@ -21,6 +21,7 @@ import { useShoppingListContext } from "@/contexts/ShoppingListContext";
 interface ListItemProps {
   listItem: ListItemInterface;
   onEnterKey: () => void;
+  onBulkCreate: (itemsToCreate: string[]) => void;
   previousId?: string;
   searchApplied?: boolean;
 }
@@ -28,6 +29,7 @@ interface ListItemProps {
 export const ListItem: FC<ListItemProps> = ({
   listItem,
   onEnterKey,
+  onBulkCreate,
   searchApplied,
   previousId,
 }) => {
@@ -101,6 +103,25 @@ export const ListItem: FC<ListItemProps> = ({
     }
   }
 
+  async function handlePaste(e: React.ClipboardEvent) {
+    const clipboardData = e.clipboardData;
+    const textData = clipboardData.getData("Text");
+    const listItems = textData.split("\n").filter((item) => !!item);
+    // allow default behavior for single item
+    if (listItems.length < 2) {
+      return;
+    }
+    e.stopPropagation();
+    e.preventDefault();
+
+    const firstItem = listItems.shift();
+    if (firstItem) {
+      await updateListItemMutation.mutateAsync({ name: name + firstItem });
+    }
+
+    onBulkCreate(listItems);
+  }
+
   return (
     // @ts-ignore
     <Draggable key={listItemId}>
@@ -108,6 +129,7 @@ export const ListItem: FC<ListItemProps> = ({
         id={listItemId}
         value={name}
         onChange={(e) => setName(e.target.value)}
+        onPaste={handlePaste}
         onKeyDown={handleKeyDown}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
