@@ -1,4 +1,4 @@
-import { FC, KeyboardEvent, useState } from "react";
+import { FC, KeyboardEvent, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   ListItem as ListItemInterface,
@@ -23,6 +23,7 @@ interface ListItemProps {
   onEnterKey: () => void;
   onBulkCreate: (itemsToCreate: string[]) => void;
   previousId?: string;
+  nextId?: string;
   searchApplied?: boolean;
 }
 
@@ -30,8 +31,9 @@ export const ListItem: FC<ListItemProps> = ({
   listItem,
   onEnterKey,
   onBulkCreate,
-  searchApplied,
   previousId,
+  nextId,
+  searchApplied,
 }) => {
   const listItemId = listItem.id;
   const shoppingListId = listItem.shoppingListId;
@@ -41,6 +43,8 @@ export const ListItem: FC<ListItemProps> = ({
   const itemsQueryKey = getItemsQueryKey(shoppingListId);
   const { setItemDeleteData, setItemUpdateData } =
     useSetItemData(shoppingListId);
+
+  const inputRef = useRef<HTMLTextAreaElement | null>(null);
 
   function invalidateCache() {
     return queryClient.invalidateQueries({
@@ -90,6 +94,10 @@ export const ListItem: FC<ListItemProps> = ({
 
   const [isFocused, setIsFocused] = useState(false);
 
+  function focusItem(itemId: string) {
+    document.getElementById(itemId)?.focus();
+  }
+
   function handleKeyDown(e: KeyboardEvent) {
     if (e.code === "Enter" && !searchApplied) {
       e.preventDefault();
@@ -100,6 +108,30 @@ export const ListItem: FC<ListItemProps> = ({
     if (e.code === "Backspace" && name === "") {
       e.preventDefault();
       deleteListItemMutation.mutate({ fromKeyboard: true });
+    }
+
+    if (!inputRef.current) {
+      return;
+    }
+
+    const { selectionStart, selectionEnd } = inputRef.current;
+
+    if (
+      e.code === "ArrowUp" &&
+      previousId &&
+      selectionStart === 0 &&
+      selectionEnd === 0
+    ) {
+      focusItem(previousId);
+    }
+
+    if (
+      e.code === "ArrowDown" &&
+      nextId &&
+      selectionStart === name.length &&
+      selectionEnd === name.length
+    ) {
+      focusItem(nextId);
     }
   }
 
@@ -127,6 +159,7 @@ export const ListItem: FC<ListItemProps> = ({
     <Draggable key={listItemId}>
       <TextField
         id={listItemId}
+        inputRef={inputRef}
         value={name}
         onChange={(e) => setName(e.target.value)}
         onPaste={handlePaste}

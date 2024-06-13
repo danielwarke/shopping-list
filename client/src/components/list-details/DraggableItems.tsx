@@ -145,6 +145,7 @@ export const DraggableItems: FC<DraggableItemsProps> = ({
                 onEnterKey={() => onEnterKeyHandler(listItem)}
                 onBulkCreate={(items) => onBulkCreateHandler(listItem, items)}
                 previousId={filteredListItems[index - 1]?.id}
+                nextId={filteredListItems[index + 1]?.id}
                 searchApplied={search.length > 0}
               />
             ))}
