@@ -138,7 +138,11 @@ export const ListItem: FC<ListItemProps> = ({
   async function handlePaste(e: React.ClipboardEvent) {
     const clipboardData = e.clipboardData;
     const textData = clipboardData.getData("Text");
-    const listItems = textData.split("\n").filter((item) => !!item);
+    const listItems = textData
+      .split("\n")
+      .filter((item) => !!item)
+      .map((item) => item.replace("▢", ""));
+
     // allow default behavior for single item
     if (listItems.length < 2) {
       return;
