@@ -78,7 +78,7 @@ export const ShoppingListCard: FC<ShoppingListCardProps> = ({
               colorId={shoppingList.colorId}
             />
           }
-        ></CardHeader>
+        />
         <Box sx={{ cursor: "pointer" }} onClick={handleViewShoppingListClick}>
           <CardContent className="details-nav-target">
             {incompleteItemsPreview.length > 0 && (

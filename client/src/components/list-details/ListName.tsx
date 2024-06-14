@@ -35,7 +35,7 @@ export const ListName: FC = () => {
       placeholder="Shopping List Name"
       fullWidth
       inputProps={{
-        sx: { fontSize: "2em" },
+        sx: { fontSize: "1.5em" },
       }}
     />
   );
