@@ -49,7 +49,17 @@ export const DraggableItems: FC<DraggableItemsProps> = ({
         shoppingListId,
         data,
       ),
-    onSuccess: setItemData,
+    onSuccess: (items) => {
+      setItemData(items);
+      let newestItem = items[0];
+      for (const item of items) {
+        if (item.createdAt > newestItem.createdAt) {
+          newestItem = item;
+        }
+      }
+
+      setTimeout(() => document.getElementById(newestItem.id)?.focus());
+    },
     onError: invalidateCache,
   });
 

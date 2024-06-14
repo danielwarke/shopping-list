@@ -110,16 +110,17 @@ export class ListItemsService {
     const { items, sortOrder } = insertBatchListItemsDto;
 
     await this.prisma.$transaction(
-      items.map((item) =>
-        this.prisma.listItem.create({
+      items.map((item, index) => {
+        return this.prisma.listItem.create({
           data: {
             name: item,
             sortOrder,
             shoppingListId,
             createdByUserId: userId,
+            createdAt: new Date(Date.now() + index),
           },
-        }),
-      ),
+        });
+      }),
     );
 
     return this.setListOrder(userId, shoppingListId);
