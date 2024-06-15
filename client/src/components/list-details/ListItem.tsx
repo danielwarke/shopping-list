@@ -224,7 +224,7 @@ export const ListItem: FC<ListItemProps> = ({
           ),
           sx: {
             ...(listItem.header && {
-              fontSize: "1.75em",
+              fontSize: "1.25em",
               paddingX: 0,
               backgroundColor: "rgba(0, 0, 0, 0.15)",
               borderRadius: "4px",
