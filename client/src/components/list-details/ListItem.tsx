@@ -1,10 +1,5 @@
 import { FC, KeyboardEvent, useRef, useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  ListItem as ListItemInterface,
-  UpdateListItemDto,
-} from "@/api/client-sdk/Api";
-import { apiClient } from "@/api/api-client";
+import { ListItem as ListItemInterface } from "@/api/client-sdk/Api";
 import { useDebounceState } from "@/hooks/use-debounce-state";
 import { Checkbox, IconButton, InputAdornment, TextField } from "@mui/material";
 import {
@@ -14,82 +9,45 @@ import {
   TextIncrease,
 } from "@mui/icons-material";
 import { Draggable } from "react-smooth-dnd";
-import { getItemsQueryKey } from "@/api/query-keys";
-import { useSetItemData } from "@/hooks/use-set-item-data";
 import { useShoppingListContext } from "@/contexts/ShoppingListContext";
+import {
+  useDeleteListItemMutation,
+  useUpdateListItemMutation,
+} from "@/api/mutation-hooks/list-item";
 
 interface ListItemProps {
   listItem: ListItemInterface;
-  onEnterKey: () => void;
+  onCreate: (name?: string) => void;
   onBulkCreate: (itemsToCreate: string[]) => void;
   previousId?: string;
+  previousName?: string;
   nextId?: string;
   searchApplied?: boolean;
 }
 
 export const ListItem: FC<ListItemProps> = ({
   listItem,
-  onEnterKey,
+  onCreate,
   onBulkCreate,
   previousId,
+  previousName,
   nextId,
   searchApplied,
 }) => {
   const listItemId = listItem.id;
-  const shoppingListId = listItem.shoppingListId;
   const { colorId } = useShoppingListContext();
-
-  const queryClient = useQueryClient();
-  const itemsQueryKey = getItemsQueryKey(shoppingListId);
-  const { setItemDeleteData, setItemUpdateData } =
-    useSetItemData(shoppingListId);
 
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
 
-  function invalidateCache() {
-    return queryClient.invalidateQueries({
-      queryKey: itemsQueryKey,
-    });
-  }
-
-  const updateListItemMutation = useMutation({
-    mutationFn: (data: UpdateListItemDto) =>
-      apiClient.shoppingLists.listItemsControllerUpdate(
-        shoppingListId,
-        listItemId,
-        data,
-      ),
-    onMutate: (data) => {
-      if (typeof data.name === "undefined") {
-        setItemUpdateData(listItemId, data);
-      }
-    },
-    onSuccess: (_, data) => {
-      if (typeof data.header !== "undefined") {
-        document.getElementById(listItemId)?.focus();
-      }
-    },
-    onError: invalidateCache,
-  });
-
-  const deleteListItemMutation = useMutation({
-    mutationFn: (_: { fromKeyboard: boolean }) =>
-      apiClient.shoppingLists.listItemsControllerRemove(
-        shoppingListId,
-        listItemId,
-      ),
-    onMutate: (data) => {
-      if (data.fromKeyboard && previousId && !searchApplied) {
-        document.getElementById(previousId)?.focus();
-      }
-
-      setItemDeleteData([listItemId]);
-    },
-    onError: invalidateCache,
+  const updateListItemMutation = useUpdateListItemMutation();
+  const deleteListItemMutation = useDeleteListItemMutation((fromKeyboard) => {
+    if (fromKeyboard && previousId && !searchApplied) {
+      document.getElementById(previousId)?.focus();
+    }
   });
 
   const [name, setName] = useDebounceState(listItem.name, (newName) => {
-    updateListItemMutation.mutate({ name: newName });
+    updateListItemMutation.mutate({ id: listItemId, name: newName });
   });
 
   const [isFocused, setIsFocused] = useState(false);
@@ -99,38 +57,46 @@ export const ListItem: FC<ListItemProps> = ({
   }
 
   function handleKeyDown(e: KeyboardEvent) {
-    if (e.code === "Enter" && !searchApplied) {
-      e.preventDefault();
-      e.stopPropagation();
-      onEnterKey();
-    }
-
-    if (e.code === "Backspace" && name === "") {
-      e.preventDefault();
-      deleteListItemMutation.mutate({ fromKeyboard: true });
-    }
-
     if (!inputRef.current) {
       return;
     }
 
     const { selectionStart, selectionEnd } = inputRef.current;
 
-    if (
-      e.code === "ArrowUp" &&
-      previousId &&
-      selectionStart === 0 &&
-      selectionEnd === 0
-    ) {
+    if (e.code === "Enter" && !searchApplied) {
+      e.preventDefault();
+      e.stopPropagation();
+      const selection = name.substring(selectionStart, selectionEnd);
+      const remainder = name.substring(selectionEnd);
+      if (selection || remainder) {
+        setName(name.substring(0, selectionStart));
+      }
+
+      onCreate(remainder);
+    }
+
+    const isStartSelected = selectionStart === 0 && selectionEnd === 0;
+    const isEndSelected =
+      selectionStart === name.length && selectionEnd === name.length;
+
+    if (e.code === "Backspace" && isStartSelected && previousId) {
+      e.preventDefault();
+      if (name) {
+        updateListItemMutation.mutate({
+          id: previousId,
+          name: previousName,
+          appendName: name,
+        });
+      }
+
+      deleteListItemMutation.mutate({ id: listItemId, fromKeyboard: true });
+    }
+
+    if (e.code === "ArrowUp" && previousId && isStartSelected) {
       focusItem(previousId);
     }
 
-    if (
-      e.code === "ArrowDown" &&
-      nextId &&
-      selectionStart === name.length &&
-      selectionEnd === name.length
-    ) {
+    if (e.code === "ArrowDown" && nextId && isEndSelected) {
       focusItem(nextId);
     }
   }
@@ -152,7 +118,10 @@ export const ListItem: FC<ListItemProps> = ({
 
     const firstItem = listItems.shift();
     if (firstItem) {
-      await updateListItemMutation.mutateAsync({ name: name + firstItem });
+      await updateListItemMutation.mutateAsync({
+        id: listItemId,
+        name: name + firstItem,
+      });
     }
 
     onBulkCreate(listItems);
@@ -193,6 +162,7 @@ export const ListItem: FC<ListItemProps> = ({
                   checked={listItem.complete}
                   onChange={(e) =>
                     updateListItemMutation.mutate({
+                      id: listItemId,
                       complete: e.target.checked,
                     })
                   }
@@ -207,7 +177,10 @@ export const ListItem: FC<ListItemProps> = ({
                 <IconButton
                   size="small"
                   onMouseDown={() => {
-                    updateListItemMutation.mutate({ header: !listItem.header });
+                    updateListItemMutation.mutate({
+                      id: listItemId,
+                      header: !listItem.header,
+                    });
                   }}
                 >
                   {listItem.header ? <TextDecrease /> : <TextIncrease />}
@@ -215,7 +188,10 @@ export const ListItem: FC<ListItemProps> = ({
               )}
               <IconButton
                 onClick={() =>
-                  deleteListItemMutation.mutate({ fromKeyboard: false })
+                  deleteListItemMutation.mutate({
+                    id: listItemId,
+                    fromKeyboard: false,
+                  })
                 }
               >
                 <Clear />

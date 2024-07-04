@@ -9,12 +9,13 @@ import {
   useTheme,
 } from "@mui/material";
 import { getShoppingListQueryKey } from "@/api/query-keys";
-import { ListDetails } from "@/components/list-details/ListDetails";
 import ShoppingListContextProvider, {
   emptyList,
 } from "@/contexts/ShoppingListContext";
 import AuthContextProvider from "@/contexts/AuthContext";
 import { ListDetailsNavBar } from "@/components/list-details/ListDetailsNavBar";
+import { ListName } from "@/components/list-details/ListName";
+import { DraggableItems } from "@/components/list-details/DraggableItems";
 
 export default function ShoppingListDetails() {
   const router = useRouter();
@@ -60,7 +61,14 @@ export default function ShoppingListDetails() {
               {shoppingListIsError && (
                 <Alert severity="error">Unable to load shopping list.</Alert>
               )}
-              {!!shoppingList.id && <ListDetails />}
+              {!!shoppingList.id && (
+                <>
+                  <ListName />
+                  <Box marginTop="2vh" paddingBottom="16vh">
+                    <DraggableItems />
+                  </Box>
+                </>
+              )}
             </Box>
           </Container>
         </Box>
