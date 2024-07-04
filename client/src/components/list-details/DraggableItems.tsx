@@ -1,12 +1,8 @@
-import { FC, useMemo, useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/api/api-client";
 import { Container as DraggableContainer } from "react-smooth-dnd";
-import {
-  InsertBatchListItemsDto,
-  ListItem as ListItemDto,
-  ReorderShoppingListDto,
-} from "@/api/client-sdk/Api";
+import { ListItem as ListItemDto } from "@/api/client-sdk/Api";
 import { Fab, Tooltip, Typography } from "@mui/material";
 import { getItemsQueryKey } from "@/api/query-keys";
 import { useSetItemData } from "@/hooks/use-set-item-data";
@@ -14,59 +10,25 @@ import { ListItem } from "@/components/list-details/ListItem";
 import { ListSearchBar } from "@/components/list-details/ListSearchBar";
 import { useShoppingListContext } from "@/contexts/ShoppingListContext";
 import { Add } from "@mui/icons-material";
+import {
+  useAppendListItemMutation,
+  useInsertBatchListItemsMutation,
+  useInsertListItemMutation,
+  useReorderListItemsMutation,
+} from "@/api/mutation-hooks/list-item";
+import { createId } from "@paralleldrive/cuid2";
 
-interface DraggableItemsProps {
-  appendListItem: () => void;
-  insertListItem: (data: { sortOrder: number; index: number }) => void;
-}
-
-export const DraggableItems: FC<DraggableItemsProps> = ({
-  appendListItem,
-  insertListItem,
-}) => {
+export const DraggableItems = () => {
   const { id: shoppingListId, colorId } = useShoppingListContext();
-  const queryClient = useQueryClient();
   const itemsQueryKey = getItemsQueryKey(shoppingListId);
   const { setItemData } = useSetItemData(shoppingListId);
 
   const [search, setSearch] = useState("");
 
-  function invalidateCache() {
-    queryClient.invalidateQueries({
-      queryKey: itemsQueryKey,
-    });
-  }
-
   const { data: listItems = [], isLoading } = useQuery({
     queryKey: itemsQueryKey,
     queryFn: () =>
       apiClient.shoppingLists.listItemsControllerFindAll(shoppingListId),
-  });
-
-  const insertBatchListItemsMutation = useMutation({
-    mutationFn: (data: InsertBatchListItemsDto) =>
-      apiClient.shoppingLists.listItemsControllerInsertBatch(
-        shoppingListId,
-        data,
-      ),
-    onSuccess: (items) => {
-      setItemData(items);
-      let newestItem = items[0];
-      for (const item of items) {
-        if (item.createdAt > newestItem.createdAt) {
-          newestItem = item;
-        }
-      }
-
-      setTimeout(() => document.getElementById(newestItem.id)?.focus());
-    },
-    onError: invalidateCache,
-  });
-
-  const reorderListItemsMutation = useMutation({
-    mutationFn: (data: ReorderShoppingListDto) =>
-      apiClient.shoppingLists.listItemsControllerReorder(shoppingListId, data),
-    onError: invalidateCache,
   });
 
   const filteredListItems = useMemo(() => {
@@ -80,6 +42,30 @@ export const DraggableItems: FC<DraggableItemsProps> = ({
       return listItem.name.toLowerCase().includes(searchValue);
     });
   }, [listItems, search]);
+
+  const appendListItemMutation = useAppendListItemMutation();
+  const insertListItemMutation = useInsertListItemMutation();
+  const insertBatchListItemsMutation = useInsertBatchListItemsMutation();
+  const reorderListItemsMutation = useReorderListItemsMutation();
+
+  function appendListItem() {
+    appendListItemMutation.mutate({
+      id: createId(),
+    });
+  }
+
+  function onEnterKeyHandler(listItem: ListItemDto) {
+    const listIndex = listItems.findIndex((item) => item.id === listItem.id);
+    if (listIndex === listItems.length - 1) {
+      appendListItem();
+    } else {
+      insertListItemMutation.mutate({
+        id: createId(),
+        sortOrder: listItem.sortOrder,
+        index: listIndex,
+      });
+    }
+  }
 
   function onDropHandler({
     removedIndex,
@@ -104,25 +90,6 @@ export const DraggableItems: FC<DraggableItemsProps> = ({
     }));
 
     reorderListItemsMutation.mutate({ order: updatedOrder });
-  }
-
-  function onEnterKeyHandler(listItem: ListItemDto) {
-    const listIndex = listItems.findIndex((item) => item.id === listItem.id);
-    if (listIndex === listItems.length - 1) {
-      appendListItem();
-    } else {
-      insertListItem({
-        sortOrder: listItem.sortOrder,
-        index: listIndex,
-      });
-    }
-  }
-
-  function onBulkCreateHandler(listItem: ListItemDto, itemsToCreate: string[]) {
-    insertBatchListItemsMutation.mutate({
-      items: itemsToCreate,
-      sortOrder: listItem.sortOrder,
-    });
   }
 
   return (
@@ -153,7 +120,12 @@ export const DraggableItems: FC<DraggableItemsProps> = ({
                 key={listItem.id}
                 listItem={listItem}
                 onEnterKey={() => onEnterKeyHandler(listItem)}
-                onBulkCreate={(items) => onBulkCreateHandler(listItem, items)}
+                onBulkCreate={(items) =>
+                  insertBatchListItemsMutation.mutate({
+                    items,
+                    sortOrder: listItem.sortOrder,
+                  })
+                }
                 previousId={filteredListItems[index - 1]?.id}
                 nextId={filteredListItems[index + 1]?.id}
                 searchApplied={search.length > 0}
