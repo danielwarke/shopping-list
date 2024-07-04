@@ -20,6 +20,7 @@ interface ListItemProps {
   onCreate: (name?: string) => void;
   onBulkCreate: (itemsToCreate: string[]) => void;
   previousId?: string;
+  previousName?: string;
   nextId?: string;
   searchApplied?: boolean;
 }
@@ -29,6 +30,7 @@ export const ListItem: FC<ListItemProps> = ({
   onCreate,
   onBulkCreate,
   previousId,
+  previousName,
   nextId,
   searchApplied,
 }) => {
@@ -73,26 +75,28 @@ export const ListItem: FC<ListItemProps> = ({
       onCreate(remainder);
     }
 
-    if (e.code === "Backspace" && name === "") {
+    const isStartSelected = selectionStart === 0 && selectionEnd === 0;
+    const isEndSelected =
+      selectionStart === name.length && selectionEnd === name.length;
+
+    if (e.code === "Backspace" && isStartSelected && previousId) {
       e.preventDefault();
+      if (name) {
+        updateListItemMutation.mutate({
+          id: previousId,
+          name: previousName,
+          appendName: name,
+        });
+      }
+
       deleteListItemMutation.mutate({ id: listItemId, fromKeyboard: true });
     }
 
-    if (
-      e.code === "ArrowUp" &&
-      previousId &&
-      selectionStart === 0 &&
-      selectionEnd === 0
-    ) {
+    if (e.code === "ArrowUp" && previousId && isStartSelected) {
       focusItem(previousId);
     }
 
-    if (
-      e.code === "ArrowDown" &&
-      nextId &&
-      selectionStart === name.length &&
-      selectionEnd === name.length
-    ) {
+    if (e.code === "ArrowDown" && nextId && isEndSelected) {
       focusItem(nextId);
     }
   }

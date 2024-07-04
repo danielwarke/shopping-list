@@ -117,22 +117,27 @@ export const DraggableItems = () => {
             lockAxis="y"
             onDrop={onDropHandler}
           >
-            {filteredListItems.map((listItem, index) => (
-              <ListItem
-                key={listItem.id}
-                listItem={listItem}
-                onCreate={(name) => onCreateHandler(listItem, name)}
-                onBulkCreate={(items) =>
-                  insertBatchListItemsMutation.mutate({
-                    items,
-                    sortOrder: listItem.sortOrder,
-                  })
-                }
-                previousId={filteredListItems[index - 1]?.id}
-                nextId={filteredListItems[index + 1]?.id}
-                searchApplied={search.length > 0}
-              />
-            ))}
+            {filteredListItems.map((listItem, index) => {
+              const previousItem = filteredListItems[index - 1];
+
+              return (
+                <ListItem
+                  key={listItem.id}
+                  listItem={listItem}
+                  onCreate={(name) => onCreateHandler(listItem, name)}
+                  onBulkCreate={(items) =>
+                    insertBatchListItemsMutation.mutate({
+                      items,
+                      sortOrder: listItem.sortOrder,
+                    })
+                  }
+                  previousId={previousItem?.id}
+                  previousName={previousItem?.name}
+                  nextId={filteredListItems[index + 1]?.id}
+                  searchApplied={search.length > 0}
+                />
+              );
+            })}
           </DraggableContainer>
         </>
       )}

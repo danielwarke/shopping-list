@@ -11,8 +11,14 @@ export function useUpdateListItemMutation() {
   const invalidateCache = useInvalidateListItemsCache(shoppingListId);
 
   return useMutation({
-    mutationFn: (data: UpdateListItemDto & { id: string }) => {
-      const { id, ...rest } = data;
+    mutationFn: (
+      data: UpdateListItemDto & { id: string; appendName?: string },
+    ) => {
+      const { id, appendName, ...rest } = data;
+      if (appendName) {
+        rest.name = (rest.name || "") + appendName;
+      }
+
       return apiClient.shoppingLists.listItemsControllerUpdate(
         shoppingListId,
         id,
@@ -20,14 +26,26 @@ export function useUpdateListItemMutation() {
       );
     },
     onMutate: (data) => {
-      const { id, ...rest } = data;
-      if (typeof rest.name === "undefined") {
-        setItemUpdateData(id, data);
+      const { id, appendName, ...rest } = data;
+      let selection: number | undefined;
+      if (appendName) {
+        const originalName = rest.name || "";
+        selection = originalName.length;
+        rest.name = originalName + appendName;
       }
+
+      setItemUpdateData(id, rest);
+      return selection;
     },
-    onSuccess: (_, data) => {
+    onSuccess: (_, data, selection) => {
+      const el = document.getElementById(data.id) as HTMLInputElement | null;
       if (typeof data.header !== "undefined") {
-        document.getElementById(data.id)?.focus();
+        el?.focus();
+      }
+
+      if (typeof selection !== "undefined") {
+        el?.focus();
+        el?.setSelectionRange(selection, selection);
       }
     },
     onError: invalidateCache,
