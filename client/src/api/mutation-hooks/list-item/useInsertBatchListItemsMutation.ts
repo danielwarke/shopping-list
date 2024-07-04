@@ -25,7 +25,14 @@ export function useInsertBatchListItemsMutation() {
         }
       }
 
-      setTimeout(() => document.getElementById(newestItem.id)?.focus());
+      setTimeout(() => {
+        const len = newestItem.name.length;
+        const el = document.getElementById(
+          newestItem.id,
+        ) as HTMLInputElement | null;
+        el?.focus();
+        el?.setSelectionRange(len, len);
+      });
     },
     onError: invalidateCache,
   });
