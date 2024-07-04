@@ -17,7 +17,7 @@ import {
 
 interface ListItemProps {
   listItem: ListItemInterface;
-  onEnterKey: () => void;
+  onCreate: (name?: string) => void;
   onBulkCreate: (itemsToCreate: string[]) => void;
   previousId?: string;
   nextId?: string;
@@ -26,7 +26,7 @@ interface ListItemProps {
 
 export const ListItem: FC<ListItemProps> = ({
   listItem,
-  onEnterKey,
+  onCreate,
   onBulkCreate,
   previousId,
   nextId,
@@ -55,22 +55,28 @@ export const ListItem: FC<ListItemProps> = ({
   }
 
   function handleKeyDown(e: KeyboardEvent) {
+    if (!inputRef.current) {
+      return;
+    }
+
+    const { selectionStart, selectionEnd } = inputRef.current;
+
     if (e.code === "Enter" && !searchApplied) {
       e.preventDefault();
       e.stopPropagation();
-      onEnterKey();
+      const selection = name.substring(selectionStart, selectionEnd);
+      const remainder = name.substring(selectionEnd);
+      if (selection || remainder) {
+        setName(name.substring(0, selectionStart));
+      }
+
+      onCreate(remainder);
     }
 
     if (e.code === "Backspace" && name === "") {
       e.preventDefault();
       deleteListItemMutation.mutate({ id: listItemId, fromKeyboard: true });
     }
-
-    if (!inputRef.current) {
-      return;
-    }
-
-    const { selectionStart, selectionEnd } = inputRef.current;
 
     if (
       e.code === "ArrowUp" &&

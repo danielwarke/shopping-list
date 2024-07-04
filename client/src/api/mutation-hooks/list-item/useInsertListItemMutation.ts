@@ -12,10 +12,18 @@ export function useInsertListItemMutation() {
   const invalidateCache = useInvalidateListItemsCache(shoppingListId);
 
   return useMutation({
-    mutationFn: (data: { id: string; sortOrder: number; index: number }) =>
+    mutationFn: (data: {
+      id: string;
+      name?: string;
+      sortOrder: number;
+      index: number;
+    }) =>
       apiClient.shoppingLists.listItemsControllerInsert(shoppingListId, data),
     onMutate: (data) => {
       const listItem = generateListItem(data.id, userId, shoppingListId);
+      if (data.name) {
+        listItem.name = data.name;
+      }
 
       setItemData((currentData) => {
         const newData = [...currentData];

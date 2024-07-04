@@ -13,10 +13,14 @@ export function useAppendListItemMutation() {
   const invalidateCache = useInvalidateListItemsCache(shoppingListId);
 
   return useMutation({
-    mutationFn: (data: { id: string }) =>
+    mutationFn: (data: { id: string; name?: string }) =>
       apiClient.shoppingLists.listItemsControllerAppend(shoppingListId, data),
     onMutate: (data) => {
       const listItem = generateListItem(data.id, userId, shoppingListId);
+      if (data.name) {
+        listItem.name = data.name;
+      }
+
       setItemAppendedData(listItem);
       setTimeout(() => document.getElementById(data.id)?.focus());
     },

@@ -48,19 +48,21 @@ export const DraggableItems = () => {
   const insertBatchListItemsMutation = useInsertBatchListItemsMutation();
   const reorderListItemsMutation = useReorderListItemsMutation();
 
-  function appendListItem() {
+  function appendListItem(name?: string) {
     appendListItemMutation.mutate({
       id: createId(),
+      name,
     });
   }
 
-  function onEnterKeyHandler(listItem: ListItemDto) {
+  function onCreateHandler(listItem: ListItemDto, name?: string) {
     const listIndex = listItems.findIndex((item) => item.id === listItem.id);
     if (listIndex === listItems.length - 1) {
-      appendListItem();
+      appendListItem(name);
     } else {
       insertListItemMutation.mutate({
         id: createId(),
+        name,
         sortOrder: listItem.sortOrder,
         index: listIndex,
       });
@@ -119,7 +121,7 @@ export const DraggableItems = () => {
               <ListItem
                 key={listItem.id}
                 listItem={listItem}
-                onEnterKey={() => onEnterKeyHandler(listItem)}
+                onCreate={(name) => onCreateHandler(listItem, name)}
                 onBulkCreate={(items) =>
                   insertBatchListItemsMutation.mutate({
                     items,
@@ -138,7 +140,7 @@ export const DraggableItems = () => {
         <Fab
           color={colorId ? "default" : "primary"}
           sx={{ position: "fixed", bottom: "2em", right: "2em" }}
-          onClick={appendListItem}
+          onClick={() => appendListItem()}
           disabled={search.length > 0}
         >
           <Add />
